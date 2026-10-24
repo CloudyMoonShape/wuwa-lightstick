@@ -1,50 +1,69 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="data:,"><meta name="theme-color" content="#101315"><meta name="description" content="免费的鸣潮应援棒网页遥控器。连接蓝牙，选颜色、调亮度、玩灯效。"><title>鸣潮应援棒遥控器</title><link rel="stylesheet" href="style.css"></head><body><main>
-<header><h1>鸣潮应援棒 <span>遥控器</span></h1><a href="principles.html">原理与开发 ↗</a></header>
-<section class="panel" id="playground">
-<div class="connection"><button id="connect" class="primary">连接应援棒</button><button id="blackout">关灯</button><div class="preview" aria-label="灯光颜色预览"><span id="orb"></span><span><strong id="effectName">常亮</strong><small id="mode">屏幕预览</small></span></div></div>
-<p id="status" role="status" aria-live="polite">未连接 · 可先试颜色和灯效</p>
-<p class="note setup">装好电池 → 连接 JFKJ 设备 → 等蓝灯闪完</p>
-<div class="swatches" id="swatches"></div><div class="row colorrow"><label for="color">自选</label><input type="color" id="color" value="#00e5ff"><label for="bright">亮度</label><input type="range" id="bright" min="0" max="100" value="100"><output id="brightv">100%</output></div>
-<div class="wheel-layout"><canvas id="wheel" width="200" height="200" aria-label="色轮：拖动选择色相和饱和度，下方滑块可用键盘操作"></canvas><div class="wheel-controls"><div class="row"><label for="wheelHue">色相</label><input id="wheelHue" type="range" min="0" max="359" value="0"><output id="wheelHueValue"></output></div><div class="row"><label for="wheelSat">浓度</label><input id="wheelSat" type="range" min="0" max="100" value="100"><output id="wheelSatValue"></output></div><p class="note">观感混色 · 保持纯色与明暗变化</p><div class="row"><label for="yellowGreen">黄色中的绿</label><input type="range" id="yellowGreen" min="16" max="255" value="96"><output id="yellowValue">96</output></div><p class="note">黄色发绿就往左调，偏橙就往右调。96 是试调起点，尚非实测校准。</p><p id="outputRgb" class="note"></p></div></div>
-<div class="sectionhead effectshead"><h2>灯效</h2><div class="row speedrow"><label for="speed">速度</label><input type="range" id="speed" min="10" max="300" value="100"><output id="speedv">1.0×</output></div></div><div class="grid" id="effects"></div>
-<label class="flash"><input id="flashConsent" type="checkbox"> 启用快速闪光（对闪光敏感请勿开启）</label><p id="flashNote" class="note" role="status"></p>
-<p class="compat" id="compat">连接请用桌面 Chrome / Edge 或 Android Chrome，保持页面在前台。无设备也能预览。</p></section>
-  <details class="panel" id="sound"><summary>音乐律动 <span>本地音乐 / 麦克风</span></summary>
-    <div class="sectionhead"><h2>选择音源</h2><button id="stopAudio">停止音源</button></div><p class="note">选择一首本地音乐，或让麦克风听见周围的声音。音频只在你的浏览器中处理。</p>
-    <div class="row">
-      <label>音源</label>
-      <button id="srcFile">本地音乐文件</button>
-      <button id="srcTab">共享标签页声音</button>
-      <button id="srcMic">麦克风</button>
-      <input type="file" id="file" accept="audio/*" hidden>
-      <span id="srcInfo" class="note" style="margin:0"></span>
-    </div>
-    <audio id="player" controls style="width:100%; margin-top:12px; display:none"></audio>
-    <canvas id="meter" width="900" height="80"></canvas>
-    <div class="grid" id="music" style="margin-top:12px"></div>
-    <div style="display:grid; gap:10px; margin-top:12px">
-      <div class="row"><label for="sens">灵敏</label><input type="range" id="sens" min="20" max="300" value="100"><span id="sensv">1.0×</span></div>
-      <div class="row"><label for="sync">同步</label><input type="range" id="sync" min="0" max="400" value="120"><span id="syncv">120 ms</span>
-        <button id="autoSync">估算同步</button></div>
-    </div>
-    <p class="note">「同步」把音乐播放推迟这么多毫秒，帮助调整灯光与声音的同步；只对本地文件和共享标签页有效（麦克风收到的是已经放出来的声音，没法推迟）。同步值仅为估算，可按实际观感微调。</p>
-  </details>
-
-  <details class="panel"><summary>白平衡校准 <span>调整灯珠偏色</span></summary>
-    <h2>手动通道修正</h2><label><input type="checkbox" id="useGains"> 应用下面的旧增益（默认不启用，数值保留）</label>
-    <div style="display:grid; gap:10px">
-      <div class="row"><label for="gainR">红</label><input type="range" id="gainR" min="5" max="100" value="100"><span id="gainRv"></span></div>
-      <div class="row"><label for="gainG">绿</label><input type="range" id="gainG" min="5" max="100" value="100"><span id="gainGv"></span></div>
-      <div class="row"><label for="gainB">蓝</label><input type="range" id="gainB" min="5" max="100" value="100"><span id="gainBv"></span></div>
-      <div class="row">
-        <button id="calY">校准：黄</button><button id="calC">校准：青</button><button id="calM">校准：品红</button>
-        <button id="calReset">恢复 100%</button>
-      </div>
-    </div>
-    <p class="note">点一个校准色，调滑块直到棒子看起来就是黄 / 青 / 品红。偏橙就降红，偏绿就降绿。设置存在这个浏览器里。三色相等（白、灰）时固件走单独的白光灯珠，不受白平衡影响。核对预设色时请先恢复 100%；旧的通道衰减会改变混色，例如降低红色会让橙色偏绿。</p>
-  </details>
-
-<details class="panel"><summary>连接帮助 <span>找不到设备？</span></summary><p>先确认棒子已装好电池，并关闭其他正在连接它的网页或程序。在浏览器弹窗中选择名称以 JFKJ 开头的设备。连接成功后会闪蓝灯，约一秒后即可使用。</p><p>若找不到设备，请确认系统蓝牙与浏览器蓝牙权限已开启，靠近棒子后重试。连接中断后可点「重新连接」。断开连接不保证棒子熄灭，需要时请使用实体电源开关。</p></details>
-<details class="panel diagnostics"><summary>连接详情 <span>排查问题时展开</span></summary><p class="note">发送帧率 <span id="fps">–</span> fps · 单帧发送耗时 <span id="rtt">–</span> ms（含软件限速，非设备回执延迟）</p><pre id="log"></pre></details>
-<footer><span>共鸣 · CloudyMoonShape · 非官方社区实验项目</span><a href="principles.html">探索原理与协议 ↗</a><p>免费使用与分享 · <a href="LICENSE.txt">社区源码许可</a> · 禁止销售、付费托管及付费捆绑。音频仅本机处理。</p></footer></main><script type="module" src="app.js"></script></body></html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:,"><meta name="theme-color" content="#101113">
+<meta name="description" content="共鸣 · 鸣潮应援棒遥控器。打开网页，连接蓝牙，让颜色与音乐握在手里。">
+<title>共鸣 · 鸣潮应援棒</title><link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip" href="#playground">跳到遥控器</a>
+<main>
+<header class="masthead">
+  <div class="identity"><svg class="mark" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M6 20V12M12.5 26V6M19.5 26V6M26 20V12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg><h1>共鸣</h1><span class="identity-note">鸣潮应援棒</span></div>
+  <a class="text-link" href="principles.html">原理与开发 <span aria-hidden="true">↗</span></a>
+</header>
+<section class="instrument" id="playground" aria-label="应援棒遥控器">
+  <div class="connection">
+    <div class="connection-state"><span class="status-light" aria-hidden="true"></span><p id="status" role="status" aria-live="polite">未连接，可先试玩</p></div>
+    <div class="connection-actions"><button id="connect" class="primary">连接应援棒</button><button id="blackout" class="power" aria-label="关灯" title="关灯"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v9M6.3 6.7a8 8 0 1 0 11.4 0"/></svg></button></div>
+  </div>
+  <div class="controls">
+    <section class="color-panel" aria-labelledby="colorHeading">
+      <div class="sectionhead"><h2 id="colorHeading">色彩</h2><label class="custom-color" for="color"><span id="colorName">自选</span><input type="color" id="color" value="#00e5ff" aria-label="自选颜色"></label></div>
+      <div class="dial"><div class="dial-ring" aria-hidden="true"></div><canvas id="wheel" width="520" height="520" aria-label="色轮：拖动选择颜色，或展开精细调色使用滑块"></canvas></div>
+      <div class="swatches" id="swatches" role="group" aria-label="快捷颜色"></div>
+      <div class="control-block"><div class="control-label"><label for="bright">亮度</label><output id="brightv" for="bright">100%</output></div><input type="range" id="bright" min="0" max="100" value="100"></div>
+      <details class="fine-color"><summary>精细调色</summary><div class="detail-body"><div class="row"><label for="wheelHue">色相</label><input id="wheelHue" type="range" min="0" max="359" value="0"><output id="wheelHueValue" for="wheelHue"></output></div><div class="row"><label for="wheelSat">浓度</label><input id="wheelSat" type="range" min="0" max="100" value="100"><output id="wheelSatValue" for="wheelSat"></output></div></div></details>
+    </section>
+    <section class="effects-panel" aria-labelledby="effectsHeading">
+      <div class="sectionhead"><h2 id="effectsHeading">灯效</h2><div class="preview" aria-label="灯光预览"><span id="orb" aria-hidden="true"></span><strong id="effectName">常亮</strong><span id="mode" class="sr-only">屏幕预览</span></div></div>
+      <div class="effect-grid" id="effects" role="group" aria-label="灯效"></div>
+      <div class="control-block speed-control"><div class="control-label"><label for="speed">速度</label><output id="speedv" for="speed">1.0×</output></div><input type="range" id="speed" min="10" max="300" value="100"></div>
+      <details class="flash-options" id="flashing"><summary>闪光灯效</summary><div class="detail-body"><label class="check"><input id="flashConsent" type="checkbox"> 允许快速闪光</label><p class="note">对闪光敏感请勿开启。</p><div class="effect-grid compact" id="flashEffects" role="group" aria-label="闪光灯效"></div></div></details>
+      <p id="flashNote" class="note feedback" role="status"></p>
+      <details id="sound"><summary><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4m4-7v10m4-14v18m4-14v10m4-7v4"/></svg>音乐律动</summary>
+        <div class="detail-body">
+          <div class="audio-sources"><button id="srcFile">音乐文件</button><button id="srcTab">标签页</button><button id="srcMic">麦克风</button><input type="file" id="file" accept="audio/*" hidden></div>
+          <div class="audio-state"><span id="srcInfo" role="status">选择音源</span><button id="stopAudio" class="quiet">停止</button></div>
+          <audio id="player" controls hidden></audio><canvas id="meter" width="900" height="80" aria-label="音频频谱"></canvas>
+          <div class="effect-grid compact" id="music" role="group" aria-label="音乐灯效"></div>
+          <div class="row"><label for="sens">灵敏度</label><input type="range" id="sens" min="20" max="300" value="100"><output id="sensv" for="sens">1.0×</output></div>
+          <details class="audio-timing"><summary>声音同步</summary><div class="detail-body"><div class="row"><label for="sync">延后</label><input type="range" id="sync" min="0" max="400" value="120"><output id="syncv" for="sync">120 ms</output></div><button id="autoSync" class="quiet">估算延迟</button><p class="note">推迟音乐以贴合灯光，仅适用于文件和标签页。估算后可按观感微调。</p></div></details>
+          <p class="note">音频只在本机处理。</p>
+        </div>
+      </details>
+    </section>
+  </div>
+</section>
+<p class="compat" id="compat">蓝牙连接支持电脑 Chrome / Edge、Android Chrome。</p>
+<div class="utilities">
+  <details id="calibration"><summary>颜色微调</summary><div class="detail-body">
+    <div class="row"><label for="yellowGreen">黄色中的绿</label><input type="range" id="yellowGreen" min="16" max="255" value="96"><output id="yellowValue" for="yellowGreen">96</output><button id="calY" class="quiet">试黄色</button></div>
+    <p class="note">发绿往左，偏橙往右。默认值来自观感试调。</p>
+    <details class="channel-gains"><summary>通道增益</summary><div class="detail-body">
+      <label class="check"><input type="checkbox" id="useGains"> 启用手动修正</label>
+      <div class="row"><label for="gainR">红</label><input type="range" id="gainR" min="5" max="100" value="100"><output id="gainRv" for="gainR"></output></div>
+      <div class="row"><label for="gainG">绿</label><input type="range" id="gainG" min="5" max="100" value="100"><output id="gainGv" for="gainG"></output></div>
+      <div class="row"><label for="gainB">蓝</label><input type="range" id="gainB" min="5" max="100" value="100"><output id="gainBv" for="gainB"></output></div>
+      <div class="row"><button id="calC" class="quiet">试青色</button><button id="calM" class="quiet">试品红</button><button id="calReset" class="quiet">重置增益</button></div>
+      <p class="note">数值保存在此浏览器，默认不启用。白光使用独立灯珠，不受增益影响。</p>
+    </div></details>
+  </div></details>
+  <details id="help"><summary>连接帮助</summary><div class="detail-body"><p>装好电池，在蓝牙弹窗中选择 <code>JFKJ</code> 开头的设备。蓝灯闪完后即可操纵，使用时保持网页在前台。</p><p>找不到设备时，请关闭其他已连接它的网页或程序，确认系统蓝牙与浏览器权限已开启，靠近棒子后重试。iPhone / iPad 常规浏览器只能预览。</p><p>断开连接后灯光可能保持；需要熄灭时点关灯，或使用棒子的实体开关。</p></div></details>
+  <details class="diagnostics"><summary>连接详情</summary><div class="detail-body"><p id="outputRgb"></p><p class="note">发送 <span id="fps">–</span> 帧 / 秒 · 单帧耗时 <span id="rtt">–</span> ms（含软件限速）</p><pre id="log"></pre></div></details>
+</div>
+<footer><span>CloudyMoonShape <span aria-hidden="true">·</span> 非官方社区项目</span><a href="LICENSE.txt">免费使用与分享 <span aria-hidden="true">↗</span></a></footer>
+</main>
+<script type="module" src="app.js"></script>
+</body></html>

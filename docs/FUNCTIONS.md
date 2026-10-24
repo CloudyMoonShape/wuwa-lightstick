@@ -15,7 +15,7 @@ flowchart LR
   CMD --> FA01[FA01 通知回包]
 ```
 
-[交互式字节实验台](../web/principles.html) 可以不连接设备，查看每个通道和校验值。
+[交互式字节实验台](https://wuwa-lightstick.pages.dev/principles) 可以不连接设备，查看每个通道和校验值。
 
 ## 固件入口与数据
 
@@ -58,7 +58,7 @@ flowchart LR
 | `scripts/venue_packet.py::pdu(body, key)` | body → 2 字节头、6 字节 AdvA、载荷 | 只拼字节，不生成/发送实际射频信号，不添加无线硬件处理的 CRC |
 | `scripts/phy_read.py::connect_patient(phy, baud)` | 串口对象与波特率 → 初始化连接 | 最长等待 600 秒；省去 FlashUnlock；会进行串口与外设寄存器初始化，所谓“只读”特指不写 flash |
 
-Python 脚本是原始工具，完整的开发接口和示例见 [SDK 文档](SDK.md)。广播类型、射频参数和备份哈希见 [README](../README.md)，不应把静态协议研究写成已通过现场测试。
+Python 脚本是原始工具，完整的开发接口和示例见 [SDK 文档](SDK.md)。广播类型、射频参数和备份哈希见 [硬件与协议](PROTOCOL.md)，不应把静态协议研究写成已通过现场测试。
 
 ## 下一位开发者可以补充什么
 

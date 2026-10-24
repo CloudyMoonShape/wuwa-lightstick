@@ -61,8 +61,8 @@ const smooth = x => x * x * (3 - 2 * x);
 
 const PALETTE = [
   ["纯红", "#ff0000"], ["橙色", "#ff8000"], ["黄色", "#ffff00"],
-  ["纯绿", "#00ff00"], ["青色（待确认）", "#00ffff"], ["纯蓝", "#0000ff"],
-  ["品红（待确认）", "#ff00ff"], ["粉红", "#ff2020"], ["白光", "#ffffff"],
+  ["纯绿", "#00ff00"], ["青色", "#00ffff"], ["纯蓝", "#0000ff"],
+  ["品红", "#ff00ff"], ["粉红", "#ff2020"], ["白光", "#ffffff"],
 ];
 // Quick colors and animated endpoints share the same device-oriented values.
 const namedColors = PALETTE.map(([, color]) => color);
@@ -163,6 +163,7 @@ function setSource(node, stream, audible, info) {
 async function useFile(file) {
   ensureAudio();
   const p = $("player");
+  p.hidden = false;
   if (p._url) URL.revokeObjectURL(p._url);
   p.src = p._url = URL.createObjectURL(file);
   p.style.display = "block";
@@ -198,6 +199,7 @@ async function useMic() {
 function applySync() {
   const ms = +$("sync").value;
   $("syncv").textContent = ms + " ms";
+  paintRange($("sync"));
   if (delay) delay.delayTime.setTargetAtTime(ms / 1000, actx.currentTime, 0.05);
 }
 
@@ -331,39 +333,51 @@ function loadGains() {
 function calibrate(hexColor) {
   $("color").value = hexColor; syncWheel();
   $("bright").value = 100; $("bright").oninput();
+  paintRange($("bright")); stopAudio();
   startEffect(effects[0]);
 }
 
 let running = null, raf = 0, t0 = 0, simT = 0, lastFrame = null;
+let lastPreview = "", lastOutput = "";
+const FLASH_EFFECTS = new Set(["闪烁", "频闪", "警灯", "爆闪", "彩虹跳变"]);
 
 function startEffect(fx) {
-  if (["闪烁", "频闪", "警灯", "爆闪", "彩虹跳变"].includes(fx.name) && !$("flashConsent").checked) { $("flashNote").textContent = "这种效果会快速闪光。请先勾选下方开关，或选择呼吸、渐变。"; return; }
+  if (FLASH_EFFECTS.has(fx.name) && !$("flashConsent").checked) { $("flashing").open = true; $("flashNote").textContent = "先开启「允许快速闪光」，或选择呼吸、渐变。"; return; }
   $("flashNote").textContent = "";
   $("effectName").textContent = fx.name;
   running = fx;
-  document.querySelectorAll("#effects button, #music button").forEach(b => { b.classList.toggle("on", b.dataset.name === fx.name); b.setAttribute("aria-pressed", String(b.dataset.name === fx.name)); });
+  document.querySelectorAll("[data-effect]").forEach(b => { b.classList.toggle("on", b.dataset.name === fx.name); b.setAttribute("aria-pressed", String(b.dataset.name === fx.name)); });
+  $("blackout").setAttribute("aria-pressed", String(fx.name === "关灯"));
+  $("speed").disabled = ["常亮", "关灯"].includes(fx.name) || !!fx.music;
   if (!raf) { t0 = performance.now(); raf = requestAnimationFrame(tick); }
 }
 
 function stopEffect() {
   running = null;
   cancelAnimationFrame(raf); raf = 0;
-  document.querySelectorAll("#effects button, #music button").forEach(b => b.classList.remove("on"));
+  document.querySelectorAll("[data-effect]").forEach(b => { b.classList.remove("on"); b.setAttribute("aria-pressed", "false"); });
 }
 
 function tick(now) {
   raf = requestAnimationFrame(tick);
   const dt = Math.min(0.1, (now - t0) / 1000); t0 = now;
   simT += dt * +$("speed").value / 100;
-  if (actx) { analyse(now, dt); drawMeter(); }
+  if (srcNode) { analyse(now, dt); drawMeter(); }
   const base = hexToRgb($("color").value);
   const k = +$("bright").value / 100;
   const rgb = running.fn(simT, base, dt).map(x => Math.max(0, Math.min(255, x)));
-  $("orb").style.background = `rgb(${rgb.map(x=>Math.round(x*k))})`;
-  $("orb").style.setProperty("--glow", `rgba(${rgb},.6)`);
+  const preview = rgb.map(x=>Math.round(x*k)).join();
+  if (preview !== lastPreview) {
+    $("orb").style.background = `rgb(${preview})`;
+    $("orb").style.setProperty("--glow", `rgba(${preview},.4)`);
+    lastPreview = preview;
+  }
   const out = balance(rgb, k);
-  $("outputRgb").textContent = `输出 RGB ${out.join(", ")} · ${out[0]>0 && out.every(x=>x===out[0]) ? "白光通道" : "RGB 通道"}`;
   const key = out.join();
+  if (key !== lastOutput) {
+    $("outputRgb").textContent = `输出 RGB ${out.join(", ")} · ${out[0]>0 && out.every(x=>x===out[0]) ? "白光通道" : "RGB 通道"}`;
+    lastOutput = key;
+  }
   if (client.ready && key !== lastFrame) { lastFrame = key; sendColor(out); }
 }
 
@@ -374,17 +388,34 @@ setInterval(() => {
 
 // ---- 界面 ----
 
-for (const [grid, list] of [["effects", effects], ["music", musicEffects]]) {
+const effectIcons = {
+  "常亮": '<circle cx="12" cy="12" r="5"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/>',
+  "呼吸": '<path d="M2 15c4 0 4-9 10-9s6 9 10 9M2 19h20"/>',
+  "心跳": '<path d="M2 12h5l3-8 4 16 3-8h5"/>',
+  "幻彩渐变": '<path d="M4 15a8 8 0 0 1 16 0M7 15a5 5 0 0 1 10 0M10 15a2 2 0 0 1 4 0"/>',
+  "多色渐变": '<circle cx="8" cy="12" r="5"/><circle cx="16" cy="12" r="5"/>',
+  "冰蓝流光": '<path d="M3 7h12m-7 5h13M3 17h12"/>',
+  "糖果": '<path d="m4 4 16 16M4 9l11 11M9 4l11 11"/>',
+  "呼吸变色": '<path d="M3 16c4 0 4-8 9-8s5 8 9 8M6 4h12"/>',
+  "烛光": '<path d="M12 3c1 5 6 7 6 12a6 6 0 0 1-12 0c0-3 3-6 6-12Z"/><path d="M12 13c-3 3-2 6 0 7"/>',
+};
+for (const [grid, list] of [["effects", effects.filter(fx => fx.name !== "关灯" && !FLASH_EFFECTS.has(fx.name))], ["flashEffects", effects.filter(fx => FLASH_EFFECTS.has(fx.name))], ["music", musicEffects]]) {
   for (const fx of list) {
     const b = document.createElement("button");
-    b.dataset.name = fx.name;
-    b.innerHTML = `${fx.name}<small>${fx.desc}</small>`;
+    b.dataset.name = fx.name; b.dataset.effect = "";
+    b.innerHTML = (effectIcons[fx.name] ? `<svg viewBox="0 0 24 24" aria-hidden="true">${effectIcons[fx.name]}</svg>` : "") + `<span>${fx.name}</span>`;
+    b.title = fx.desc;
     b.onclick = () => startEffect(fx);
     $(grid).append(b);
   }
 }
 $("srcFile").onclick = () => $("file").click();
-$("file").onchange = () => $("file").files[0] && useFile($("file").files[0]);
+$("file").onchange = () => {
+  const file = $("file").files[0];
+  if (file) useFile(file);
+  $("file").value = "";
+};
+$("player").onended = stopAudio;
 $("srcTab").onclick = useTab;
 $("srcMic").onclick = useMic;
 $("sync").oninput = applySync;
@@ -392,7 +423,7 @@ $("autoSync").onclick = autoSync;
 $("sens").oninput = () => { $("sensv").textContent = (+$("sens").value / 100).toFixed(1) + "×"; };
 for (const [name, c] of PALETTE) {
   const b = document.createElement("button");
-  b.className = "swatch"; b.style.background = c;
+  b.className = "swatch"; b.style.setProperty("--swatch", c); b.dataset.color = c;
   b.title = `${name} · ${c.toUpperCase()}`;
   b.setAttribute("aria-label", `选择${name} ${c.toUpperCase()}`);
   b.onclick = () => { $("color").value = c; syncWheel(); stopAudio(); startEffect(effects[0]); };
@@ -414,7 +445,10 @@ function stopAudio() {
   const stream = srcStream; srcStream = null;
   if (stream) stream.getTracks().forEach(t => t.stop());
   if (srcNode) srcNode.disconnect(); srcNode = null;
-  $("player").pause(); $("srcInfo").textContent = "音源已停止";
+  $("player").pause(); $("player").hidden = true; $("player").style.display = "none";
+  $("srcInfo").textContent = "音源已停止";
+  if (actx?.state === "running") actx.suspend().catch(error => log(error.message));
+  const meter=$("meter"); meter.getContext("2d").clearRect(0,0,meter.width,meter.height);
   for (const key of Object.keys(au)) au[key] = 0;
   if (running?.music) startEffect(effects[0]);
 }
@@ -422,15 +456,16 @@ $("stopAudio").onclick = stopAudio;
 $("blackout").onclick = () => { stopAudio(); startEffect(effects.at(-1)); };
 $("flashConsent").onchange = () => { if (!$("flashConsent").checked && ["闪烁","频闪","警灯","爆闪","彩虹跳变"].includes(running?.name)) startEffect(effects[1]); };
 if (!window.isSecureContext || !navigator.bluetooth) {
-  $("compat").textContent = "当前浏览器只能预览。连接棒子请使用支持 Web Bluetooth 的桌面 Chrome / Edge 或 Android Chrome，并通过 HTTPS 打开。iPhone / iPad 常规浏览器暂不支持连接。";
+  $("compat").textContent = "当前浏览器可试玩。蓝牙连接请用电脑 Chrome / Edge 或 Android Chrome。";
   $("connect").disabled = true;
+  $("connect").textContent = "仅预览";
 }
 if (!navigator.mediaDevices?.getDisplayMedia) $("srcTab").disabled = true;
 window.addEventListener("pagehide", () => { stopAudio(); client.disconnect(); });
 
 // Native canvas color wheel: hue around the rim, saturation toward the center.
 const wheel = $("wheel"), ctx = wheel.getContext("2d");
-const size=wheel.width, center=size/2, radius=center-3;
+const size=wheel.width, center=size/2, radius=center-14;
 const pixels=ctx.createImageData(size,size);
 for(let y=0;y<size;y++) for(let x=0;x<size;x++) {
   const dx=x-center,dy=y-center, sat=Math.hypot(dx,dy)/radius;
@@ -446,9 +481,12 @@ function syncWheel() {
   $("wheelHue").value=Math.round(selectedHue); $("wheelSat").value=Math.round(s*100);
   $("wheelHueValue").textContent=`${Math.round(selectedHue)}°`;
   $("wheelSatValue").textContent=`${Math.round(s*100)}%`;
+  $("colorName").textContent=PALETTE.find(([,color])=>color === $("color").value)?.[0] || "自选";
+  document.querySelectorAll("[data-color]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.color === $("color").value)));
+  paintRange($("wheelHue")); paintRange($("wheelSat"));
   ctx.putImageData(pixels,0,0);
   const a=(selectedHue-90)*Math.PI/180, x=center+Math.cos(a)*s*radius, y=center+Math.sin(a)*s*radius;
-  ctx.beginPath();ctx.arc(x,y,6,0,Math.PI*2);ctx.strokeStyle="#000";ctx.lineWidth=4;ctx.stroke();ctx.strokeStyle="#fff";ctx.lineWidth=2;ctx.stroke();
+  ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.strokeStyle="#18201e";ctx.lineWidth=6;ctx.stroke();ctx.strokeStyle="#fff";ctx.lineWidth=3;ctx.stroke();
 }
 function selectWheel(h,s) {
   selectedHue=((h%360)+360)%360;
@@ -466,4 +504,13 @@ $("wheelHue").oninput=()=>selectWheel(+$("wheelHue").value,+$("wheelSat").value/
 $("wheelSat").oninput=()=>selectWheel(+$("wheelHue").value,+$("wheelSat").value/100);
 $("yellowGreen").oninput=()=>{$("yellowValue").textContent=$("yellowGreen").value;lastFrame=null};
 $("useGains").onchange=()=>{lastFrame=null};
+function paintRange(input) {
+  const min=+input.min || 0, max=+input.max || 100;
+  input.style.setProperty("--fill", `${(+input.value-min)/(max-min)*100}%`);
+}
+document.querySelectorAll('input[type="range"]').forEach(input => {
+  paintRange(input); input.addEventListener("input", () => paintRange(input));
+});
+const resetGains = $("calReset").onclick;
+$("calReset").onclick=()=>{resetGains();GAIN_IDS.forEach(id=>paintRange($(id)))};
 syncWheel();
