@@ -11,7 +11,7 @@
 
 ## MoonShade 样式
 
-`web/moonshade/tokens.css` 与 `bundle.css` 是本项目采用的 MoonShade 网页样式快照。应用只复用中性配色、字阶、间距和组件结构，不分发源设计系统的内部文档或专用图像。控件颜色、色轮和实物照片属于本产品的信息内容。
+`web/moonshade/tokens.css` 与 `bundle.css` 是本项目采用的 MoonShade 网页样式快照。应用复用中性配色、字阶、间距、组件结构与原版字符画字标。字标由设计系统的原始字符矩阵生成单路径 SVG，以 142 × 33.6 的紧凑尺寸内联在页面中；不依赖终端字体或额外图片请求。不分发设计系统的内部文档。控件颜色、色轮和实物照片属于本产品的信息内容。
 
 普通开发与构建无需访问原设计系统。维护者更新快照时，可使用 `scripts/sync_moonshade.py PROJECT_DIR SKILL_REFERENCES_DIR`；只有此刷新步骤需要 `fonttools[woff]`，部署构建只使用 Python 标准库。
 

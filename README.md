@@ -2,9 +2,9 @@
 
 在浏览器里，重新点亮你的鸣潮应援棒。
 
-**[打开控制台 ↗](https://wuwa-lightstick.pages.dev/)**　[工作原理](https://wuwa-lightstick.pages.dev/principles)　[开发文档](docs/README.md)
+**[打开控制台 ↗](https://wuwa.south-wall.com/)**　[工作原理](https://wuwa.south-wall.com/principles)　[开发文档](docs/README.md)
 
-[![共鸣控制台：色轮、亮度与灯效](docs/screenshots/controller-desktop.png)](https://wuwa-lightstick.pages.dev/)
+[![共鸣控制台：色轮、亮度与灯效](docs/screenshots/controller-desktop.png)](https://wuwa.south-wall.com/)
 
 连接自己的应援棒，调色，播放灯效，跟随音乐。蓝牙控制与音频分析都在本机完成，无需账号或控制服务器。首页是一个轻量 HTML，约 30 KB gzip，样式、字体与脚本均内联；硬件照片只在原理页加载。
 

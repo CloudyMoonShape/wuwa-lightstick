@@ -15,7 +15,7 @@ flowchart LR
   CMD --> FA01[FA01 通知回包]
 ```
 
-[交互式字节实验台](https://wuwa-lightstick.pages.dev/principles) 可以不连接设备，查看每个通道和校验值。
+[交互式字节实验台](https://wuwa.south-wall.com/principles) 可以不连接设备，查看每个通道和校验值。
 
 ## 固件入口与数据
 

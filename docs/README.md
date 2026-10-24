@@ -1,6 +1,6 @@
 # 开发文档
 
-[共鸣](../README.md) · [打开控制台 ↗](https://wuwa-lightstick.pages.dev/) · [交互原理 ↗](https://wuwa-lightstick.pages.dev/principles)
+[共鸣](../README.md) · [打开控制台 ↗](https://wuwa.south-wall.com/) · [交互原理 ↗](https://wuwa.south-wall.com/principles)
 
 ## 开发与研究
 

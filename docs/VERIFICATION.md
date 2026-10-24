@@ -2,8 +2,8 @@
 
 ## 已交付
 
-- 正式网页：https://wuwa-lightstick.pages.dev/
-- 原理页：https://wuwa-lightstick.pages.dev/principles.html
+- 正式网页：https://wuwa.south-wall.com/
+- 原理页：https://wuwa.south-wall.com/principles.html
 - Cloudflare Pages 项目：wuwa-lightstick，production branch main，Direct Upload。
 - 新工作目录独立于 Project-Wuling 原件，未改变原仓库。用户随后授权创建私有源码仓库 `CloudyMoonShape/wuwa-lightstick`，首个提交使用 GitHub noreply 作者邮箱。
 
@@ -52,3 +52,9 @@
 控制台、原理页、404 采用 MoonShade 网页样式。四张样机照片进入硬件文档，原理页使用其中三张；控制台不加载照片。首页约 98 KB、gzip 估算 30 KB，字体子集内联且单独保留 OFL 许可。上述旧版体积是历史记录。
 
 四宽度、双主题、灰阶、焦点和展开状态检查及明确保留的功能性色彩例外见 [展示审查](DESIGN-AUDIT.md#moonshade-追加轮)。浏览器确认此前接受的颜色输出；此次没有重新请求麦克风、连接真实灯棒、写入 OTA 或发送射频广播。
+
+## MoonShade 字标与域名更新（2026-10-24）
+
+三个页面嵌入原版字符画字标，并核对生成路径与设计系统原件一致。四宽度、双主题视觉检查通过；404 字标焦点框收缩到内容宽度后复验通过。15 项 SDK / 混色测试保持通过。构建首页 100,585 字节，gzip 估算 30,523 字节，仍为单 HTML。
+
+新增主域名 `wuwa.south-wall.com`，Pages 项目关联该域名，DNS CNAME 指向 `wuwa-lightstick.pages.dev`。仓库仍为 private；域名配置与发布检查方法见 [部署说明](DEPLOYMENT.md)。此轮不涉及实物蓝牙操作。
