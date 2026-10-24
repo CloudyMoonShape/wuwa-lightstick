@@ -1,6 +1,6 @@
 # 到访计数
 
-页脚显示「N 位共鸣者到访」。N 是启用计数后，成功登记过的浏览器身份数；从 0 开始，不补造此前的访问量，也不表示独立人数或灯棒数量。
+页头、连接栏上方显示「N 位共鸣者到访」。N 是启用计数后，成功登记过的浏览器身份数；从 0 开始，不补造此前的访问量，也不表示独立人数或灯棒数量。
 
 ## 怎么计数
 
@@ -28,10 +28,10 @@ flowchart LR
 
 ## 接入页面
 
-页脚提供一个默认隐藏的容器：
+页头提供一个默认隐藏的容器：
 
 ```html
-<span id="visitorCount" hidden></span>
+<span id="visitorCount" class="web-body" hidden></span>
 ```
 
 加载 [web/visitors.js](../web/visitors.js) 一次即可，无导出接口、无初始化参数。源码预览可用 `<script defer src="visitors.js"></script>`；发布时将脚本原样内联到独立 `<script>` 中，避免额外脚本请求。不要让蓝牙初始化等待计数请求。

@@ -16,6 +16,8 @@ svg { width:var(--web-space-6); height:var(--web-space-6); fill:none; stroke:cur
 .product-title { display:flex; flex-direction:column; gap:var(--web-space-1); }
 .identity h1 { font-family:var(--font-sans); }
 .identity-note { color:var(--web-ink-2); white-space:nowrap; }
+.masthead-meta { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:var(--web-space-2) var(--web-space-8); }
+#visitorCount { color:var(--web-ink); font-variant-numeric:tabular-nums; white-space:nowrap; }
 .text-link { display:inline-flex; align-items:center; min-height:var(--web-space-12); white-space:nowrap; }
 .connection { display:flex; justify-content:space-between; align-items:center; gap:var(--web-space-4); margin-bottom:var(--web-space-8); }
 .connection-state { display:flex; align-items:center; gap:var(--web-space-3); min-width:0; }
@@ -100,12 +102,11 @@ button.quiet { background:transparent; color:var(--web-ink-2); padding:var(--web
 #log:empty { display:none; }
 .ms-site-footer { padding-top:var(--web-space-8); }
 .ms-footer { margin-top:var(--web-space-6); }
-.footer-meta { display:grid; gap:var(--web-space-2); }
-#visitorCount { white-space:nowrap; }
 .ms-footer a { min-height:var(--web-space-8); }
 @media(min-width:768px) { .masthead { padding-block:var(--web-space-8); } }
 @media(max-width:767px) {
   .identity { gap:var(--web-space-4); }
+  .masthead-meta { width:100%; gap:var(--web-space-2) var(--web-space-4); }
   .masthead .text-link { margin-left:auto; }
   .connection { flex-wrap:wrap; gap:var(--web-space-3); margin-bottom:var(--web-space-4); }
   .connection-state { flex-basis:100%; }
