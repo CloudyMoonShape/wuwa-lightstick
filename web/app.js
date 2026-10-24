@@ -11,7 +11,7 @@ function log(line) {
   el.scrollTop = el.scrollHeight;
 }
 
-function setStatus(text, cls = "") { $("status").textContent = text; $("status").className = cls; }
+function setStatus(text, cls = "") { $("status").textContent = text; $("status").className = "web-small " + cls; $("connectionMark").dataset.state = cls === "ok" ? "on" : cls === "err" ? "off" : "unknown"; }
 
 // Transport and frame validation are shared with developer examples through sdk.js.
 let sentFrames = 0, rttMs = 0;
@@ -265,6 +265,8 @@ function analyse(now, dt) {
   else au.pulse *= Math.exp(-dt / BEAT_DECAY_S);
 }
 
+let meterInk = getComputedStyle(document.documentElement).getPropertyValue("--web-ink").trim();
+matchMedia("(prefers-color-scheme: light)").addEventListener("change", () => { meterInk = getComputedStyle(document.documentElement).getPropertyValue("--web-ink").trim(); });
 function drawMeter() {
   const c = $("meter"), g = c.getContext("2d"), W = c.width, H = c.height;
   g.clearRect(0, 0, W, H);
@@ -273,11 +275,11 @@ function drawMeter() {
   for (let i = 0; i < n; i++) {
     const m = spec[i * step + 1] / (peaks.level / spec.length * 8 + 1e-6);
     const h = Math.min(1, Math.sqrt(m)) * (H - 8);
-    g.fillStyle = `hsl(${i / n * 300},80%,55%)`;
+    g.fillStyle = meterInk;
     g.fillRect(i * (W / n) + 1, H - h, W / n - 2, h);
   }
-  g.fillStyle = `rgba(242,193,78,${au.pulse})`;
-  g.fillRect(W - 16, 4, 12, 12);
+  g.fillStyle = meterInk;
+  if (au.pulse > 0.5) g.fillRect(W - 16, 4, 12, 12);
 }
 
 // 亮度按平方映射：LED 的 PWM 是线性的，人眼对暗部更敏感，平方后律动更有冲击感
@@ -369,7 +371,6 @@ function tick(now) {
   const preview = rgb.map(x=>Math.round(x*k)).join();
   if (preview !== lastPreview) {
     $("orb").style.background = `rgb(${preview})`;
-    $("orb").style.setProperty("--glow", `rgba(${preview},.4)`);
     lastPreview = preview;
   }
   const out = balance(rgb, k);
@@ -402,7 +403,7 @@ const effectIcons = {
 for (const [grid, list] of [["effects", effects.filter(fx => fx.name !== "关灯" && !FLASH_EFFECTS.has(fx.name))], ["flashEffects", effects.filter(fx => FLASH_EFFECTS.has(fx.name))], ["music", musicEffects]]) {
   for (const fx of list) {
     const b = document.createElement("button");
-    b.dataset.name = fx.name; b.dataset.effect = "";
+    b.className = "web-small"; b.dataset.name = fx.name; b.dataset.effect = "";
     b.innerHTML = (effectIcons[fx.name] ? `<svg viewBox="0 0 24 24" aria-hidden="true">${effectIcons[fx.name]}</svg>` : "") + `<span>${fx.name}</span>`;
     b.title = fx.desc;
     b.onclick = () => startEffect(fx);
@@ -423,7 +424,7 @@ $("autoSync").onclick = autoSync;
 $("sens").oninput = () => { $("sensv").textContent = (+$("sens").value / 100).toFixed(1) + "×"; };
 for (const [name, c] of PALETTE) {
   const b = document.createElement("button");
-  b.className = "swatch"; b.style.setProperty("--swatch", c); b.dataset.color = c;
+  b.className = "swatch web-small"; b.style.setProperty("--swatch", c); b.dataset.color = c;
   b.title = `${name} · ${c.toUpperCase()}`;
   b.setAttribute("aria-label", `选择${name} ${c.toUpperCase()}`);
   b.onclick = () => { $("color").value = c; syncWheel(); stopAudio(); startEffect(effects[0]); };
@@ -456,6 +457,7 @@ $("stopAudio").onclick = stopAudio;
 $("blackout").onclick = () => { stopAudio(); startEffect(effects.at(-1)); };
 $("flashConsent").onchange = () => { if (!$("flashConsent").checked && ["闪烁","频闪","警灯","爆闪","彩虹跳变"].includes(running?.name)) startEffect(effects[1]); };
 if (!window.isSecureContext || !navigator.bluetooth) {
+  setStatus("仅预览 · 连接请用电脑或 Android Chrome");
   $("compat").textContent = "当前浏览器可试玩。蓝牙连接请用电脑 Chrome / Edge 或 Android Chrome。";
   $("connect").disabled = true;
   $("connect").textContent = "仅预览";
@@ -486,7 +488,7 @@ function syncWheel() {
   paintRange($("wheelHue")); paintRange($("wheelSat"));
   ctx.putImageData(pixels,0,0);
   const a=(selectedHue-90)*Math.PI/180, x=center+Math.cos(a)*s*radius, y=center+Math.sin(a)*s*radius;
-  ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.strokeStyle="#18201e";ctx.lineWidth=6;ctx.stroke();ctx.strokeStyle="#fff";ctx.lineWidth=3;ctx.stroke();
+  ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue("--eink-black").trim();ctx.lineWidth=6;ctx.stroke();ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue("--eink-paper").trim();ctx.lineWidth=3;ctx.stroke();
 }
 function selectWheel(h,s) {
   selectedHue=((h%360)+360)%360;

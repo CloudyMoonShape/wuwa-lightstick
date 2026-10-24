@@ -4,118 +4,193 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" href="data:,">
-<meta name="theme-color" content="#101113">
-<meta name="description" content="从 RGB 到六字节蓝牙帧，动手了解共鸣如何控制应援棒。离线交互实验、连接流程与研究边界。">
+<meta name="color-scheme" content="dark light">
+<meta name="description" content="从 RGB 到六字节蓝牙帧，再到主控板与灯珠。共鸣的离线设色实验、实物记录与开发原理。">
 <title>原理 · 共鸣</title>
+<link rel="stylesheet" href="moonshade/tokens.css">
+<link rel="stylesheet" href="moonshade/bundle.css">
 <style>
-:root{color-scheme:dark;--bg:#101113;--surface:#17191b;--ink:#f4f2ec;--muted:#a0a6a5;--line:#303536;--accent:#8be8d2;--mono:ui-monospace,SFMono-Regular,Consolas,monospace}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.75;-webkit-font-smoothing:antialiased}a{color:inherit;text-decoration:none}a:hover{color:var(--accent)}button,input{font:inherit}button,a,input,summary{-webkit-tap-highlight-color:transparent}button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:5px}button{cursor:pointer}p{margin:0}strong{font-weight:600}code{font-family:var(--mono);font-size:.9em;color:var(--accent);overflow-wrap:anywhere}.shell{max-width:1168px;padding:0 40px;margin:auto}.site-header{height:100px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}.brand{display:inline-flex;align-items:center;gap:11px;font-size:23px;font-weight:600;letter-spacing:.06em}.brand-mark{display:flex;align-items:center;gap:3px;width:22px;height:23px}.brand-mark i{display:block;width:3px;height:12px;border-radius:3px;background:var(--accent)}.brand-mark i:nth-child(2){height:23px}.brand-mark i:nth-child(3){height:17px}.back{display:flex;align-items:center;gap:13px;font-size:14px}.back span{color:var(--accent);font-size:19px}.hero{padding:75px 0 48px;display:grid;grid-template-columns:1fr auto;align-items:end;gap:40px}h1{font-size:clamp(42px,5.8vw,70px);font-weight:500;line-height:1.18;letter-spacing:-.055em;margin:0 0 26px}.hero p{max-width:590px;font-size:16px;color:var(--muted)}.scope{font-family:var(--mono);font-size:12px;color:var(--muted);line-height:1.9;text-align:right;padding-bottom:3px;white-space:nowrap}.scope strong{font-weight:400;color:var(--ink)}h2{margin:0;font-size:27px;line-height:1.4;font-weight:500;letter-spacing:-.035em}h3{font-size:19px;font-weight:500;line-height:1.5;margin:0}.lab{border:1px solid var(--line);border-radius:18px;background:var(--surface);overflow:hidden}.lab-body{display:grid;grid-template-columns:1fr 1.2fr}.color-panel,.packet-panel{padding:30px 32px}.color-panel{border-right:1px solid var(--line)}.panel-heading{display:flex;align-items:center;justify-content:space-between;gap:20px}.panel-heading h2{font-size:19px}.panel-heading>span{font-family:var(--mono);font-size:12px;color:var(--muted)}.lamp{height:168px;display:grid;place-items:center;position:relative;overflow:hidden;isolation:isolate}.lamp:before{content:"";position:absolute;inset:12px 12%;background:radial-gradient(ellipse,rgba(255,255,255,.03),transparent 65%);z-index:-1}.bar{height:108px;width:22px;border-radius:20px;background:#ff0000;box-shadow:0 0 45px 10px #ff0000;transition:background .12s,box-shadow .12s;position:relative}.bar:after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 1px 0 0 #ffffff40,inset -1px 0 0 #00000030}.controls{margin-top:4px}label{display:grid;grid-template-columns:20px minmax(0,1fr) 34px;gap:15px;align-items:center;margin:15px 0;font-family:var(--mono);font-size:13px}.channel-r{color:#ff867c}.channel-g{color:#91d99d}.channel-b{color:#95adff}input[type=range]{width:100%;height:24px;margin:0;cursor:pointer;accent-color:currentColor}output{font-variant-numeric:tabular-nums;color:var(--ink);text-align:right}.presets{display:flex;flex-wrap:wrap;gap:7px;margin-top:24px}.presets button{display:flex;align-items:center;gap:7px;border:1px solid #3a4040;border-radius:7px;padding:6px 10px;background:transparent;color:var(--muted);font-size:12px;line-height:1.6;transition:color .15s,border-color .15s,background .15s}.presets button:before{content:"";width:6px;height:6px;flex:0 0 6px;border-radius:50%;background:var(--dot);box-shadow:0 0 0 1px #ffffff18}.presets button:hover,.presets button[aria-pressed=true]{color:var(--ink);border-color:#77817f;background:#ffffff06}.packet-panel{display:flex;flex-direction:column}.packet-note{font-size:14px;color:var(--muted);margin-top:24px;max-width:440px}.bytes{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));margin:35px 0 22px;border-top:1px solid #454d4b;border-bottom:1px solid #454d4b}.byte{text-align:center;padding:19px 0 16px;border-right:1px solid var(--line)}.byte:last-child{border-right:0}.byte strong{display:block;font:400 clamp(21px,2.6vw,30px)/1.4 var(--mono);letter-spacing:-.04em}.byte small{display:block;font-size:11px;color:var(--muted);margin-top:7px;white-space:nowrap}.byte:nth-child(3) strong{color:#91d99d}.byte:nth-child(4) strong{color:#ff867c}.byte:nth-child(5) strong{color:#95adff}.byte:last-child strong{color:var(--accent)}.formula{font-size:13px;line-height:1.8}.formula code{color:var(--ink);font-size:12px}.formula p{color:var(--muted);font-size:12px;margin-top:5px}.channel-status{display:flex;gap:9px;align-items:flex-start;margin-top:auto;padding-top:27px;font-size:13px;color:var(--accent)}.channel-status:before{content:"";width:5px;height:5px;background:currentColor;border-radius:50%;margin-top:9px;flex-shrink:0}.lab-caption{border-top:1px solid var(--line);padding:18px 32px;display:grid;grid-template-columns:1fr 1fr;gap:32px;font-size:12px;color:var(--muted)}.lab-caption strong{color:var(--ink);font-weight:400}.section{margin-top:88px}.section-head{display:flex;justify-content:space-between;align-items:baseline;gap:32px;margin-bottom:32px}.section-head p{color:var(--muted);font-size:13px;max-width:420px}.flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line)}.step{position:relative;padding:22px 22px 0 0}.step:not(:first-child){padding-left:22px;border-left:1px solid var(--line)}.step-no{font:12px var(--mono);color:var(--accent);display:block;margin-bottom:22px}.step h3{font-size:18px;margin-bottom:12px}.step p{font-size:13px;color:var(--muted);line-height:1.9}.flow-note{font-size:12px;color:var(--muted);margin-top:27px}.paths{display:grid;grid-template-columns:1fr 1fr;gap:48px}.path{border-top:1px solid var(--line);padding-top:23px}.path-heading{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:20px}.path-heading h3{font-size:23px;letter-spacing:-.035em}.path-heading span{font-size:11px;letter-spacing:.04em;color:var(--accent);border:1px solid #3d5750;padding:2px 8px;border-radius:4px;white-space:nowrap}.path p{font-size:14px;color:var(--muted);margin-top:15px}.path p:first-of-type{color:var(--ink)}.signal{display:flex;align-items:center;flex-wrap:wrap;gap:7px 9px;margin:23px 0 20px;font-size:12px;color:var(--ink)}.signal i{font-style:normal;color:#697572}.boundary{border-left:2px solid #82735b;padding-left:14px;color:#c9bb9e!important;font-size:12px!important}.evidence{margin:0;border-top:1px solid var(--line)}.evidence-row{display:grid;grid-template-columns:180px 1fr;gap:30px;padding:23px 0;border-bottom:1px solid var(--line)}.evidence dt{font-size:14px;color:var(--accent)}.evidence dd{margin:0;font-size:14px}.evidence dd p+p{font-size:12px;color:var(--muted);margin-top:7px}.reading{display:grid;grid-template-columns:220px 1fr;gap:50px}.reading h2{padding-top:18px}.details{border-top:1px solid var(--line)}details{border-bottom:1px solid var(--line)}summary{list-style:none;cursor:pointer;padding:21px 28px 21px 0;font-size:15px;position:relative}summary::-webkit-details-marker{display:none}summary:after{content:"+";font-family:var(--mono);font-size:20px;font-weight:300;color:var(--muted);position:absolute;right:0;top:17px}details[open] summary:after{content:"−"}details p{font-size:14px;color:var(--muted);padding:0 30px 24px 0;max-width:720px}details a{text-decoration:underline;text-decoration-color:#53645f;text-underline-offset:4px;color:var(--ink)}.site-footer{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;margin-top:85px;padding:28px 0 36px;border-top:1px solid var(--line);color:var(--muted);font-size:12px}.site-footer strong{display:block;font-size:16px;font-weight:500;letter-spacing:.06em;color:var(--ink);margin-bottom:7px}.site-footer a{white-space:nowrap}.skip{position:absolute;top:12px;left:16px;transform:translateY(-200%);background:var(--ink);color:var(--bg);z-index:4;padding:8px 16px}.skip:focus{transform:translateY(0)}
-@media(min-width:1200px){.hero h1 br{display:none}}@media(max-width:850px){.shell{padding:0 28px}.hero{padding-top:52px;gap:24px}.hero p{max-width:440px}.color-panel,.packet-panel{padding:25px 24px}.lab-body{grid-template-columns:1fr 1.1fr}.lab-caption{padding:18px 24px;gap:24px}.presets{gap:6px}.presets button{padding:5px 8px}.paths{gap:30px}.section-head{align-items:flex-start}.section-head p{max-width:330px}.flow{grid-template-columns:repeat(2,minmax(0,1fr));gap:28px 0}.step{padding-right:28px}.step:nth-child(3){border-left:0;padding-left:0}.step-no{margin-bottom:12px}.reading{grid-template-columns:180px 1fr;gap:30px}.evidence-row{grid-template-columns:145px 1fr;gap:25px}}
-@media(max-width:620px){.shell{padding:0 20px}.site-header{height:78px}.brand{font-size:21px}.back{font-size:13px;gap:8px}.hero{grid-template-columns:1fr;padding:45px 0 30px;gap:21px}h1{font-size:45px;margin-bottom:20px}.hero h1 br{display:block}.hero p{font-size:14px;line-height:1.85;max-width:100%}.scope{font-size:11px;text-align:left;display:flex;gap:12px}.scope br{display:none}.lab{border-radius:12px}.lab-body{grid-template-columns:1fr}.color-panel{border-right:0;border-bottom:1px solid var(--line);padding:23px 22px}.packet-panel{padding:24px 22px}.lamp{height:142px}.bar{height:88px;width:20px}.controls{margin-top:0}.presets{margin-top:20px}.presets button{padding:6px 9px}.packet-note{margin-top:17px}.bytes{margin:24px 0 18px}.byte{padding:16px 0 13px}.byte strong{font-size:26px}.byte small{font-size:10px;margin-top:5px}.channel-status{padding-top:23px}.lab-caption{grid-template-columns:1fr;gap:9px;padding:16px 22px}.section{margin-top:57px}h2{font-size:25px}.section-head{display:block;margin-bottom:23px}.section-head p{max-width:none;margin-top:13px}.step{padding:20px 19px 0 0}.step:not(:first-child){padding-left:19px}.step:nth-child(3){padding-left:0}.step h3{font-size:17px}.step p{font-size:12px}.flow-note{font-size:11px}.paths{grid-template-columns:1fr;gap:36px}.path{padding-top:20px}.path-heading{margin-bottom:17px}.path-heading h3{font-size:22px}.signal{margin:19px 0 17px}.evidence-row{grid-template-columns:1fr;gap:9px;padding:20px 0}.evidence dt{font-size:12px}.evidence dd{font-size:13px}.reading{grid-template-columns:1fr;gap:22px}.reading h2{padding:0}.site-footer{margin-top:57px;padding:25px 0 28px;font-size:11px;align-items:flex-start}.site-footer strong{font-size:15px}}
-@media(max-width:360px){.shell{padding:0 16px}h1{font-size:39px}.color-panel,.packet-panel{padding-left:18px;padding-right:18px}.lab-caption{padding-left:18px;padding-right:18px}.presets{gap:5px}.presets button{padding:5px 7px}.byte strong{font-size:23px}.byte small{font-size:9px}.signal{gap:6px}}
-@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important}}
-.brand-mark{width:28px;height:28px;color:var(--accent)}.presets button{min-height:44px;min-width:44px}input[type=range]{height:36px}
+:root{color-scheme:dark light}
+.page-head .ms-headrow{align-items:baseline}.product-name{color:var(--web-ink);text-decoration:none;white-space:nowrap}.page-head .ms-headid{align-items:baseline;gap:var(--web-space-3)}.page-head .page-name{margin:0;color:var(--web-ink-2)}.page-head .back{white-space:nowrap}.intro{padding-top:var(--web-space-6)}.intro-copy{max-width:var(--web-measure);color:var(--web-ink-2)}.intro .ms-unitline{gap:var(--web-space-2) var(--web-space-6)}.lab-column{min-width:0}.lab-heading{display:flex;align-items:baseline;justify-content:space-between;gap:var(--web-space-4);margin-bottom:var(--web-space-4)}.drive-preview{height:var(--web-space-16);background:var(--drive-color);margin-block:var(--web-space-4) var(--web-space-6)}.rgb-control{display:grid;grid-template-columns:var(--web-space-6) minmax(0,1fr) var(--web-space-12);gap:var(--web-space-4);align-items:center;margin-block:var(--web-space-2)}.rgb-control output{--digits:3}.rgb-control input{appearance:none;-webkit-appearance:none;width:100%;min-width:0;height:var(--web-space-8);margin:0;background:transparent;cursor:pointer}.rgb-control input::-webkit-slider-runnable-track{height:var(--web-space-1);background:var(--web-ink-2)}.rgb-control input::-moz-range-track{height:var(--web-space-1);background:var(--web-ink-2)}.rgb-control input::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:var(--web-space-4);height:var(--web-space-6);margin-top:calc((var(--web-space-1) - var(--web-space-6))/2);border:0;border-radius:var(--radius-none);background:var(--web-ink)}.rgb-control input::-moz-range-thumb{width:var(--web-space-4);height:var(--web-space-6);border:0;border-radius:var(--radius-none);background:var(--web-ink)}.rgb-control input:focus-visible{outline:calc(var(--web-space-1)/2) solid var(--web-focus);outline-offset:var(--web-space-1)}.rgb-presets{display:flex;flex-wrap:wrap;gap:var(--web-space-2);margin-top:var(--web-space-4)}.rgb-presets button{display:flex;align-items:center;justify-content:center;gap:var(--web-space-2);min-height:calc(var(--web-space-8) + var(--web-space-2));min-width:calc(var(--web-space-8) + var(--web-space-2));padding:var(--web-space-2) var(--web-space-1);border:0;border-radius:var(--radius-none);background:transparent;cursor:pointer;white-space:nowrap;transition:color var(--web-fade) ease-out}.rgb-presets button::before{content:"";display:block;align-self:flex-end;width:var(--web-space-1);height:var(--web-space-1);margin-bottom:var(--web-space-1);background:var(--web-dim)}.rgb-presets button[aria-pressed=true]{color:var(--web-ink)}.rgb-presets button[aria-pressed=true]::before{align-self:center;height:var(--web-space-4);margin-bottom:0;background:var(--web-ink)}.rgb-presets button:hover{color:var(--web-ink)}.packet-note{margin:0 0 var(--web-space-6)}.packet-ruler{margin-bottom:var(--web-space-2)}.bytes{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:var(--web-space-1);margin-block:var(--web-space-2) var(--web-space-6)}.byte{min-width:0;padding-block:var(--web-space-4);text-align:center;background:var(--web-surface)}.byte strong{--digits:2;display:block;min-width:0;text-align:center}.byte small{display:block;margin-top:var(--web-space-2);white-space:nowrap}.formula{overflow-wrap:anywhere}.formula p{margin:var(--web-space-2) 0 0}.channel-status{margin:var(--web-space-6) 0 0}.lab-notes{margin-top:var(--web-space-6)}.lab-notes p{margin:0}.lab-notes p+p{margin-top:var(--web-space-2)}.hardware-intro{margin-bottom:var(--web-space-6)}.hardware-grid figure{margin:0;min-width:0}.hardware-grid img{display:block;width:100%;height:auto}.hardware-grid a{display:block}.hardware-grid figcaption{margin-top:var(--web-space-2)}.hardware-grid figcaption p{margin:var(--web-space-2) 0 0}.hardware-more{min-width:0}.hardware-parts{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--ms-gutter)}.hardware-note{margin-top:var(--web-space-6)}.path p{margin:var(--web-space-4) 0 0}.path h3{margin-bottom:var(--web-space-4)}.path .ms-small{margin-top:var(--web-space-4)}.connection-list li+li{margin-top:var(--web-space-4)}.connection-note{margin-top:var(--web-space-6)}.evidence{margin:0}.evidence-row{padding-block:var(--web-space-4)}.evidence-row:first-child{padding-top:0}.evidence-row dt{margin-bottom:var(--web-space-2)}.evidence-row dd{margin:0}.evidence-row dd p{margin:0}.evidence-row dd p+p{margin-top:var(--web-space-2)}.reading summary{white-space:nowrap}.reading .ms-viewer-body{max-width:var(--web-measure)}.ms-site-footer a{white-space:nowrap}
+@media(min-width:768px){.hardware-more{grid-column:span 2}.hardware-parts{grid-template-columns:repeat(2,minmax(0,1fr))}.hardware-grid>.hardware-more{padding-inline:0}.hardware-parts>figure{padding-inline:var(--ms-hang)}}
+@media(prefers-reduced-motion:reduce){.rgb-presets button{transition:none}}
 </style>
 </head>
-<body>
-<a class="skip" href="#lab">跳到颜色实验台</a>
-<div class="shell">
-<header class="site-header">
-  <a class="brand" href="/" aria-label="共鸣，回到遥控器"><svg class="brand-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M6 20V12M12.5 26V6M19.5 26V6M26 20V12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>共鸣</a>
-  <a class="back" href="/"><span aria-hidden="true">←</span> 回到遥控器</a>
-</header>
-<main>
-  <div class="hero">
-    <div><h1>从颜色，<br>到一束光。</h1><p>一次设色，只需要六个字节。遥控器先做观感混色；这里从驱动 RGB 开始，看看颜色如何抵达灯珠。</p></div>
-    <div class="scope"><strong>HE-750G24</strong><br><span>固件 V4.1.8</span></div>
+<body class="ms-page">
+<a class="ms-skip" href="#main">跳到正文</a>
+<header class="ms-header ms-header--compact ms-wrap page-head">
+  <div class="ms-headrow">
+    <div class="ms-headid"><a class="product-name ms-h2" href="/">共鸣</a><p class="page-name ms-label">/ 原理</p></div>
+    <a class="ms-link ms-small back" href="/">回到遥控器</a>
   </div>
-
-  <section class="lab" id="lab" aria-label="颜色与蓝牙帧实验台">
-    <div class="lab-body">
-      <div class="color-panel">
-        <div class="panel-heading"><h2>驱动 RGB</h2><span>0 — 255</span></div>
-        <div class="lamp" aria-hidden="true"><div class="bar" id="lamp"></div></div>
-        <div class="controls">
-          <label class="channel-r" for="r">R<input id="r" type="range" min="0" max="255" value="255" aria-label="红色驱动值"><output id="rv" for="r">255</output></label>
-          <label class="channel-g" for="g">G<input id="g" type="range" min="0" max="255" value="0" aria-label="绿色驱动值"><output id="gv" for="g">0</output></label>
-          <label class="channel-b" for="b">B<input id="b" type="range" min="0" max="255" value="0" aria-label="蓝色驱动值"><output id="bv" for="b">0</output></label>
-        </div>
-        <div class="presets" aria-label="颜色预设">
-          <button type="button" data-rgb="255,0,0" style="--dot:#ff867c">红</button>
-          <button type="button" data-rgb="0,255,0" style="--dot:#91d99d">绿</button>
-          <button type="button" data-rgb="0,0,255" style="--dot:#95adff">蓝</button>
-          <button type="button" data-rgb="180,180,180" style="--dot:#f4f2ec">等值白</button>
-          <button type="button" data-rgb="0,0,0" style="--dot:#555e5c">熄灭</button>
-        </div>
-      </div>
-      <div class="packet-panel">
-        <div class="panel-heading"><h2>六字节指令</h2><span>FA02</span></div>
-        <p class="packet-note">先绿，再红，最后蓝。写入顺序是 <code>GRB</code>，保留字节固定为 <code>00</code>。</p>
-        <div class="bytes" id="bytes" role="group" aria-label="六字节设色帧"></div>
-        <div class="formula"><code id="formula"></code><p id="sum"></p></div>
-        <p class="channel-status" id="channel" role="status"></p>
+</header>
+<main id="main">
+  <section class="ms-section ms-wrap intro" aria-labelledby="page-title">
+    <div class="ms-verdict ms-verdict--plain ms-plate">
+      <div class="ms-verdict-body">
+        <h1 class="ms-title" id="page-title">RGB → GRB</h1>
+        <p class="intro-copy">一个颜色，六个字节。主控板接收这帧指令，再把它变成灯珠的光。</p>
+        <p class="ms-unitline"><span class="ms-unit">HE-750G24</span><span class="ms-unit">V4.1.8</span></p>
       </div>
     </div>
-    <div class="lab-caption">
-      <p><strong>等值 RGB → 独立白光。</strong>非零等值会切换白光通道，并非三色灯混白；全零关灯。</p>
-      <p>实验台在本页计算，不会连接设备。屏幕只作示意，不代表实际灯珠的亮度与色彩。</p>
+  </section>
+
+  <section class="ms-section ms-wrap" id="lab" aria-labelledby="lab-title">
+    <div class="ms-section-head"><div><span class="ms-section-label">01</span><h2 class="ms-h2" id="lab-title">颜色与字节</h2></div></div>
+    <div class="ms-grid">
+      <div class="lab-column">
+        <div class="lab-heading"><h3 class="ms-h3">驱动 RGB</h3><span class="ms-unit ms-asis">0–255</span></div>
+        <!-- This swatch is functional color data, not a MoonShade interface accent. -->
+        <div class="drive-preview" id="lamp" style="--drive-color:rgb(255,0,0)" aria-hidden="true"></div>
+        <label class="rgb-control ms-label" for="r">R<input id="r" type="range" min="0" max="255" value="255" aria-label="红色驱动值"><output class="ms-readout ms-readout--sm" id="rv" for="r">255</output></label>
+        <label class="rgb-control ms-label" for="g">G<input id="g" type="range" min="0" max="255" value="0" aria-label="绿色驱动值"><output class="ms-readout ms-readout--sm" id="gv" for="g">0</output></label>
+        <label class="rgb-control ms-label" for="b">B<input id="b" type="range" min="0" max="255" value="0" aria-label="蓝色驱动值"><output class="ms-readout ms-readout--sm" id="bv" for="b">0</output></label>
+        <div class="rgb-presets" aria-label="颜色预设">
+          <button class="ms-label" type="button" data-rgb="255,0,0" aria-pressed="true">红</button>
+          <button class="ms-label" type="button" data-rgb="0,255,0" aria-pressed="false">绿</button>
+          <button class="ms-label" type="button" data-rgb="0,0,255" aria-pressed="false">蓝</button>
+          <button class="ms-label" type="button" data-rgb="180,180,180" aria-label="等值白，RGB 均为 180" aria-pressed="false">白</button>
+          <button class="ms-label" type="button" data-rgb="0,0,0" aria-pressed="false">熄灭</button>
+        </div>
+      </div>
+      <div class="lab-column">
+        <div class="lab-heading"><h3 class="ms-h3">六字节指令</h3><span class="ms-unit">FA02</span></div>
+        <p class="packet-note ms-small">先绿，再红，最后蓝。保留字节固定为 <code>00</code>。</p>
+        <div class="ms-dim packet-ruler"><span class="ms-asis">6 bytes</span></div>
+        <div class="bytes" id="bytes" role="group" aria-label="六字节设色帧">
+          <div class="byte"><strong class="ms-readout ms-readout--sm">01</strong><small class="ms-label">命令</small></div>
+          <div class="byte"><strong class="ms-readout ms-readout--sm">00</strong><small class="ms-label">保留</small></div>
+          <div class="byte"><strong class="ms-readout ms-readout--sm">00</strong><small class="ms-label">G</small></div>
+          <div class="byte"><strong class="ms-readout ms-readout--sm">FF</strong><small class="ms-label">R</small></div>
+          <div class="byte"><strong class="ms-readout ms-readout--sm">00</strong><small class="ms-label">B</small></div>
+          <div class="byte"><strong class="ms-readout ms-readout--sm">00</strong><small class="ms-label">校验</small></div>
+        </div>
+        <div class="formula"><p class="ms-label ms-asis" id="formula">校验 = (−256) mod 256 = 0 (0x00)</p><p class="ms-small" id="sum">完整帧相加 = 256；除以 256 的余数 = 0。</p></div>
+        <p class="channel-status ms-unit" id="channel" role="status">RGB 通道</p>
+      </div>
+    </div>
+    <div class="ms-prose ms-small lab-notes"><p>遥控器先做观感混色；实验台直接封装驱动值，不重复应用混色。所有计算留在本页，不会连接设备。</p><p>非零等值 RGB 会切换到独立白光通道，并非三色混白；全零关灯。屏幕色块仅作示意，不代表实际亮度与色彩。</p></div>
+  </section>
+
+  <section class="ms-section ms-wrap" id="hardware" aria-labelledby="hardware-title">
+    <div class="ms-section-head"><div><span class="ms-section-label">02</span><h2 class="ms-h2" id="hardware-title">字节的终点</h2></div></div>
+    <div class="ms-prose hardware-intro"><p>六字节设色帧由主控板解析，最终驱动顶部的 RGBW 灯珠。下面是研究样机的装配、主控板与 LED 模组。</p></div>
+    <div class="ms-grid ms-grid--trio hardware-grid">
+      <figure>
+        <a href="assets/hardware/assembly.webp" aria-label="查看样机装配照片"><img src="assets/hardware/assembly.webp" width="960" height="1280" loading="lazy" decoding="async" alt="拆开外壳的应援棒，主控板、顶部透镜和电池仓与外壳并列"></a>
+        <figcaption class="ms-small"><span class="ms-code">FIG 02.1</span><p>样机装配：主控板位于手柄上部，灯珠在透镜下方。</p></figcaption>
+      </figure>
+      <details class="ms-fold hardware-more" id="hardware-more">
+        <summary>主控板与灯珠</summary>
+        <div class="ms-fold-body hardware-parts">
+          <figure>
+            <a href="assets/hardware/board-front.webp" aria-label="查看主控板正面照片"><img src="assets/hardware/board-front.webp" width="960" height="1280" loading="lazy" decoding="async" alt="HE-750G24 主控板正面，可见 ST17H66B 主控、按键和板载天线"></a>
+            <figcaption class="ms-small"><span class="ms-code">FIG 02.2</span><p>主控板：HE-750G24，U1 丝印 ST17H66B。</p></figcaption>
+          </figure>
+          <figure>
+            <a href="assets/hardware/led-module.webp" aria-label="查看 LED 模组照片"><img src="assets/hardware/led-module.webp" width="960" height="1280" loading="lazy" decoding="async" alt="HE-590L5 LED 模组，灯珠旁可见 B、W、正极和 R 标记"></a>
+            <figcaption class="ms-small"><span class="ms-code">FIG 02.3</span><p>LED 模组：独立白光与 RGB 通道，W 标记可见。</p></figcaption>
+          </figure>
+        </div>
+      </details>
+    </div>
+    <p class="ms-small hardware-note">实物照片用于辨认结构；白光切换逻辑来自固件分析，照片本身不承担颜色或亮度测量。</p>
+  </section>
+
+  <section class="ms-section ms-wrap" id="connection" aria-labelledby="connection-title">
+    <div class="ms-section-head"><div><span class="ms-section-label">03</span><h2 class="ms-h2" id="connection-title">连接流程</h2></div></div>
+    <div class="ms-prose">
+      <ol class="connection-list">
+        <li><strong>选择棒子。</strong>通过浏览器设备选择器连接，研究样机的广播名是 <code>JFKJ-FBFB</code>。</li>
+        <li><strong>完成握手。</strong>8 秒内向 FA02 写入口令 <code>JFKJ-20250421</code>，等待 FA01 回显确认。</li>
+        <li><strong>等蓝灯闪完。</strong>三次蓝灯约 0.9 秒；网页预留 1.2 秒，CLI 预留 1.5 秒。</li>
+        <li><strong>发送颜色。</strong>向 FA02 写入六字节设色帧，FA01 返回处理通知。</li>
+      </ol>
+      <p class="ms-small connection-note">FA02 负责写入，FA01 返回通知。共享口令来自固件明文，不是设备所有权验证。</p>
     </div>
   </section>
 
-  <section class="section" aria-labelledby="connection-title">
-    <div class="section-head"><h2 id="connection-title">连接流程</h2><p>蓝牙直接连到你选中的棒子。FA02 负责写入，FA01 返回通知。</p></div>
-    <div class="flow">
-      <div class="step"><span class="step-no">01</span><h3>选择棒子</h3><p>使用浏览器设备选择器。<br>研究样机名 <code>JFKJ-FBFB</code>。</p></div>
-      <div class="step"><span class="step-no">02</span><h3>完成握手</h3><p>8 秒内向 FA02 写入口令<br><code>JFKJ-20250421</code><br>等待 FA01 回显确认。</p></div>
-      <div class="step"><span class="step-no">03</span><h3>等蓝灯闪完</h3><p>三次蓝灯约 0.9 秒。<br>网页预留 1.2 秒，<br>CLI 预留 1.5 秒。</p></div>
-      <div class="step"><span class="step-no">04</span><h3>发送颜色</h3><p>向 FA02 写入六字节帧，<br>由 FA01 返回处理通知。</p></div>
-    </div>
-    <p class="flow-note">共享口令来自固件明文，不是设备所有权验证。</p>
-  </section>
-
-  <section class="section" aria-labelledby="paths-title">
-    <div class="section-head"><h2 id="paths-title">两条控制路径</h2></div>
-    <div class="paths">
-      <article class="path">
-        <div class="path-heading"><h3>网页灯效</h3><span>蓝牙 GATT</span></div>
-        <p>呼吸、渐变和律动，都是网页算出的一串颜色，再逐帧发送 <code>01</code> 设色指令。</p>
-        <div class="signal" aria-label="灯效数据流"><span>时间 / 音频</span><i aria-hidden="true">→</i><span>颜色与亮度</span><i aria-hidden="true">→</i><span>蓝牙</span><i aria-hidden="true">→</i><span>灯珠</span></div>
-        <p>音频频谱与低频变化用于判断节拍。蓝牙有传输延迟，本地音频可延后播放来对齐；麦克风已听到的声音无法倒回去延后。</p>
-        <p class="boundary">网页灯效不等于固件内置灯效。命令 <code>02–0c</code> 的参数与效果仍未逐项确认。</p>
-      </article>
-      <article class="path">
-        <div class="path-heading"><h3>现场广播</h3><span>静态逆向</span></div>
-        <p>固件会绕过常规 GATT，在 <code>2478 MHz</code> 接收特殊射频包，使用 RGB 顺序、另一种加和校验与 XOR 混淆。</p>
-        <p>这一链路尚未完成空口实测。普通网页蓝牙不能发送它，本项目的广播脚本只生成字节。</p>
-        <p class="boundary">不要在活动现场尝试广播。它可能影响其他棒子；类型 6 会永久改写分组号，掉电不恢复。</p>
-      </article>
+  <section class="ms-section ms-wrap" id="paths" aria-labelledby="paths-title">
+    <div class="ms-section-head"><div><span class="ms-section-label">04</span><h2 class="ms-h2" id="paths-title">两条控制路径</h2></div></div>
+    <div class="ms-grid">
+      <article class="ms-prose path"><h3 class="ms-h3">网页灯效</h3><p>呼吸、渐变和律动，都是网页算出的一串颜色，再通过蓝牙 GATT 逐帧发送 <code>01</code> 设色指令。</p><p>音频频谱与低频变化用于判断节拍。蓝牙有传输延迟，本地音频可延后播放来对齐；麦克风已听到的声音无法倒回去延后。</p><p class="ms-small">网页灯效不等于固件内置灯效。命令 <code>02–0c</code> 的参数与效果仍未逐项确认。</p></article>
+      <article class="ms-prose path"><h3 class="ms-h3">现场广播</h3><p>静态分析发现固件绕过常规 GATT，在 <code>2478 MHz</code> 接收特殊射频包，使用 RGB 顺序、另一种加和校验与 XOR 混淆。</p><p>这一链路尚未完成空口实测。普通网页蓝牙不能发送它，广播脚本只生成字节。</p><p class="ms-small">不要在活动现场尝试广播。它可能影响其他棒子；类型 6 会永久改写分组号，掉电不恢复。</p></article>
     </div>
   </section>
 
-  <section class="section" aria-labelledby="evidence-title">
-    <div class="section-head"><h2 id="evidence-title">验证范围</h2></div>
-    <dl class="evidence">
-      <div class="evidence-row"><dt>实物反馈</dt><dd><p>研究样机已测试口令握手、GRB 设色、原版网页灯效与音乐律动。新版基础颜色与观感混色已有用户实物反馈。</p><p>当前全部灯效、音频路径和时序仍未逐项验收；实物反馈不等于仪器测量，也不能外推到其他批次。</p></dd></div>
-      <div class="evidence-row"><dt>静态逆向</dt><dd><p>函数地址、射频包结构、分组号持久化。</p><p>代码分析不等于实际发射或接收测试。</p></dd></div>
-      <div class="evidence-row"><dt>仍待确认</dt><dd><p><code>02–0c</code> 的完整参数、白化实际初值，以及其他批次的兼容性。</p><p>尚不能把这些结论当作稳定接口或兼容保证。</p></dd></div>
+  <section class="ms-section ms-wrap" id="evidence" aria-labelledby="evidence-title">
+    <div class="ms-section-head"><div><span class="ms-section-label">05</span><h2 class="ms-h2" id="evidence-title">验证范围</h2></div></div>
+    <dl class="ms-prose evidence">
+      <div class="evidence-row"><dt class="ms-h3">实物反馈</dt><dd><p>研究样机已测试口令握手、GRB 设色、原版网页灯效与音乐律动。新版基础颜色与观感混色已有用户实物反馈。</p><p class="ms-small">当前全部灯效、音频路径和时序仍未逐项验收；实物反馈不等于仪器测量，也不能外推到其他批次。</p></dd></div>
+      <div class="evidence-row"><dt class="ms-h3">静态逆向</dt><dd><p>函数地址、射频包结构、分组号持久化。</p><p class="ms-small">代码分析不等于实际发射或接收测试。</p></dd></div>
+      <div class="evidence-row"><dt class="ms-h3">仍待确认</dt><dd><p><code>02–0c</code> 的完整参数、白化实际初值，以及其他批次的兼容性。</p><p class="ms-small">尚不能把这些结论当作稳定接口或兼容保证。</p></dd></div>
     </dl>
   </section>
 
-  <section class="section reading" aria-labelledby="reading-title">
-    <h2 id="reading-title">继续开发</h2>
-    <div class="details">
-      <details><summary>为什么校验是负数？</summary><p>前五个字节的和为 S，校验取 <code>(256 − (S mod 256)) mod 256</code>。加上它后，总和的低八位就是 0。这种校验只能发现部分传输错误，不能防止恶意控制。</p></details>
-      <details><summary>哪些函数在处理这六个字节？</summary><p>写回调 <code>0x1fff4290</code> 将输入复制到 <code>0x1fffc343</code>；约 10 ms 后，由 <code>0x1fff6774</code> 完成口令、校验与命令分发。灯效任务入口为 <code>0x1fff7c60</code>。这些是研究描述，不是厂家的函数名，也不是跨版本稳定地址。</p></details>
-      <details><summary>如何接着开发？</summary><p>仓库提供自行实现的控制 SDK、离线字节测试与 Ghidra 工程重建脚本。开发入口是 <code>docs/SDK.md</code>、<code>docs/FUNCTIONS.md</code> 和 <code>re/README.md</code>。厂家固件、第三方工具及厂家 SDK 不随仓库分发。遵守<a href="LICENSE.txt">社区源码许可</a>：允许免费使用、二次开发与分享，禁止销售、付费托管和付费捆绑。不要向 OTA 服务 <code>5833ff01</code> 写入。</p></details>
+  <section class="ms-section ms-wrap reading" id="development" aria-labelledby="development-title">
+    <div class="ms-section-head"><div><span class="ms-section-label">06</span><h2 class="ms-h2" id="development-title">继续开发</h2></div></div>
+    <div class="ms-viewer">
+      <details name="development"><summary>校验怎么算</summary><div class="ms-viewer-body ms-prose"><p>前五个字节的和为 S，校验取 <code>(256 − (S mod 256)) mod 256</code>。加上它后，总和的低八位就是 0。这种校验只能发现部分传输错误，不能防止恶意控制。</p></div></details>
+      <details name="development"><summary>处理函数</summary><div class="ms-viewer-body ms-prose"><p>写回调 <code>0x1fff4290</code> 将输入复制到 <code>0x1fffc343</code>；约 10 ms 后，由 <code>0x1fff6774</code> 完成口令、校验与命令分发。灯效任务入口为 <code>0x1fff7c60</code>。这些是研究描述，不是厂家的函数名，也不是跨版本稳定地址。</p></div></details>
+      <details name="development"><summary>SDK 与资料</summary><div class="ms-viewer-body ms-prose"><p>仓库提供自行实现的控制 SDK、离线字节测试与 Ghidra 工程重建脚本。开发入口是 <code>docs/SDK.md</code>、<code>docs/FUNCTIONS.md</code> 和 <code>re/README.md</code>。<a href="assets/hardware/board-back.webp">主控板背面照片</a>可辅助查看走线与焊点。</p><p>厂家固件、第三方工具及厂家 SDK 不随仓库分发。遵守<a href="LICENSE.txt">社区源码许可</a>：允许免费使用、二次开发与分享，禁止销售、付费托管和付费捆绑。不要向 OTA 服务 <code>5833ff01</code> 写入。</p></div></details>
     </div>
   </section>
 </main>
-<footer class="site-footer"><div><strong>共鸣</strong><p>独立兼容研究 · 2026-10-24</p></div><a href="LICENSE.txt">社区源码许可 ↗</a></footer>
-</div>
+<footer class="ms-site-footer ms-wrap">
+  <div class="ms-warnstrip" data-status="candidate"><span class="ms-hazard" aria-hidden="true">//////</span><p>Do not write to OTA service <code>5833ff01</code>.</p></div>
+  <div class="ms-footer"><span>共鸣 · 原理</span><span><a class="ms-link" href="LICENSE.txt">社区源码许可</a> · 2026-10-24</span></div>
+</footer>
 <script>
-const channels=['r','g','b'];const hex=n=>n.toString(16).padStart(2,'0').toUpperCase();
-function update(){const [r,g,b]=channels.map(id=>Number(document.getElementById(id).value));channels.forEach((id,i)=>document.getElementById(id+'v').textContent=[r,g,b][i]);const body=[1,0,g,r,b];const total=body.reduce((a,v)=>a+v,0);const check=(-total)&255;const labels=['命令','保留','G 绿色','R 红色','B 蓝色','校验'];document.getElementById('bytes').replaceChildren(...[...body,check].map((v,i)=>{const cell=document.createElement('div');cell.className='byte';const strong=document.createElement('strong');strong.textContent=hex(v);const small=document.createElement('small');small.textContent=labels[i];cell.append(strong,small);return cell}));document.getElementById('formula').textContent=`校验 = (−${total}) mod 256 = ${check} (0x${hex(check)})`;document.getElementById('sum').textContent=`完整帧相加 = ${total+check}；除以 256 的余数 = 0。`;const color=`rgb(${r}, ${g}, ${b})`;const lamp=document.getElementById('lamp');lamp.style.background=color;lamp.style.boxShadow=r+g+b?`0 0 45px 10px ${color}`:'none';document.getElementById('channel').textContent=r===g&&g===b?(r?'独立白光通道':'全部灯光关闭'):'RGB 通道';document.querySelectorAll('[data-rgb]').forEach(btn=>btn.setAttribute('aria-pressed',String(btn.dataset.rgb===`${r},${g},${b}`)))}
-channels.forEach(id=>document.getElementById(id).addEventListener('input',update));document.querySelectorAll('[data-rgb]').forEach(btn=>btn.addEventListener('click',()=>{btn.dataset.rgb.split(',').forEach((v,i)=>document.getElementById(channels[i]).value=v);update()}));update();
+const channels = ['r', 'g', 'b'];
+const hex = value => value.toString(16).padStart(2, '0').toUpperCase();
+const presets = [...document.querySelectorAll('[data-rgb]')];
+function update() {
+  const rgb = channels.map(id => Number(document.getElementById(id).value));
+  const [r, g, b] = rgb;
+  channels.forEach((id, i) => document.getElementById(id + 'v').textContent = rgb[i]);
+  const body = [1, 0, g, r, b];
+  const total = body.reduce((sum, value) => sum + value, 0);
+  const checksum = (-total) & 255;
+  const labels = ['命令', '保留', 'G', 'R', 'B', '校验'];
+  document.getElementById('bytes').replaceChildren(...[...body, checksum].map((value, i) => {
+    const cell = document.createElement('div');
+    cell.className = 'byte';
+    const strong = document.createElement('strong');
+    strong.className = 'ms-readout ms-readout--sm';
+    strong.textContent = hex(value);
+    const small = document.createElement('small');
+    small.className = 'ms-label';
+    small.textContent = labels[i];
+    cell.append(strong, small);
+    return cell;
+  }));
+  document.getElementById('formula').textContent = `校验 = (−${total}) mod 256 = ${checksum} (0x${hex(checksum)})`;
+  document.getElementById('sum').textContent = `完整帧相加 = ${total + checksum}；除以 256 的余数 = 0。`;
+  document.getElementById('lamp').style.setProperty('--drive-color', `rgb(${r}, ${g}, ${b})`);
+  const channel = r === g && g === b ? (r ? '独立白光通道' : '全部灯光关闭') : 'RGB 通道';
+  const channelOutput = document.getElementById('channel');
+  if (channelOutput.textContent !== channel) channelOutput.textContent = channel;
+  presets.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.rgb === rgb.join(','))));
+}
+channels.forEach(id => document.getElementById(id).addEventListener('input', update));
+presets.forEach(button => button.addEventListener('click', () => {
+  button.dataset.rgb.split(',').forEach((value, i) => document.getElementById(channels[i]).value = value);
+  update();
+}));
+update();
+// Native details stays usable without JavaScript; wide layouts show all three photos.
+const hardwareFold = document.getElementById('hardware-more');
+const widePhotos = matchMedia('(min-width: 768px)');
+let mobilePhotosOpen = hardwareFold.open;
+hardwareFold.addEventListener('toggle', () => {
+  if (!widePhotos.matches) mobilePhotosOpen = hardwareFold.open;
+});
+function syncHardwarePhotos() {
+  hardwareFold.classList.toggle('is-auto', widePhotos.matches);
+  hardwareFold.open = widePhotos.matches || mobilePhotosOpen;
+}
+widePhotos.addEventListener('change', syncHardwarePhotos);
+syncHardwarePhotos();
 </script>
 </body>
 </html>

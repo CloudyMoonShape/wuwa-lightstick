@@ -1,0 +1,517 @@
+/* MoonShade 网页层。ms- 类只读 tokens.css 的变量,自己不带取值;深浅两套主题由 <html data-theme> 切换。
+ * 规则出处见「网页规范」一章:哪些照搬终端 / Kindle,哪些是推导出来的建议。
+ * 字号、行高、字距与断点在生成时从 tokens.json 的 Web 字阶和 breakpoint 代入(媒体查询里不能用变量),改 token 后重新生成这个文件。 */
+
+/* ---------- 页面与栅格 ---------- */
+/* .ms-page 通常挂在 body 上:清掉浏览器默认的 8px 外边距,页边只由 --ms-margin 决定 */
+.ms-page {
+  margin: 0;
+  --ms-hang: 0px;
+  --ms-margin: var(--web-space-4);
+  --ms-gutter: var(--web-space-4);
+  background: var(--web-bg);
+  color: var(--web-ink);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 28px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+.ms-page *, .ms-page *::before, .ms-page *::after { box-sizing: border-box; }
+@media (min-width: 768px) { .ms-page { --ms-margin: var(--web-space-8); --ms-gutter: var(--web-space-6); } }
+/* 宽屏时面向外挂一个内距:卡片、代码块、失联块里的字落在栏线上,和区块标签、正文同一条左缘。窄屏页边不够,不挂 */
+@media (min-width: 1200px) { .ms-page { --ms-margin: var(--web-space-12); --ms-hang: var(--web-space-6); } }
+
+.ms-wrap {
+  width: 100%;
+  max-width: calc(var(--web-max) + 2 * var(--ms-margin));
+  margin-inline: auto;
+  padding-inline: var(--ms-margin);
+}
+.ms-grid {
+  margin-inline: calc(-1 * var(--ms-hang));
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--ms-gutter);
+}
+@media (min-width: 768px) { .ms-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1200px) { .ms-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+/* 内容本身是三段(三站、三步、三台)时从平板起就排三栏:768 宽时每栏约 218px,只放一个读数或一行十来个字的短句 */
+@media (min-width: 768px) { .ms-grid--trio { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.ms-span-all { grid-column: 1 / -1; }
+/* 栅格整体外挂,每一格的外缘就是面的外缘;格子里不是面的东西(一段字、一个读数)补同样的内距。
+   这样同一栏的字不管在不在面里都从同一条线起:三栏时就是 0、⅓ + 24px、⅔ + 48px 三条,这就是这一页的栏线 */
+.ms-grid > :where(:not(.ms-card, .ms-screen, .ms-plate, .ms-verdict, pre)) { padding-inline: var(--ms-hang); }
+
+/* ---------- 文字角色 ---------- */
+.ms-label, .ms-eyebrow, .ms-nav a, .ms-kv dt, .ms-status, .ms-card-title, .ms-facility, .ms-section-label, .ms-footer, .ms-table th {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 20px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 400;
+}
+.ms-zh { text-transform: none; letter-spacing: 0; font-family: var(--font-sans); color: var(--web-ink-2); font-weight: 400; margin-inline-start: 0.5em; }
+/* 英文标签后的中文隔半个字,源码里两者之间不写空格;独占一行的中文(结论下的解释、段落)不缩进;眉题照终端空两格 */
+.ms-title .ms-zh, p.ms-zh, div.ms-zh { margin-inline-start: 0; }
+.ms-eyebrow .ms-zh { margin-inline-start: 2ch; }
+/* 标签里的单位、命令名保持原样大小写(TiB 不变成 TIB) */
+.ms-asis { text-transform: none; }
+.ms-label { color: var(--web-ink-2); margin: 0; }
+.ms-title {
+  margin: 0;
+  font-family: var(--font-din-exp);
+  font-weight: 700;
+  font-size: 36px;
+  line-height: 36px;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--web-ink);
+}
+@media (min-width: 768px) { .ms-title { font-size: 56px; line-height: 52px; } }
+.ms-title .ms-zh { display: block; margin-top: var(--web-space-3); font-size: 16px; line-height: 24px; letter-spacing: 0; }
+.ms-h2 { margin: 0; font-size: 22px; line-height: 30px; font-weight: 600; letter-spacing: 0; }
+.ms-h3 { margin: 0; font-size: 17px; line-height: 26px; font-weight: 600; }
+.ms-small { font-size: 13px; line-height: 20px; color: var(--web-ink-2); }
+
+/* ---------- 页头:眉题 + 像素字标 + 谱条与设施名 + 导航 ---------- */
+.ms-header { padding-block: var(--web-space-6) 0; }
+@media (min-width: 768px) { .ms-header { padding-block-start: var(--web-space-12); } }
+.ms-eyebrow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  column-gap: var(--web-space-6);
+  color: var(--web-ink-2);
+  margin: 0 0 var(--web-space-2);
+}
+.ms-eyebrow > * { min-width: 0; }
+@media (min-width: 768px) { .ms-eyebrow > * { white-space: nowrap; } }
+.ms-brand { display: block; margin: 0; color: var(--web-ink); line-height: 0; }
+.ms-brand a { display: block; color: inherit; }
+.ms-brand svg { display: block; width: 100%; height: auto; }
+/* 设施名右缘对齐字标右缘(终端的「第 73 列」),上沿对齐谱条上沿 */
+.ms-brandline { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--web-space-4); }
+.ms-brandline .ms-bar { flex: 0 0 36.62%; display: block; height: auto; }
+.ms-bar svg { display: block; width: 100%; height: auto; }
+.ms-facility { margin: 0; text-align: right; color: var(--web-ink); font-weight: 700; padding-top: 0; }
+@media (min-width: 768px) { .ms-facility { font-size: 15px; line-height: 21px; } }
+.ms-facility .ms-zh { font-weight: 400; }
+
+.ms-header--compact { padding-block: var(--web-space-6); }
+.ms-header--compact .ms-headrow { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--web-space-4) var(--web-space-8); }
+.ms-header--compact .ms-brand svg { width: 142px; }
+/* 紧凑版的身份组:字标(unit 1)+ 设施位,底边对齐;眉题可选,放在这一行上面 */
+.ms-headid { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--web-space-2) var(--web-space-4); }
+.ms-headid .ms-facility { text-align: left; }
+
+.ms-nav { margin-top: var(--web-space-8); }
+.ms-header--compact .ms-nav { margin-top: 0; }
+.ms-nav ul { display: flex; flex-wrap: wrap; gap: var(--web-space-2) var(--web-space-4); margin: 0; padding: 0; list-style: none; }
+.ms-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  color: var(--web-ink-2);
+  text-decoration: none;
+  transition: color var(--web-fade) ease-out;
+}
+.ms-nav a:hover { color: var(--web-ink); }
+/* 当前项 = 终端信息栏首行的「你在这里」黄块:一个字格宽高比 1 : 2.1 的实心块 + 粗体 */
+.ms-nav a[aria-current="page"] { color: var(--web-ink); font-weight: 700; }
+/* 导航序号就是页号(「网页规范」§14):固定不随增删重排,写在词前,常规字重 */
+.ms-nav .ms-no { margin-right: 1ch; font-weight: 400; color: var(--web-ink-2); }
+@media (min-width: 768px) { .ms-nav ul { column-gap: var(--web-space-6); } }
+.ms-nav a[aria-current="page"]::before {
+  content: "";
+  width: 0.5em;
+  height: 1.05em;
+  margin-right: 0.5em;
+  background: var(--web-sig);
+}
+
+/* ---------- 焦点 ---------- */
+.ms-page a:focus-visible, .ms-page button:focus-visible, .ms-page summary:focus-visible, .ms-page [tabindex]:focus-visible {
+  outline: 2px solid var(--web-focus);
+  outline-offset: 3px;
+}
+
+/* ---------- 区块 ---------- */
+.ms-section { padding-block: var(--web-space-12) 0; }
+.ms-section-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: last baseline; gap: var(--web-space-2) var(--web-space-4); margin-bottom: var(--web-space-6); }
+/* 窄屏:标题独占一行,点线和读数一起落到第二行,点线永远指着读数;平板起三样排成一行 */
+.ms-section-head > div { grid-column: 1 / -1; }
+@media (min-width: 768px) {
+  .ms-section-head { grid-template-columns: minmax(0, auto) minmax(4ch, 1fr) auto; }
+  .ms-section-head > div { grid-column: auto; }
+}
+/* 引导点线:从中文标题的基线一路点到右侧读数,和目录里的点线一样只做引导(每 4px 一个 1px 点) */
+.ms-leader { min-width: 4ch; align-self: last baseline; height: 1px; margin-bottom: 0.32em;
+  background: linear-gradient(90deg, var(--web-line) 1px, transparent 1px) 0 0 / 4px 1px repeat-x; }
+.ms-section-label { display: block; color: var(--web-ink-2); margin-bottom: var(--web-space-1); }
+/* 分隔线 = Kindle 的灰点线:每 4px 一个 1px 点,只做引导 */
+.ms-rule {
+  height: 1px;
+  border: 0;
+  margin: 0;
+  background: linear-gradient(90deg, var(--web-line) 1px, transparent 1px) 0 0 / 4px 1px repeat-x;
+}
+
+/* ---------- 结论区(Kindle 的 2 米层 + 登录页的纹样与信息栏) ---------- */
+.ms-verdict { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--web-space-6); align-items: start; }
+.ms-verdict .ms-emblem { width: 120px; color: var(--web-dim); }
+@media (min-width: 768px) {
+  .ms-verdict { grid-template-columns: 200px minmax(0, 1fr); gap: var(--web-space-8); }
+  .ms-verdict .ms-emblem { width: 200px; }
+}
+.ms-emblem svg { display: block; width: 100%; height: auto; }
+.ms-verdict-body > * + * { margin-top: var(--web-space-3); }
+/* 标题(连同它下面的中文解释)和范围行之间空一档,范围行是另一层信息 */
+.ms-verdict-body > .ms-title + * { margin-top: var(--web-space-6); }
+/* 无状态:讲解页、总览页没有「这台机器怎么样」可说,只留标题、一句话和一行范围;不放纹样,不放状态 */
+.ms-verdict.ms-verdict--plain { grid-template-columns: minmax(0, 1fr); }
+.ms-verdict--plain .ms-zh { max-width: var(--web-measure); }
+/* 屏当主角:一块终端屏或 Kindle 屏占纹样的位置并放大,结论退成屏旁的说明,底边对齐。
+   宽屏时和外挂栅格同一套三栏:屏占前两栏(两侧都挂,和下面的切片、卡片同一条外缘),结论的字落在第三栏的栏线上 */
+.ms-verdict.ms-verdict--exhibit { grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 1200px) {
+  /* 屏宽默认 = 三栏里的两栏加一个栏间((200% - 栏间) / 3),结论吃剩下的一栏;屏要按整数倍定宽(例如终端 1 : 1)时在结论区写 --screen,结论栏吃剩下的宽 */
+  .ms-verdict.ms-verdict--exhibit { grid-template-columns: var(--screen, calc((200% - var(--ms-gutter)) / 3)) minmax(0, 1fr); column-gap: var(--ms-gutter); margin-inline: calc(-1 * var(--ms-hang)); align-items: end; }
+  .ms-verdict--exhibit > .ms-screen { margin-inline: 0; }
+  .ms-verdict--exhibit > .ms-verdict-body { padding-inline: var(--ms-hang); }
+  /* 屏在右:页面的值栏在右、或屏要挨着右侧版式装置时用;窄屏仍是屏在上 */
+  .ms-verdict.ms-verdict--exhibit.ms-verdict--end { grid-template-columns: minmax(0, 1fr) var(--screen, calc((200% - var(--ms-gutter)) / 3)); }
+  .ms-verdict--end > .ms-screen { order: 2; }
+}
+.ms-verdict--exhibit .ms-title { font-size: 36px; line-height: 36px; }
+/* 失联:整块反色(Kindle 的「失联警告框反黑」),纹样和字都换成底色,读数一律写 - */
+.ms-verdict.is-lost, .ms-verdict.ms-plate.is-lost { background: var(--web-ink); color: var(--web-bg); padding: var(--web-space-6) max(var(--web-space-4), var(--ms-hang)); margin-inline: calc(-1 * var(--ms-hang));
+  clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px); }
+.ms-verdict.is-lost .ms-title, .ms-verdict.is-lost .ms-kv dd, .ms-verdict.is-lost .ms-emblem { color: var(--web-bg); }
+.ms-verdict.is-lost .ms-zh, .ms-verdict.is-lost .ms-kv dt, .ms-verdict.is-lost .ms-unit, .ms-verdict.is-lost .ms-status { color: var(--web-bg); }
+
+/* ---------- 展品:一块屏是一个物件。屏内不跟主题(纸就是纸),机身把屏和页面分开 ---------- */
+/* 屏和卡片守同一条外挂规则:桌面宽度向外挂 --ms-hang,机身宽 = 外挂量,所以画面边落在栏线上、机身外缘和卡片外缘对齐 */
+.ms-screen { margin: 0; margin-inline: calc(-1 * var(--ms-hang)); --ms-bezel: max(var(--web-space-2), var(--ms-hang)); }
+/* 栅格已经整体外挂,格子里的屏不再挂第二次 */
+.ms-grid > .ms-screen { margin-inline: 0; }
+.ms-screen-face { position: relative; display: block; padding: var(--ms-bezel); background: var(--web-bezel); clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px); }
+.ms-screen--kindle .ms-screen-face { background: var(--eink-black); }
+.ms-screen-face :where(img, svg) { display: block; width: 100%; height: auto; }
+.ms-screen figcaption { margin-top: var(--web-space-2); padding-inline: var(--ms-hang); font-size: 13px; line-height: 20px; color: var(--web-ink-2); }
+/* 切片:从一块屏里取出的一段,仍是这块屏的一部分,照样带机身。取景框(.ms-crop)宽度跟栏,机身外缘和上下的面对齐。
+   框里的截图按 --s 倍显示(终端截图是 2 倍图,0.5 = 终端 1 : 1),从截图的 (--x, --y) 像素起取 --w × --h 像素;
+   --W 是整张截图的宽(终端 1752,Kindle 1680 已带),--w 不写 = 整宽,即只按行取。取景比框窄时其余部分铺截图自己的底色;窄屏放不下时等比缩到框宽。
+   位移全用相对框宽的百分比算(--k = 取景实际显示宽),不用容器查询,所以放进 flex / grid 里也不会塌成 0 宽 */
+.ms-crop { --cw: var(--w, var(--W, 1752)); width: 100%; overflow: hidden; aspect-ratio: var(--cw) / var(--h, 980); max-height: calc(var(--h, 980) * var(--s, 0.5) * 1px); background: var(--crop-bg, var(--term-bg)); }
+.ms-screen--kindle .ms-crop { --W: 1680; --crop-bg: var(--eink-desk); }
+.ms-crop :where(img) { --k: min(calc(var(--cw) * var(--s, 0.5) * 1px), 100%); display: block; max-width: none; height: auto;
+  width: calc(var(--W, 1752) / var(--cw) * var(--k));
+  margin: calc(var(--y, 0) / var(--cw) * var(--k) * -1) 0 0 calc(var(--x, 0) / var(--cw) * var(--k) * -1);
+  clip-path: inset(0 calc((var(--W, 1752) - var(--x, 0) - var(--cw)) / var(--W, 1752) * 100%) 0 0); }
+/* 屏外行号:印在左侧机身上(机身够宽时才有,即桌面宽度);--pad / --pitch / --h 是截图里的上留白、行距、总高(像素) */
+.ms-rail { display: none; }
+@media (min-width: 1200px) {
+  .ms-rail { display: block; position: absolute; left: 0; top: var(--ms-bezel); bottom: var(--ms-bezel); width: var(--ms-bezel); margin: 0; padding: 0; list-style: none;
+    font-family: var(--font-mono); font-size: 13px; line-height: 1; letter-spacing: 0; color: var(--web-ink); --pad: 28; --pitch: 42; --h: 980; }
+  .ms-rail > li { position: absolute; left: 0; right: 0; text-align: center; top: calc((var(--pad) + var(--pitch) * (var(--r) - 0.5)) / var(--h) * 100%); transform: translateY(-50%); }
+  .ms-screen--kindle .ms-rail { color: var(--eink-paper); }
+}
+/* 屏旁逐行图例:和屏并排的一列说明,每条对着截图的第 --r 行(格坐标和 .ms-rail 同一组,--pad / --pitch / --h 可改)。
+   放在面外,所以不会被机身的切角裁掉。桌面宽度和屏当主角同一套三栏:屏占前两栏,图例的字落在第三栏的栏线上(--screen 可给屏定宽);窄屏落到屏下面按顺序排 */
+.ms-legend { margin: var(--web-space-2) 0 0; padding: 0 var(--ms-hang); list-style: none; font-family: var(--font-mono);
+  font-size: 13px; line-height: 20px; color: var(--web-ink-2); }
+@media (min-width: 1200px) {
+  .ms-screen--legend { display: grid; grid-template-columns: var(--screen, calc((200% - var(--ms-gutter)) / 3)) minmax(0, 1fr); column-gap: var(--ms-gutter); }
+  .ms-screen--legend > figcaption { grid-column: 1 / -1; }
+  .ms-legend { position: relative; margin: 0; padding: 0; --pad: 28; --pitch: 42; --h: 980; }
+  .ms-legend > li { position: absolute; left: var(--ms-hang); right: var(--ms-hang); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transform: translateY(-50%);
+    top: calc(var(--ms-bezel) + (100% - 2 * var(--ms-bezel)) * (var(--pad) + var(--pitch) * (var(--r) - 0.5)) / var(--h)); }
+}
+/* 深浅成对的截图按页面主题二选一;没写 data-theme 时按深色 */
+.ms-if-light { display: none; }
+[data-theme="light"] .ms-if-light { display: block; }
+[data-theme="light"] .ms-if-dark { display: none; }
+
+/* ---------- 铭牌:不铺底的面,只画四个 L 形角标(印刷裁切角标的画法)。一个视口最多一块 ---------- */
+/* 和卡片同一套外挂与内距,所以角标外缘 = 卡片外缘,里面的字落在栏线上 */
+.ms-plate {
+  --ms-mark: var(--web-dim);
+  margin-inline: calc(-1 * var(--ms-hang));
+  padding: var(--web-space-6) max(var(--web-space-4), var(--ms-hang));
+  background:
+    linear-gradient(var(--ms-mark) 0 0) 0 0 / 12px 2px no-repeat, linear-gradient(var(--ms-mark) 0 0) 0 0 / 2px 12px no-repeat,
+    linear-gradient(var(--ms-mark) 0 0) 100% 0 / 12px 2px no-repeat, linear-gradient(var(--ms-mark) 0 0) 100% 0 / 2px 12px no-repeat,
+    linear-gradient(var(--ms-mark) 0 0) 0 100% / 12px 2px no-repeat, linear-gradient(var(--ms-mark) 0 0) 0 100% / 2px 12px no-repeat,
+    linear-gradient(var(--ms-mark) 0 0) 100% 100% / 12px 2px no-repeat, linear-gradient(var(--ms-mark) 0 0) 100% 100% / 2px 12px no-repeat;
+}
+
+/* ---------- 规格标注:尺寸线、登记码、图号(手册式的标注。线用 web-dim,字用 web-ink-2) ---------- */
+.ms-dim { display: flex; align-items: center; gap: 1ch; min-height: 20px; border-inline: 1px solid var(--web-dim);
+  font-family: var(--font-mono); font-size: 13px; line-height: 20px; letter-spacing: 0.06em; color: var(--web-ink-2); white-space: nowrap; }
+.ms-dim::before, .ms-dim::after { content: ""; flex: 1 1 0; min-width: var(--web-space-2); height: 1px; background: var(--web-dim); }
+.ms-dim--v { flex-direction: column; min-height: 0; min-width: 20px; width: 20px; border-inline: 0; border-block: 1px solid var(--web-dim); }
+.ms-dim--v::before, .ms-dim--v::after { width: 1px; height: auto; min-width: 0; min-height: var(--web-space-2); }
+.ms-dim--v > span { writing-mode: vertical-rl; transform: rotate(180deg); }
+/* 无字括线:只标一段的起止(一行高的段放不下字),字写在括线旁的标签里 */
+.ms-dim--bare { gap: 0; }
+.ms-dim--bare::after { display: none; }
+.ms-dim--v.ms-dim--bare { width: 9px; min-width: 9px; }
+/* 占位行:同排卡片只有几张带标注行时,其余几张放一条同款的占位,保住逐行对齐;看不见,读屏也跳过 */
+.ms-dim.is-slot { visibility: hidden; }
+/* 登记码:字母 + 两位数(F-03、FIG 02.1),方括号由样式画,读屏只读码 */
+.ms-code { font-family: var(--font-mono); font-size: 13px; line-height: 20px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--web-ink-2); white-space: nowrap; }
+.ms-code::before { content: "[\2002" / ""; }
+.ms-code::after { content: "\2002]" / ""; }
+
+/* ---------- 图鉴:一次只展开一块(原生 <details name> 互斥,不靠脚本) ---------- */
+/* 展开项 = 实心字格块,收起 = 只剩字格底下四分之一(一个空着的格位;空心方框在小字号下像缺字的方块);和导航当前项同一个字格,但不用黄 */
+.ms-viewer > details { background: linear-gradient(90deg, var(--web-line) 1px, transparent 1px) 0 0 / 4px 1px repeat-x; }
+.ms-viewer > details:last-child { padding-bottom: 1px; background: linear-gradient(90deg, var(--web-line) 1px, transparent 1px) 0 0 / 4px 1px repeat-x, linear-gradient(90deg, var(--web-line) 1px, transparent 1px) 0 100% / 4px 1px repeat-x; }
+.ms-viewer summary, .ms-fold > summary, .ms-switch label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 2ch;
+  min-height: 48px;
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 20px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--web-ink-2);
+  transition: color var(--web-fade) ease-out;
+}
+.ms-viewer summary::-webkit-details-marker, .ms-fold > summary::-webkit-details-marker { display: none; }
+.ms-viewer summary::before, .ms-fold > summary::before, .ms-switch label::before { content: ""; flex: none; width: 0.5em; height: 1.05em; background: linear-gradient(currentColor 0 0) 0 100% / 100% 0.25em no-repeat; }
+.ms-viewer summary:hover, .ms-fold > summary:hover, .ms-switch label:hover { color: var(--web-ink); }
+.ms-viewer details[open] > summary, .ms-fold[open] > summary, .ms-switch label:has(input:checked) { color: var(--web-ink); font-weight: 700; }
+.ms-viewer details[open] > summary::before, .ms-fold[open] > summary::before, .ms-switch label:has(input:checked)::before { background: currentColor; }
+/* 状态位放单元词也行(无状态的图鉴):和 ms-status 同一个位置 */
+.ms-viewer summary .ms-unit { margin-left: auto; }
+.ms-viewer-name .ms-zh { font-weight: 400; }
+.ms-viewer summary .ms-status { margin-left: auto; font-weight: 400; }
+.ms-viewer-body { padding-block: var(--web-space-2) var(--web-space-8); }
+
+/* 折叠块:窄屏收起成一行摘要;宽屏(≥ bp-tablet)由 render() 展开并藏起摘要行。没有脚本时摘要行一直在,照样能点开 */
+.ms-fold > summary { min-height: 40px; }
+.ms-fold-body { padding-block: var(--web-space-2) 0; }
+@media (min-width: 768px) { .ms-fold.is-auto[open] > summary { display: none; } .ms-fold.is-auto[open] > .ms-fold-body { padding-top: 0; } }
+
+/* 状态开关:一块屏切几种状态。单选框 + 和图鉴同一个字格块;选中 = 实心墨块,不用黄。状态词照那块屏自己的写法,不转大写 */
+.ms-switch { display: flex; flex-wrap: wrap; gap: 0 var(--web-space-6); margin: 0; padding: 0; border: 0; min-width: 0; }
+.ms-switch legend { padding: 0; }
+.ms-switch label { min-height: 40px; text-transform: none; }
+/* render() 之后各状态叠在同一格,按最高的一格定高,切换时下面和旁边的东西不跳;没选中的只是看不见(读屏和 Tab 也跳过) */
+[data-pane-group].is-stacked { display: grid; }
+[data-pane-group].is-stacked > [data-pane] { grid-area: 1 / 1; }
+[data-pane-group].is-stacked > .is-off { visibility: hidden; }
+.ms-switch input { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; }
+.ms-switch label:has(input:focus-visible) { outline: 2px solid var(--web-focus); outline-offset: 3px; }
+
+/* ---------- 卡片(面靠色调分开,不描边;四角各缺一格) ---------- */
+.ms-card {
+  container-type: inline-size;
+  position: relative;
+  background: var(--web-surface);
+  padding: var(--web-space-4);
+  clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
+}
+@media (min-width: 768px) { .ms-card { padding: var(--web-space-6); } }
+/* 顶缘胶带:越阈值、掉线的卡片顶边一道 k-unit 高的 warn,一排卡片里一眼找到出事的那张;正常、停用、读不到都没有 */
+.ms-card[data-state="attn"], .ms-card[data-state="down"], .ms-card[data-state="off"] { box-shadow: inset 0 4px 0 0 var(--warn); }
+.ms-card-head { display: flex; align-items: center; justify-content: space-between; gap: var(--web-space-4); min-height: 20px; }
+.ms-card-title { margin: 0; color: var(--web-ink); font-weight: 700; }
+.ms-card > * + * { margin-top: var(--web-space-4); }
+/* 卡片主读数行:左边图案条或标签、右边定宽读数框(Kindle 卡片的「88%」数字框) */
+.ms-figure { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--web-space-4); }
+
+/* ---------- 读数(D-DIN 没有等宽数字:按最宽值定宽、右对齐) ---------- */
+.ms-readout {
+  display: inline-block;
+  min-width: calc(var(--digits, 4) * 1ch);
+  text-align: right;
+  white-space: nowrap;
+  font-family: var(--font-din);
+  font-weight: 400;
+  font-size: 44px;
+  line-height: 44px;
+  color: var(--web-ink);
+  font-variant-numeric: tabular-nums;
+}
+.ms-readout small { font-size: 0.55em; line-height: 0; margin-left: 0.04em; }
+.ms-readout--sm { font-size: 28px; line-height: 28px; }
+.ms-unit { font-family: var(--font-mono); font-size: 13px; line-height: 20px; letter-spacing: 0.06em; color: var(--web-ink-2); text-transform: uppercase; }
+
+/* ---------- 键值行(终端信息栏:键 7 列 + 值,一行 21px) ---------- */
+.ms-kv { display: grid; grid-template-columns: var(--web-key-w) minmax(0, 1fr); margin: 0; font-family: var(--font-mono); font-size: 15px; line-height: 21px; }
+.ms-kv dt { color: var(--web-ink-2); font-size: 15px; line-height: 21px; letter-spacing: 0; padding-block: 3px; }
+.ms-kv dd { margin: 0; color: var(--web-ink); padding-block: 3px; display: flex; flex-wrap: wrap; align-items: center; gap: 0 1ch; min-width: 0; }
+.ms-kv dd > * { min-width: 0; }
+/* 窄卡片(手机)里计量格和点缩一号,数值留在同一行;再窄(< 280)一律把数值放到下一行,同一张卡片里不出现有的折、有的不折 */
+/* 计量和一排点在键值行里占满一行高(21px),折行后仍和左边的键同一条中线 */
+.ms-kv dd > .ms-meter, .ms-kv dd > .ms-dots { height: 21px; vertical-align: top; }
+@container (max-width: 340px) {
+  .ms-kv dd > .ms-meter { gap: 2px; padding-inline: 1px; }
+  .ms-kv dd > .ms-meter i { width: 4px; }
+  .ms-kv dd > .ms-dots { gap: 3px; }
+  .ms-kv dd > .ms-dots i { width: 8px; height: 8px; }
+}
+@container (max-width: 280px) {
+  .ms-kv dd > .ms-meter, .ms-kv dd > .ms-dots { flex-basis: 100%; justify-content: flex-start; }
+}
+.ms-kv--ruled dt, .ms-kv--ruled dd { background: linear-gradient(90deg, var(--web-line) 1px, transparent 1px) 0 100% / 4px 1px repeat-x; }
+
+/* 信息栏首行的网页版:单元词 + 节点名 + 状态 + 时长,段间 2 列 */
+.ms-unitline { display: flex; flex-wrap: wrap; align-items: center; gap: 0 2ch; margin: 0; font-family: var(--font-mono); font-size: 15px; line-height: 21px; color: var(--web-ink); }
+.ms-unitline > .ms-key { color: var(--web-ink-2); }
+.ms-unitline > b { font-weight: 700; }
+.ms-verdict.is-lost .ms-unitline, .ms-verdict.is-lost .ms-unitline > * { color: var(--web-bg); }
+
+/* ---------- 段式计量 ▰▱(16 格,形状照终端的平行四边形) ---------- */
+.ms-meter { display: inline-flex; gap: 3px; align-items: center; height: 1em; padding-inline: 2px; vertical-align: -2px; }
+.ms-meter i { display: block; width: 5px; height: 9px; transform: skewX(-18deg); box-shadow: inset 0 0 0 1px currentColor; }
+.ms-meter i.is-early { color: var(--web-dim); }
+.ms-meter i.is-late { color: var(--web-ink-2); }
+.ms-meter i.is-on { color: var(--sage); background: currentColor; }
+.ms-meter.is-over i.is-on { color: var(--warn); }
+
+/* ---------- 状态记号:形 + 词 + 色,记号用 CSS 画,不靠字体里的 ○◌●▲ 字形对齐 ---------- */
+.ms-status { display: inline-flex; align-items: center; gap: 0.6em; color: var(--web-ink-2); white-space: nowrap; }
+.ms-status::before { content: ""; flex: none; width: 0.7em; height: 0.7em; border-radius: 50%; box-shadow: inset 0 0 0 1.5px currentColor; }
+.ms-status[data-state="on"] { color: var(--web-ink); }
+.ms-status[data-state="on"]::before { background: var(--sage); box-shadow: none; }
+.ms-status[data-state="off"], .ms-status[data-state="attn"], .ms-status[data-state="down"] { color: var(--web-warn-ink); }
+.ms-status[data-state="off"]::before, .ms-status[data-state="down"]::before { box-shadow: none; border: 1.5px dotted currentColor; }
+.ms-status[data-state="attn"]::before { display: none; }
+.ms-status[data-state="attn"]::after, .ms-status[data-state="down"]::after { content: ""; flex: none; width: 0.78em; height: 0.68em; background: var(--warn); clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+.ms-status[data-state="unknown"]::before { border-radius: 0; box-shadow: none; height: 1.5px; background: currentColor; }
+/* 挂牌停用:维护者有意停掉的(维护、冻结),不是故障。方形空心记号 + 词,安静色,不挂 ▲ */
+.ms-status[data-state="locked"]::before { border-radius: 0; }
+/* 停用的读数条整条铺 50% 棋盘格(System 7 里「变灰」就是这个图案),读数写 - */
+.ms-patbar.is-locked > .ms-pat { width: calc(100% - 4px); color: var(--web-dim); box-shadow: none; -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2232%22%20height%3D%2232%22%20viewBox%3D%220%200%208%208%22%20shape-rendering%3D%22crispEdges%22%3E%3Cpath%20d%3D%22M0%200h1v1h-1zM2%200h1v1h-1zM4%200h1v1h-1zM6%200h1v1h-1zM1%201h1v1h-1zM3%201h1v1h-1zM5%201h1v1h-1zM7%201h1v1h-1zM0%202h1v1h-1zM2%202h1v1h-1zM4%202h1v1h-1zM6%202h1v1h-1zM1%203h1v1h-1zM3%203h1v1h-1zM5%203h1v1h-1zM7%203h1v1h-1zM0%204h1v1h-1zM2%204h1v1h-1zM4%204h1v1h-1zM6%204h1v1h-1zM1%205h1v1h-1zM3%205h1v1h-1zM5%205h1v1h-1zM7%205h1v1h-1zM0%206h1v1h-1zM2%206h1v1h-1zM4%206h1v1h-1zM6%206h1v1h-1zM1%207h1v1h-1zM3%207h1v1h-1zM5%207h1v1h-1zM7%207h1v1h-1z%22%2F%3E%3C%2Fsvg%3E"); mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2232%22%20height%3D%2232%22%20viewBox%3D%220%200%208%208%22%20shape-rendering%3D%22crispEdges%22%3E%3Cpath%20d%3D%22M0%200h1v1h-1zM2%200h1v1h-1zM4%200h1v1h-1zM6%200h1v1h-1zM1%201h1v1h-1zM3%201h1v1h-1zM5%201h1v1h-1zM7%201h1v1h-1zM0%202h1v1h-1zM2%202h1v1h-1zM4%202h1v1h-1zM6%202h1v1h-1zM1%203h1v1h-1zM3%203h1v1h-1zM5%203h1v1h-1zM7%203h1v1h-1zM0%204h1v1h-1zM2%204h1v1h-1zM4%204h1v1h-1zM6%204h1v1h-1zM1%205h1v1h-1zM3%205h1v1h-1zM5%205h1v1h-1zM7%205h1v1h-1zM0%206h1v1h-1zM2%206h1v1h-1zM4%206h1v1h-1zM6%206h1v1h-1zM1%207h1v1h-1zM3%207h1v1h-1zM5%207h1v1h-1zM7%207h1v1h-1z%22%2F%3E%3C%2Fsvg%3E"); -webkit-mask-size: 8px 8px; mask-size: 8px 8px; }
+
+.ms-dots { display: inline-flex; gap: 4px; align-items: center; vertical-align: -1px; }
+.ms-dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--sage); }
+.ms-dots i.is-bad { background: none; border: 1.5px dotted var(--warn); }
+/* ▲ 用 CSS 画:字体里的 ▲ 各家大小、粗细、基线都不同,和状态记号里的三角对不齐;字形留在文本里给复制和读屏 */
+.ms-flag { display: inline-block; width: 0.78em; height: 0.68em; margin-inline: 0.1em; vertical-align: -0.02em; overflow: hidden; color: transparent; background: var(--warn); clip-path: polygon(50% 0, 100% 100%, 0 100%); user-select: all; }
+.ms-title .ms-flag { width: 0.62em; height: 0.54em; vertical-align: 0.04em; margin-left: 0.12em; }
+.ms-warn-text { color: var(--web-warn-ink); }
+
+/* ---------- MacPaint 图案:蒙版 + currentColor,随主题换墨 ---------- */
+.ms-pat { background: currentColor; -webkit-mask-repeat: repeat; mask-repeat: repeat; -webkit-mask-size: 16px 16px; mask-size: 16px 16px; -webkit-mask-position: 0 0; mask-position: 0 0; }
+.ms-pat--stripes { -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2232%22%20height%3D%2232%22%20viewBox%3D%220%200%208%208%22%20shape-rendering%3D%22crispEdges%22%3E%3Cpath%20d%3D%22M2%200h1v1h-1zM3%200h1v1h-1zM6%200h1v1h-1zM7%200h1v1h-1zM1%201h1v1h-1zM2%201h1v1h-1zM5%201h1v1h-1zM6%201h1v1h-1zM0%202h1v1h-1zM1%202h1v1h-1zM4%202h1v1h-1zM5%202h1v1h-1zM0%203h1v1h-1zM3%203h1v1h-1zM4%203h1v1h-1zM7%203h1v1h-1zM2%204h1v1h-1zM3%204h1v1h-1zM6%204h1v1h-1zM7%204h1v1h-1zM1%205h1v1h-1zM2%205h1v1h-1zM5%205h1v1h-1zM6%205h1v1h-1zM0%206h1v1h-1zM1%206h1v1h-1zM4%206h1v1h-1zM5%206h1v1h-1zM0%207h1v1h-1zM3%207h1v1h-1zM4%207h1v1h-1zM7%207h1v1h-1z%22%2F%3E%3C%2Fsvg%3E"); mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2232%22%20height%3D%2232%22%20viewBox%3D%220%200%208%208%22%20shape-rendering%3D%22crispEdges%22%3E%3Cpath%20d%3D%22M2%200h1v1h-1zM3%200h1v1h-1zM6%200h1v1h-1zM7%200h1v1h-1zM1%201h1v1h-1zM2%201h1v1h-1zM5%201h1v1h-1zM6%201h1v1h-1zM0%202h1v1h-1zM1%202h1v1h-1zM4%202h1v1h-1zM5%202h1v1h-1zM0%203h1v1h-1zM3%203h1v1h-1zM4%203h1v1h-1zM7%203h1v1h-1zM2%204h1v1h-1zM3%204h1v1h-1zM6%204h1v1h-1zM7%204h1v1h-1zM1%205h1v1h-1zM2%205h1v1h-1zM5%205h1v1h-1zM6%205h1v1h-1zM0%206h1v1h-1zM1%206h1v1h-1zM4%206h1v1h-1zM5%206h1v1h-1zM0%207h1v1h-1zM3%207h1v1h-1zM4%207h1v1h-1zM7%207h1v1h-1z%22%2F%3E%3C%2Fsvg%3E"); }
+.ms-pat--bricks { -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2232%22%20height%3D%2232%22%20viewBox%3D%220%200%208%208%22%20shape-rendering%3D%22crispEdges%22%3E%3Cpath%20d%3D%22M0%200h1v1h-1zM1%200h1v1h-1zM2%200h1v1h-1zM3%200h1v1h-1zM4%200h1v1h-1zM5%200h1v1h-1zM6%200h1v1h-1zM7%200h1v1h-1zM0%201h1v1h-1zM0%202h1v1h-1zM0%203h1v1h-1zM0%204h1v1h-1zM1%204h1v1h-1zM2%204h1v1h-1zM3%204h1v1h-1zM4%204h1v1h-1zM5%204h1v1h-1zM6%204h1v1h-1zM7%204h1v1h-1zM4%205h1v1h-1zM4%206h1v1h-1zM4%207h1v1h-1z%22%2F%3E%3C%2Fsvg%3E"); mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2232%22%20height%3D%2232%22%20viewBox%3D%220%200%208%208%22%20shape-rendering%3D%22crispEdges%22%3E%3Cpath%20d%3D%22M0%200h1v1h-1zM1%200h1v1h-1zM2%200h1v1h-1zM3%200h1v1h-1zM4%200h1v1h-1zM5%200h1v1h-1zM6%200h1v1h-1zM7%200h1v1h-1zM0%201h1v1h-1zM0%202h1v1h-1zM0%203h1v1h-1zM0%204h1v1h-1zM1%204h1v1h-1zM2%204h1v1h-1zM3%204h1v1h-1zM4%204h1v1h-1zM5%204h1v1h-1zM6%204h1v1h-1zM7%204h1v1h-1zM4%205h1v1h-1zM4%206h1v1h-1zM4%207h1v1h-1z%22%2F%3E%3C%2Fsvg%3E"); }
+.ms-pat--checker { -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2232%22%20height%3D%2232%22%20viewBox%3D%220%200%208%208%22%20shape-rendering%3D%22crispEdges%22%3E%3Cpath%20d%3D%22M0%200h1v1h-1zM2%200h1v1h-1zM4%200h1v1h-1zM6%200h1v1h-1zM1%201h1v1h-1zM3%201h1v1h-1zM5%201h1v1h-1zM7%201h1v1h-1zM0%202h1v1h-1zM2%202h1v1h-1zM4%202h1v1h-1zM6%202h1v1h-1zM1%203h1v1h-1zM3%203h1v1h-1zM5%203h1v1h-1zM7%203h1v1h-1zM0%204h1v1h-1zM2%204h1v1h-1zM4%204h1v1h-1zM6%204h1v1h-1zM1%205h1v1h-1zM3%205h1v1h-1zM5%205h1v1h-1zM7%205h1v1h-1zM0%206h1v1h-1zM2%206h1v1h-1zM4%206h1v1h-1zM6%206h1v1h-1zM1%207h1v1h-1zM3%207h1v1h-1zM5%207h1v1h-1zM7%207h1v1h-1z%22%2F%3E%3C%2Fsvg%3E"); mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2232%22%20height%3D%2232%22%20viewBox%3D%220%200%208%208%22%20shape-rendering%3D%22crispEdges%22%3E%3Cpath%20d%3D%22M0%200h1v1h-1zM2%200h1v1h-1zM4%200h1v1h-1zM6%200h1v1h-1zM1%201h1v1h-1zM3%201h1v1h-1zM5%201h1v1h-1zM7%201h1v1h-1zM0%202h1v1h-1zM2%202h1v1h-1zM4%202h1v1h-1zM6%202h1v1h-1zM1%203h1v1h-1zM3%203h1v1h-1zM5%203h1v1h-1zM7%203h1v1h-1zM0%204h1v1h-1zM2%204h1v1h-1zM4%204h1v1h-1zM6%204h1v1h-1zM1%205h1v1h-1zM3%205h1v1h-1zM5%205h1v1h-1zM7%205h1v1h-1zM0%206h1v1h-1zM2%206h1v1h-1zM4%206h1v1h-1zM6%206h1v1h-1zM1%207h1v1h-1zM3%207h1v1h-1zM5%207h1v1h-1zM7%207h1v1h-1z%22%2F%3E%3C%2Fsvg%3E"); }
+.ms-pat--dots { -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2232%22%20height%3D%2232%22%20viewBox%3D%220%200%208%208%22%20shape-rendering%3D%22crispEdges%22%3E%3Cpath%20d%3D%22M2%201h1v1h-1zM6%201h1v1h-1zM0%203h1v1h-1zM4%203h1v1h-1zM2%205h1v1h-1zM6%205h1v1h-1zM0%207h1v1h-1zM4%207h1v1h-1z%22%2F%3E%3C%2Fsvg%3E"); mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2232%22%20height%3D%2232%22%20viewBox%3D%220%200%208%208%22%20shape-rendering%3D%22crispEdges%22%3E%3Cpath%20d%3D%22M2%201h1v1h-1zM6%201h1v1h-1zM0%203h1v1h-1zM4%203h1v1h-1zM2%205h1v1h-1zM6%205h1v1h-1zM0%207h1v1h-1zM4%207h1v1h-1z%22%2F%3E%3C%2Fsvg%3E"); }
+.ms-pat--lattice { -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2232%22%20height%3D%2232%22%20viewBox%3D%220%200%208%208%22%20shape-rendering%3D%22crispEdges%22%3E%3Cpath%20d%3D%22M0%200h1v1h-1zM7%200h1v1h-1zM1%201h1v1h-1zM6%201h1v1h-1zM2%202h1v1h-1zM5%202h1v1h-1zM3%203h1v1h-1zM4%203h1v1h-1zM3%204h1v1h-1zM4%204h1v1h-1zM2%205h1v1h-1zM5%205h1v1h-1zM1%206h1v1h-1zM6%206h1v1h-1zM0%207h1v1h-1zM7%207h1v1h-1z%22%2F%3E%3C%2Fsvg%3E"); mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2232%22%20height%3D%2232%22%20viewBox%3D%220%200%208%208%22%20shape-rendering%3D%22crispEdges%22%3E%3Cpath%20d%3D%22M0%200h1v1h-1zM7%200h1v1h-1zM1%201h1v1h-1zM6%201h1v1h-1zM2%202h1v1h-1zM5%202h1v1h-1zM3%203h1v1h-1zM4%203h1v1h-1zM3%204h1v1h-1zM4%204h1v1h-1zM2%205h1v1h-1zM5%205h1v1h-1zM1%206h1v1h-1zM6%206h1v1h-1zM0%207h1v1h-1zM7%207h1v1h-1z%22%2F%3E%3C%2Fsvg%3E"); }
+.ms-pat--stars { -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2232%22%20height%3D%2232%22%20viewBox%3D%220%200%208%208%22%20shape-rendering%3D%22crispEdges%22%3E%3Cpath%20d%3D%22M3%201h1v1h-1zM2%202h1v1h-1zM3%202h1v1h-1zM4%202h1v1h-1zM3%203h1v1h-1zM7%205h1v1h-1zM0%206h1v1h-1zM6%206h1v1h-1zM7%206h1v1h-1zM7%207h1v1h-1z%22%2F%3E%3C%2Fsvg%3E"); mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2232%22%20height%3D%2232%22%20viewBox%3D%220%200%208%208%22%20shape-rendering%3D%22crispEdges%22%3E%3Cpath%20d%3D%22M3%201h1v1h-1zM2%202h1v1h-1zM3%202h1v1h-1zM4%202h1v1h-1zM3%203h1v1h-1zM7%205h1v1h-1zM0%206h1v1h-1zM6%206h1v1h-1zM7%206h1v1h-1zM7%207h1v1h-1z%22%2F%3E%3C%2Fsvg%3E"); }
+/* 读数条:2px 墨框里按百分比铺图案(CPU 斜纹、RAM 砖墙),前沿一道实线 */
+.ms-pat--lg { -webkit-mask-size: 32px 32px; mask-size: 32px 32px; }
+.ms-patbar { position: relative; height: 20px; box-shadow: inset 0 0 0 2px var(--web-ink); }
+.ms-patbar > .ms-pat { -webkit-mask-position: 0 4px; mask-position: 0 4px; position: absolute; inset: 2px auto 2px 2px; width: calc((100% - 4px) * var(--v, 0) / 100); color: var(--web-ink); box-shadow: 2px 0 0 0 var(--web-ink); }
+
+/* ---------- 时间序列:一格时间一根竖条(逐日 / 逐小时)。竖条在表达数,所以用 web-ink-2(≥ 3:1),不用只做引导的 web-line ---------- */
+.ms-ticks { display: flex; align-items: flex-end; gap: var(--web-space-1); height: 24px; margin: 0; padding: 0; list-style: none; }
+.ms-ticks > i { flex: none; width: 4px; height: calc(var(--v, 1) * 100%); background: var(--web-ink-2); }
+/* 最近的一格用正文墨;越阈值的用 warn;没有数据的格位只留 1px 刻度(版式装置,web-dim) */
+.ms-ticks > i.is-now { background: var(--web-ink); }
+.ms-ticks > i.is-over { background: var(--warn); }
+.ms-ticks > i.is-none { height: 1px; background: var(--web-dim); }
+@media (min-width: 1200px) { .ms-ticks > i { width: 8px; } }
+/* 一条序列连同下面的尺寸线和起止日期包成一组;inline-grid 让尺寸线自动和竖条一样宽 */
+.ms-series { display: inline-grid; gap: var(--web-space-2); width: max-content; max-width: 100%; margin: 0; }
+.ms-series-ends { display: flex; justify-content: space-between; gap: var(--web-space-4); margin: 0; }
+
+/* ---------- 正文 ---------- */
+.ms-prose { max-width: var(--web-measure); }
+.ms-prose > * { margin: 0; }
+.ms-prose > * + * { margin-top: var(--web-space-4); }
+.ms-prose > h2 + *, .ms-prose > h3 + * { margin-top: var(--web-space-2); }
+.ms-prose > * + h2 { margin-top: var(--web-space-12); }
+.ms-prose > * + h3 { margin-top: var(--web-space-8); }
+.ms-prose h2 { font-size: 22px; line-height: 30px; font-weight: 600; }
+.ms-prose h3 { font-size: 17px; line-height: 26px; font-weight: 600; }
+.ms-prose ul, .ms-prose ol { padding: 0; list-style: none; }
+.ms-prose li { position: relative; padding-left: 1.5em; }
+.ms-prose li + li { margin-top: var(--web-space-2); }
+.ms-prose ul > li::before { content: ""; position: absolute; left: 0.25em; top: 11px; width: 6px; height: 6px; background: var(--web-ink-2); }
+.ms-prose ol { counter-reset: ms-ol; }
+.ms-prose ol > li { counter-increment: ms-ol; padding-left: 2.5em; }
+.ms-prose ol > li::before { content: counter(ms-ol, decimal-leading-zero); position: absolute; left: 0; top: 1px; font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.06em; color: var(--web-ink-2); }
+.ms-prose a:not(.ms-action), .ms-link {
+  color: var(--web-ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  text-decoration-color: var(--web-ink-2);
+  transition: text-decoration-color var(--web-fade) ease-out;
+}
+.ms-prose a:not(.ms-action):hover, .ms-link:hover { text-decoration-color: var(--web-ink); }
+.ms-page code { font-family: var(--font-mono); font-size: 0.875em; color: var(--web-ink); }
+.ms-page pre {
+  margin: 0;
+  overflow-x: auto;
+  padding: var(--web-space-4);
+  background: var(--web-surface);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 20px;
+  clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
+}
+.ms-prose pre { margin-inline: calc(-1 * var(--ms-hang)); padding-inline: max(var(--web-space-4), var(--ms-hang)); }
+.ms-page pre code { font-size: inherit; }
+.ms-prose strong { font-weight: 600; color: var(--web-ink); }
+
+/* 行动链接:System 7 按钮的网页版。悬停垫一层 web-line,按下那一下反色(控件反馈,面积不超过一个按钮;大面积反色只给失联) */
+.ms-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75em;
+  min-height: 40px;
+  padding: 0 var(--web-space-4);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--web-ink);
+  box-shadow: inset 0 0 0 2px var(--web-ink);
+  clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
+  transition: background-color var(--web-fade) ease-out, color var(--web-fade) ease-out;
+}
+.ms-action:hover { background: var(--web-line); }
+.ms-action:active { background: var(--web-ink); color: var(--web-bg); }
+
+/* ---------- 表格 ---------- */
+.ms-table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 15px; line-height: 21px; }
+.ms-table th { text-align: left; color: var(--web-ink-2); padding: 0 var(--web-space-4) var(--web-space-2) 0; }
+.ms-table td { padding: var(--web-space-2) var(--web-space-4) var(--web-space-2) 0; background: linear-gradient(90deg, var(--web-line) 1px, transparent 1px) 0 0 / 4px 1px repeat-x; }
+.ms-table .is-num { text-align: right; font-variant-numeric: tabular-nums; }
+.ms-table th:last-child, .ms-table td:last-child { padding-right: 0; }
+
+/* ---------- 页脚:警示条 + 一行元信息 ---------- */
+.ms-site-footer { padding-block: var(--web-space-16) var(--web-space-8); }
+.ms-warnstrip { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 2ch; align-items: start; margin: 0; font-family: var(--font-mono); font-size: 15px; line-height: 21px; }
+.ms-warnstrip .ms-hazard { background: var(--web-sig); color: var(--sig-ink); padding: 0; letter-spacing: 0; }
+.ms-warnstrip p { margin: 0; color: var(--web-ink-2); text-transform: uppercase; letter-spacing: 0.04em; }
+.ms-warnstrip p code { text-transform: none; font-size: inherit; color: inherit; }
+.ms-footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--web-space-2) var(--web-space-6); margin-top: var(--web-space-8); padding-top: var(--web-space-4); color: var(--web-ink-2);
+  background: linear-gradient(90deg, var(--web-line) 1px, transparent 1px) 0 0 / 4px 1px repeat-x; }
+
+/* ---------- 动效:只动颜色;减少动态时一律不动 ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .ms-page *, .ms-page *::before, .ms-page *::after { transition: none !important; animation: none !important; }
+}
+
+/* ---------- 无障碍工具 ---------- */
+.ms-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.ms-skip { position: absolute; left: var(--web-space-4); top: -100px; padding: var(--web-space-2) var(--web-space-4); background: var(--web-ink); color: var(--web-bg); font-family: var(--font-mono); font-size: 13px; z-index: 10; }
+.ms-skip:focus { top: var(--web-space-4); }
