@@ -1,4 +1,5 @@
 import { LightstickClient } from "./sdk.js";
+import { rgbToHsv, wheelRgb, renderColor } from "./color.js";
 
 const $ = id => document.getElementById(id);
 const hex = b => [...b].map(x => x.toString(16).padStart(2, "0")).join(" ");
@@ -58,12 +59,18 @@ const mix = (a, b, k) => a.map((x, i) => x + (b[i] - x) * k);
 const scale = (c, k) => c.map(x => x * k);
 const smooth = x => x * x * (3 - 2 * x);
 
-const PALETTE = ["#ff2040", "#ff7a00", "#ffd400", "#3dff6e", "#00e5ff", "#2f6bff", "#a64dff", "#ff4fd8", "#ffffff"];
-// 幻彩多色用的几组配色
+const PALETTE = [
+  ["纯红", "#ff0000"], ["橙色", "#ff8000"], ["黄色", "#ffff00"],
+  ["纯绿", "#00ff00"], ["青色（待确认）", "#00ffff"], ["纯蓝", "#0000ff"],
+  ["品红（待确认）", "#ff00ff"], ["粉红", "#ff2020"], ["白光", "#ffffff"],
+];
+// Quick colors and animated endpoints share the same device-oriented values.
+const namedColors = PALETTE.map(([, color]) => color);
+// 混色仍需实物确认；连续 HSV 色环不是经过测量的色彩校准。
 const THEMES = [
-  ["#ff2040", "#ffd400", "#00e5ff", "#a64dff"],
-  ["#00e5ff", "#2f6bff", "#a64dff"],
-  ["#ff4fd8", "#ffd400", "#3dff6e"],
+  [namedColors[0], namedColors[2], namedColors[4], namedColors[6]],
+  [namedColors[4], namedColors[5], namedColors[6]],
+  [namedColors[7], namedColors[2], namedColors[3]],
 ].map(t => t.map(hexToRgb));
 
 // ---- 灯效：给定时间 t（秒，已乘速度）和基础色，返回 RGB ----
@@ -90,7 +97,7 @@ const effects = [
   { name: "烛光", desc: "随机摇曳", fn: (t, c) => scale(c, 0.55 + 0.45 * flicker(t)) },
   { name: "警灯", desc: "红蓝交替", fn: t => {
       const p = (t * 1.5) % 1, on = (p * 6) % 1 < 0.5;
-      return on ? (p < 0.5 ? [255, 0, 0] : [0, 40, 255]) : [0, 0, 0];
+      return on ? (p < 0.5 ? [255, 0, 0] : [0, 0, 255]) : [0, 0, 0];
     } },
   { name: "关灯", desc: "全灭", fn: () => [0, 0, 0] },
 ];
@@ -294,7 +301,7 @@ const musicEffects = [
       return lum(hsv(hueDrift + beatHue), 0.2 + 0.8 * Math.max(au.pulse, au.level));
     } },
 ];
-const PALETTE_RGB = ["#ff2040", "#ffd400", "#00e5ff", "#a64dff", "#3dff6e", "#ff7a00"].map(hexToRgb);
+const PALETTE_RGB = [0, 2, 4, 6, 3, 1].map(i => hexToRgb(namedColors[i]));
 
 // ---- 白平衡 ----
 
@@ -302,9 +309,10 @@ const GAIN_IDS = ["gainR", "gainG", "gainB"];
 const GAIN_KEY = "wuwa-lightstick-gain";
 
 // 预览圆点显示的是想要的颜色，发给棒子的才乘增益；R=G=B 时固件点白光灯珠，乘了反而变成三色混白
-function balance(rgb) {
-  if (rgb[0] === rgb[1] && rgb[1] === rgb[2]) return rgb;
-  return rgb.map((x, i) => Math.round(x * +$(GAIN_IDS[i]).value / 100));
+function balance(rgb, brightness) {
+  return renderColor(rgb, {brightness,
+    yellowGreen: +$("yellowGreen").value,
+    gains: $("useGains").checked ? GAIN_IDS.map(id => +$(id).value/100) : [1,1,1]});
 }
 
 function showGains() {
@@ -321,7 +329,7 @@ function loadGains() {
 }
 
 function calibrate(hexColor) {
-  $("color").value = hexColor;
+  $("color").value = hexColor; syncWheel();
   $("bright").value = 100; $("bright").oninput();
   startEffect(effects[0]);
 }
@@ -350,10 +358,11 @@ function tick(now) {
   if (actx) { analyse(now, dt); drawMeter(); }
   const base = hexToRgb($("color").value);
   const k = +$("bright").value / 100;
-  const rgb = running.fn(simT, base, dt).map(x => Math.max(0, Math.min(255, Math.round(x * k))));
-  $("orb").style.background = `rgb(${rgb})`;
+  const rgb = running.fn(simT, base, dt).map(x => Math.max(0, Math.min(255, x)));
+  $("orb").style.background = `rgb(${rgb.map(x=>Math.round(x*k))})`;
   $("orb").style.setProperty("--glow", `rgba(${rgb},.6)`);
-  const out = balance(rgb);
+  const out = balance(rgb, k);
+  $("outputRgb").textContent = `输出 RGB ${out.join(", ")} · ${out[0]>0 && out.every(x=>x===out[0]) ? "白光通道" : "RGB 通道"}`;
   const key = out.join();
   if (client.ready && key !== lastFrame) { lastFrame = key; sendColor(out); }
 }
@@ -381,12 +390,15 @@ $("srcMic").onclick = useMic;
 $("sync").oninput = applySync;
 $("autoSync").onclick = autoSync;
 $("sens").oninput = () => { $("sensv").textContent = (+$("sens").value / 100).toFixed(1) + "×"; };
-for (const c of PALETTE) {
+for (const [name, c] of PALETTE) {
   const b = document.createElement("button");
-  b.className = "swatch"; b.style.background = c; b.title = c; b.setAttribute("aria-label", "选择颜色 " + c);
-  b.onclick = () => { $("color").value = c; if (running && !running.music && ![effects[0], effects[1], effects[2], effects[3], effects[4], effects[11]].includes(running)) startEffect(effects[0]); };
+  b.className = "swatch"; b.style.background = c;
+  b.title = `${name} · ${c.toUpperCase()}`;
+  b.setAttribute("aria-label", `选择${name} ${c.toUpperCase()}`);
+  b.onclick = () => { $("color").value = c; syncWheel(); stopAudio(); startEffect(effects[0]); };
   $("swatches").append(b);
 }
+$("color").oninput = () => { syncWheel(); stopAudio(); startEffect(effects[0]); };
 $("bright").oninput = () => { $("brightv").textContent = $("bright").value + "%"; };
 $("speed").oninput = () => { $("speedv").textContent = (+$("speed").value / 100).toFixed(1) + "×"; };
 $("connect").onclick = connect;
@@ -415,3 +427,43 @@ if (!window.isSecureContext || !navigator.bluetooth) {
 }
 if (!navigator.mediaDevices?.getDisplayMedia) $("srcTab").disabled = true;
 window.addEventListener("pagehide", () => { stopAudio(); client.disconnect(); });
+
+// Native canvas color wheel: hue around the rim, saturation toward the center.
+const wheel = $("wheel"), ctx = wheel.getContext("2d");
+const size=wheel.width, center=size/2, radius=center-3;
+const pixels=ctx.createImageData(size,size);
+for(let y=0;y<size;y++) for(let x=0;x<size;x++) {
+  const dx=x-center,dy=y-center, sat=Math.hypot(dx,dy)/radius;
+  if(sat>1) continue;
+  const h=(Math.atan2(dy,dx)*180/Math.PI+90+360)%360;
+  const color=wheelRgb(h,sat), j=(y*size+x)*4;
+  pixels.data.set([...color.map(Math.round),255],j);
+}
+let selectedHue=0;
+function syncWheel() {
+  const [h,s]=rgbToHsv(hexToRgb($("color").value));
+  if(s) selectedHue=h;
+  $("wheelHue").value=Math.round(selectedHue); $("wheelSat").value=Math.round(s*100);
+  $("wheelHueValue").textContent=`${Math.round(selectedHue)}°`;
+  $("wheelSatValue").textContent=`${Math.round(s*100)}%`;
+  ctx.putImageData(pixels,0,0);
+  const a=(selectedHue-90)*Math.PI/180, x=center+Math.cos(a)*s*radius, y=center+Math.sin(a)*s*radius;
+  ctx.beginPath();ctx.arc(x,y,6,0,Math.PI*2);ctx.strokeStyle="#000";ctx.lineWidth=4;ctx.stroke();ctx.strokeStyle="#fff";ctx.lineWidth=2;ctx.stroke();
+}
+function selectWheel(h,s) {
+  selectedHue=((h%360)+360)%360;
+  $("color").value="#"+wheelRgb(selectedHue,s).map(x=>Math.round(x).toString(16).padStart(2,"0")).join("");
+  syncWheel(); stopAudio(); startEffect(effects[0]);
+}
+function pointWheel(event) {
+  const rect=wheel.getBoundingClientRect(),dx=(event.clientX-rect.left)*size/rect.width-center,dy=(event.clientY-rect.top)*size/rect.height-center;
+  selectWheel((Math.atan2(dy,dx)*180/Math.PI+90+360)%360,Math.min(1,Math.hypot(dx,dy)/radius));
+}
+wheel.onpointerdown=e=>{wheel.setPointerCapture(e.pointerId);pointWheel(e)};
+wheel.onpointermove=e=>{if(wheel.hasPointerCapture(e.pointerId)) pointWheel(e)};
+wheel.onpointerup=e=>{if(wheel.hasPointerCapture(e.pointerId)) wheel.releasePointerCapture(e.pointerId)};
+$("wheelHue").oninput=()=>selectWheel(+$("wheelHue").value,+$("wheelSat").value/100);
+$("wheelSat").oninput=()=>selectWheel(+$("wheelHue").value,+$("wheelSat").value/100);
+$("yellowGreen").oninput=()=>{$("yellowValue").textContent=$("yellowGreen").value;lastFrame=null};
+$("useGains").onchange=()=>{lastFrame=null};
+syncWheel();

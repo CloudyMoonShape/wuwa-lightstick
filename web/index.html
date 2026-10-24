@@ -6,6 +6,7 @@
 <p id="status" role="status" aria-live="polite">未连接 · 可先试颜色和灯效</p>
 <p class="note setup">装好电池 → 连接 JFKJ 设备 → 等蓝灯闪完</p>
 <div class="swatches" id="swatches"></div><div class="row colorrow"><label for="color">自选</label><input type="color" id="color" value="#00e5ff"><label for="bright">亮度</label><input type="range" id="bright" min="0" max="100" value="100"><output id="brightv">100%</output></div>
+<div class="wheel-layout"><canvas id="wheel" width="200" height="200" aria-label="色轮：拖动选择色相和饱和度，下方滑块可用键盘操作"></canvas><div class="wheel-controls"><div class="row"><label for="wheelHue">色相</label><input id="wheelHue" type="range" min="0" max="359" value="0"><output id="wheelHueValue"></output></div><div class="row"><label for="wheelSat">浓度</label><input id="wheelSat" type="range" min="0" max="100" value="100"><output id="wheelSatValue"></output></div><p class="note">观感混色 · 保持纯色与明暗变化</p><div class="row"><label for="yellowGreen">黄色中的绿</label><input type="range" id="yellowGreen" min="16" max="255" value="96"><output id="yellowValue">96</output></div><p class="note">黄色发绿就往左调，偏橙就往右调。96 是试调起点，尚非实测校准。</p><p id="outputRgb" class="note"></p></div></div>
 <div class="sectionhead effectshead"><h2>灯效</h2><div class="row speedrow"><label for="speed">速度</label><input type="range" id="speed" min="10" max="300" value="100"><output id="speedv">1.0×</output></div></div><div class="grid" id="effects"></div>
 <label class="flash"><input id="flashConsent" type="checkbox"> 启用快速闪光（对闪光敏感请勿开启）</label><p id="flashNote" class="note" role="status"></p>
 <p class="compat" id="compat">连接请用桌面 Chrome / Edge 或 Android Chrome，保持页面在前台。无设备也能预览。</p></section>
@@ -31,7 +32,7 @@
   </details>
 
   <details class="panel"><summary>白平衡校准 <span>调整灯珠偏色</span></summary>
-    <h2>白平衡（灯珠三色亮度不一致，按肉眼调）</h2>
+    <h2>手动通道修正</h2><label><input type="checkbox" id="useGains"> 应用下面的旧增益（默认不启用，数值保留）</label>
     <div style="display:grid; gap:10px">
       <div class="row"><label for="gainR">红</label><input type="range" id="gainR" min="5" max="100" value="100"><span id="gainRv"></span></div>
       <div class="row"><label for="gainG">绿</label><input type="range" id="gainG" min="5" max="100" value="100"><span id="gainGv"></span></div>
@@ -41,7 +42,7 @@
         <button id="calReset">恢复 100%</button>
       </div>
     </div>
-    <p class="note">点一个校准色，调滑块直到棒子看起来就是黄 / 青 / 品红。偏橙就降红，偏绿就降绿。设置存在这个浏览器里。三色相等（白、灰）时固件走单独的白光灯珠，不受白平衡影响。</p>
+    <p class="note">点一个校准色，调滑块直到棒子看起来就是黄 / 青 / 品红。偏橙就降红，偏绿就降绿。设置存在这个浏览器里。三色相等（白、灰）时固件走单独的白光灯珠，不受白平衡影响。核对预设色时请先恢复 100%；旧的通道衰减会改变混色，例如降低红色会让橙色偏绿。</p>
   </details>
 
 <details class="panel"><summary>连接帮助 <span>找不到设备？</span></summary><p>先确认棒子已装好电池，并关闭其他正在连接它的网页或程序。在浏览器弹窗中选择名称以 JFKJ 开头的设备。连接成功后会闪蓝灯，约一秒后即可使用。</p><p>若找不到设备，请确认系统蓝牙与浏览器蓝牙权限已开启，靠近棒子后重试。连接中断后可点「重新连接」。断开连接不保证棒子熄灭，需要时请使用实体电源开关。</p></details>

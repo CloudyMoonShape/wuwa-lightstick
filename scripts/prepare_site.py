@@ -6,7 +6,7 @@ import shutil
 
 ROOT = Path(__file__).resolve().parents[1]
 DEST = ROOT / 'dist'
-COPY = ('sdk.js', 'principles.html', '_headers', '404.html', 'LICENSE.txt')
+COPY = ('color.js', 'sdk.js', 'principles.html', '_headers', '404.html', 'LICENSE.txt')
 
 def main():
     for name in ('index.html', 'app.js', 'style.css', *COPY):
@@ -17,11 +17,14 @@ def main():
     sdk = (ROOT / 'web/sdk.js').read_text()
     app = (ROOT / 'web/app.js').read_text()
     sdk = re.sub(r'^export ', '', sdk, flags=re.M)
+    color = re.sub(r'^export ', '', (ROOT / 'web/color.js').read_text(), flags=re.M)
+    app, color_imports = re.subn(r'^import \{ rgbToHsv, wheelRgb, renderColor \} from "\./color.js";\s*', '', app, flags=re.M)
+    if color_imports != 1: raise SystemExit('Color import changed')
     app, imports = re.subn(r'^import \{ LightstickClient \} from "\./sdk.js";\s*', '', app)
     if imports != 1:
         raise SystemExit('SDK import changed: inspect bundle before publishing')
     html, styles = re.subn(r'<link rel="stylesheet" href="style.css">', lambda _: '<style>' + style + '</style>', html)
-    html, scripts = re.subn(r'<script type="module" src="app.js"></script>', lambda _: '<script type="module">\n' + sdk + '\n' + app + '\n</script>', html)
+    html, scripts = re.subn(r'<script type="module" src="app.js"></script>', lambda _: '<script type="module">\n' + sdk + '\n' + color + '\n' + app + '\n</script>', html)
     if styles != 1 or scripts != 1:
         raise SystemExit('Controller asset tags changed: inspect bundle')
     if DEST.exists():
