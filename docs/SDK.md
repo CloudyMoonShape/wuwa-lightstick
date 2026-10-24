@@ -97,3 +97,5 @@ flowchart LR
 ## 与网页色轮的关系
 
 SDK `setColor` 接收原始RGB驱动值。网页先通过 `web/color.js` 的 `renderColor` 做观感混色，再调用SDK；请勿对已转换值重复应用映射。网页唯一混色标准、黄色微调和样机验收范围见 [混色说明](COLOR-MIXING.md)。
+
+网页手动亮度与呼吸由 `web/dimming.js` 生成整体亮度系数：滑块平滑后经过温和二次曲线，呼吸单独生成连续包络，再交给 `renderColor` 最后取整。SDK 不自动应用这些曲线，开发者传入 `[128,0,0]` 仍发送原始 128。详细换算和 8 位暗部限制见 [调光说明](DIMMING.md)。

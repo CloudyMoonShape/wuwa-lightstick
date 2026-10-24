@@ -1,5 +1,6 @@
 import { LightstickClient } from "./sdk.js";
 import { rgbToHsv, wheelRgb, renderColor } from "./color.js";
+import { brightnessDrive, BrightnessSmoother, breathBrightness, breathHue } from "./dimming.js";
 
 const $ = id => document.getElementById(id);
 const hex = b => [...b].map(x => x.toString(16).padStart(2, "0")).join(" ");
@@ -77,7 +78,7 @@ const THEMES = [
 
 const effects = [
   { name: "常亮", desc: "单色", fn: (t, c) => c },
-  { name: "呼吸", desc: "缓慢明暗", fn: (t, c) => scale(c, 0.04 + 0.96 * smooth((Math.sin(t * 1.6) + 1) / 2)) },
+  { name: "呼吸", desc: "缓慢明暗", breathing: true, fn: (t, c) => c },
   { name: "闪烁", desc: "一亮一灭", fn: (t, c) => (t * 2) % 1 < 0.5 ? c : [0, 0, 0] },
   { name: "频闪", desc: "短促爆闪", fn: (t, c) => (t * 6) % 1 < 0.18 ? c : [0, 0, 0] },
   { name: "心跳", desc: "咚-咚", fn: (t, c) => {
@@ -90,10 +91,7 @@ const effects = [
   { name: "多色渐变", desc: "配色 1 循环", fn: t => theme(THEMES[0], t * 0.8) },
   { name: "冰蓝流光", desc: "配色 2 循环", fn: t => theme(THEMES[1], t * 0.8) },
   { name: "糖果", desc: "配色 3 循环", fn: t => theme(THEMES[2], t * 0.8) },
-  { name: "呼吸变色", desc: "每口气换色", fn: t => {
-      const k = smooth((Math.sin(t * 1.6 - Math.PI / 2) + 1) / 2);
-      return scale(hsv(Math.floor((t * 1.6) / (2 * Math.PI)) * 67), 0.03 + 0.97 * k);
-    } },
+  { name: "呼吸变色", desc: "暗处柔和换色", breathing: true, fn: t => hsv(breathHue(t)) },
   { name: "烛光", desc: "随机摇曳", fn: (t, c) => scale(c, 0.55 + 0.45 * flicker(t)) },
   { name: "警灯", desc: "红蓝交替", fn: t => {
       const p = (t * 1.5) % 1, on = (p * 6) % 1 < 0.5;
@@ -340,6 +338,7 @@ function calibrate(hexColor) {
 }
 
 let running = null, raf = 0, t0 = 0, simT = 0, lastFrame = null;
+const brightnessSmoother = new BrightnessSmoother(+$("bright").value / 100);
 let lastPreview = "", lastOutput = "";
 const FLASH_EFFECTS = new Set(["闪烁", "频闪", "警灯", "爆闪", "彩虹跳变"]);
 
@@ -347,6 +346,7 @@ function startEffect(fx) {
   if (FLASH_EFFECTS.has(fx.name) && !$("flashConsent").checked) { $("flashing").open = true; $("flashNote").textContent = "先开启「允许快速闪光」，或选择呼吸、渐变。"; return; }
   $("flashNote").textContent = "";
   $("effectName").textContent = fx.name;
+  if (fx.breathing && running !== fx) simT = 0;
   running = fx;
   document.querySelectorAll("[data-effect]").forEach(b => { b.classList.toggle("on", b.dataset.name === fx.name); b.setAttribute("aria-pressed", String(b.dataset.name === fx.name)); });
   $("blackout").setAttribute("aria-pressed", String(fx.name === "关灯"));
@@ -362,12 +362,15 @@ function stopEffect() {
 
 function tick(now) {
   raf = requestAnimationFrame(tick);
-  const dt = Math.min(0.1, (now - t0) / 1000); t0 = now;
+  const elapsed = Math.max(0, (now - t0) / 1000); t0 = now;
+  const dt = Math.min(0.1, elapsed);
   simT += dt * +$("speed").value / 100;
   if (srcNode) { analyse(now, dt); drawMeter(); }
   const base = hexToRgb($("color").value);
-  const k = +$("bright").value / 100;
+  const level = brightnessSmoother.advance(+$("bright").value / 100, elapsed);
+  const ceiling = brightnessDrive(level);
   const rgb = running.fn(simT, base, dt).map(x => Math.max(0, Math.min(255, x)));
+  const k = running.breathing ? breathBrightness(simT, ceiling, Math.max(...rgb)) : ceiling;
   const preview = rgb.map(x=>Math.round(x*k)).join();
   if (preview !== lastPreview) {
     $("orb").style.background = `rgb(${preview})`;

@@ -6,7 +6,7 @@ import shutil
 
 ROOT = Path(__file__).resolve().parents[1]
 DEST = ROOT / 'dist'
-COPY = ('color.js', 'sdk.js', 'principles.html', '_headers', '_routes.json', '404.html', 'LICENSE.txt')
+COPY = ('color.js', 'dimming.js', 'sdk.js', 'principles.html', '_headers', '_routes.json', '404.html', 'LICENSE.txt')
 ARTWORK = ('wuwa-key-visual-2bf16e89.avif', 'wuwa-key-visual-0cc8a4a2.webp',
            'wuwa-key-visual-mobile-c930edae.avif', 'wuwa-key-visual-mobile-64336493.webp')
 
@@ -37,13 +37,16 @@ def main():
     app = (ROOT / 'web/app.js').read_text()
     sdk = re.sub(r'^export ', '', sdk, flags=re.M)
     color = re.sub(r'^export ', '', (ROOT / 'web/color.js').read_text(), flags=re.M)
+    dimming = re.sub(r'^export ', '', (ROOT / 'web/dimming.js').read_text(), flags=re.M)
+    app, dimming_imports = re.subn(r'^import \{ brightnessDrive, BrightnessSmoother, breathBrightness, breathHue \} from "\./dimming.js";\s*', '', app, flags=re.M)
+    if dimming_imports != 1: raise SystemExit('Dimming import changed')
     app, color_imports = re.subn(r'^import \{ rgbToHsv, wheelRgb, renderColor \} from "\./color.js";\s*', '', app, flags=re.M)
     if color_imports != 1: raise SystemExit('Color import changed')
     app, imports = re.subn(r'^import \{ LightstickClient \} from "\./sdk.js";\s*', '', app)
     if imports != 1:
         raise SystemExit('SDK import changed: inspect bundle before publishing')
     html = inline_styles(html, controller=True)
-    html, scripts = re.subn(r'<script type="module" src="app.js"></script>', lambda _: '<script type="module">\n' + sdk + '\n' + color + '\n' + app + '\n</script>', html)
+    html, scripts = re.subn(r'<script type="module" src="app.js"></script>', lambda _: '<script type="module">\n' + sdk + '\n' + color + '\n' + dimming + '\n' + app + '\n</script>', html)
     if scripts != 1:
         raise SystemExit('Controller asset tags changed: inspect bundle')
     visitors = (ROOT / 'web/visitors.js').read_text()

@@ -40,7 +40,7 @@
       <div class="sectionhead"><h2 class="ms-h2" id="colorHeading">色彩</h2><label class="web-small custom-color" for="color"><span id="colorName">自选</span><input type="color" id="color" value="#00e5ff" aria-label="自选颜色"></label></div>
       <div class="dial"><canvas id="wheel" width="520" height="520" aria-label="色轮：拖动选择颜色，或展开精细调色使用滑块"></canvas></div>
       <div class="swatches" id="swatches" role="group" aria-label="快捷颜色"></div>
-      <div class="control-block"><div class="control-label"><label for="bright" class="web-small">亮度</label><output class="ms-readout ms-readout--sm" id="brightv" for="bright">100%</output></div><input type="range" id="bright" min="0" max="100" value="100"></div>
+      <div class="control-block"><div class="control-label"><label for="bright" class="web-small">亮度</label><output class="ms-readout ms-readout--sm" id="brightv" for="bright">100%</output></div><input type="range" id="bright" min="0" max="100" step="0.1" value="100"></div>
       <details class="fine-color"><summary class="web-small">精细调色</summary><div class="detail-body"><div class="row"><label for="wheelHue" class="web-small">色相</label><input id="wheelHue" type="range" min="0" max="359" value="0"><output id="wheelHueValue" for="wheelHue" class="web-data"></output></div><div class="row"><label for="wheelSat" class="web-small">浓度</label><input id="wheelSat" type="range" min="0" max="100" value="100"><output id="wheelSatValue" for="wheelSat" class="web-data"></output></div></div></details>
     </section>
     <section class="effects-panel ms-card" aria-labelledby="effectsHeading">

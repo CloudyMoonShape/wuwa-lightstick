@@ -114,7 +114,7 @@
   <section class="ms-section ms-wrap" id="paths" aria-labelledby="paths-title">
     <div class="ms-section-head"><div><span class="ms-section-label">04</span><h2 class="ms-h2" id="paths-title">两条控制路径</h2></div></div>
     <div class="ms-grid">
-      <article class="ms-prose path"><h3 class="ms-h3">网页灯效</h3><p>呼吸、渐变和律动，都是网页算出的一串颜色，再通过蓝牙 GATT 逐帧发送 <code>01</code> 设色指令。</p><p>音频频谱与低频变化用于判断节拍。蓝牙有传输延迟，本地音频可延后播放来对齐；麦克风已听到的声音无法倒回去延后。</p><p class="ms-small">网页灯效不等于固件内置灯效。命令 <code>02–0c</code> 的参数与效果仍未逐项确认。</p></article>
+      <article class="ms-prose path"><h3 class="ms-h3">网页灯效</h3><p>呼吸、渐变和律动，都是网页算出的一串颜色，再通过蓝牙 GATT 逐帧发送 <code>01</code> 设色指令。</p><p>亮度滑块经过短暂平滑和温和调光曲线，呼吸使用连续明暗包络；只缩放整体亮度，保留观感混色比例，最终再取整为每通道 0–255。低亮度仍受档位数量限制。</p><p>音频频谱与低频变化用于判断节拍。蓝牙有传输延迟，本地音频可延后播放来对齐；麦克风已听到的声音无法倒回去延后。</p><p class="ms-small">网页灯效不等于固件内置灯效。命令 <code>02–0c</code> 的参数与效果仍未逐项确认。</p></article>
       <article class="ms-prose path"><h3 class="ms-h3">现场广播</h3><p>静态分析发现固件绕过常规 GATT，在 <code>2478 MHz</code> 接收特殊射频包，使用 RGB 顺序、另一种加和校验与 XOR 混淆。</p><p>这一链路尚未完成空口实测。普通网页蓝牙不能发送它，广播脚本只生成字节。</p><p class="ms-small">不要在活动现场尝试广播。它可能影响其他棒子；类型 6 会永久改写分组号，掉电不恢复。</p></article>
     </div>
   </section>
