@@ -1,10 +1,10 @@
 /* MoonShade application extensions. RGB values are control data, not UI colors. */
-/* The owner requested gold resonance contours as a local MoonShade exception. */
-.wuwa-controller { --wuwa-gold:#d8c38d; --wuwa-wave:#3c3527; position:relative; isolation:isolate; }
-[data-theme=light] .wuwa-controller,.wuwa-controller[data-theme=light] { --wuwa-gold:#765a23; --wuwa-wave:#ded7c7; }
-@media(prefers-color-scheme:light) { :root:not([data-theme]) .wuwa-controller { --wuwa-gold:#765a23; --wuwa-wave:#ded7c7; } }
-.resonance-field { position:fixed; inset:0; z-index:-1; width:100%; height:100%; pointer-events:none; fill:none; stroke:var(--wuwa-wave); stroke-width:1; }
-.resonance-field use { vector-effect:non-scaling-stroke; }
+/* The owner requested gold water photography as a local MoonShade exception. */
+.wuwa-controller { --wuwa-gold:#d8c38d; --wuwa-art-opacity:.38; position:relative; isolation:isolate; }
+[data-theme=light] .wuwa-controller,.wuwa-controller[data-theme=light] { --wuwa-gold:#765a23; --wuwa-art-opacity:.08; }
+@media(prefers-color-scheme:light) { :root:not([data-theme]) .wuwa-controller { --wuwa-gold:#765a23; --wuwa-art-opacity:.08; } }
+.resonance-field { position:fixed; inset:0; z-index:-1; pointer-events:none; opacity:var(--wuwa-art-opacity); mask-image:linear-gradient(135deg,transparent,black 72%); }
+.resonance-field img { display:block; width:100%; height:100%; object-fit:cover; object-position:50% 62%; filter:saturate(.35); }
 p,h1,h2 { margin:0; }
 button,input { font:inherit; }
 button,a,input,summary { touch-action:manipulation; }
@@ -25,8 +25,9 @@ svg { width:var(--web-space-6); height:var(--web-space-6); fill:none; stroke:cur
 .visitor-count:not([hidden]) { display:flex; flex-direction:column; align-items:flex-end; gap:var(--web-space-1); color:var(--web-ink); white-space:nowrap; }
 #visitorTotal { --digits:1; color:var(--wuwa-gold); }
 .masthead-nav { grid-column:1 / -1; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:0 var(--web-space-4); }
-.social-links { display:flex; flex-wrap:wrap; align-items:center; gap:0 var(--web-space-6); }
-.social-links a { display:inline-flex; align-items:center; min-height:var(--web-space-12); white-space:nowrap; }
+.social-links { display:flex; align-items:center; gap:var(--web-space-2); margin-left:calc(-1 * var(--web-space-3)); }
+.social-links a { display:grid; place-items:center; width:var(--web-space-12); height:var(--web-space-12); color:var(--web-ink-2); }
+.social-links svg { width:calc(var(--web-space-4) + var(--web-space-1)); height:calc(var(--web-space-4) + var(--web-space-1)); fill:currentColor; stroke:none; }
 .social-links a:hover,.social-links a:focus-visible { color:var(--wuwa-gold); }
 .text-link { display:inline-flex; align-items:center; min-height:var(--web-space-12); white-space:nowrap; }
 .connection { display:flex; justify-content:space-between; align-items:center; gap:var(--web-space-4); margin-bottom:var(--web-space-8); }
@@ -117,7 +118,7 @@ button.quiet { background:transparent; color:var(--web-ink-2); padding:var(--web
   .masthead { column-gap:var(--web-space-4); }
   .identity { flex-direction:column; align-items:flex-start; gap:var(--web-space-2); }
   .product-title { flex-direction:row; align-items:baseline; gap:var(--web-space-2); }
-  .social-links { gap:0 var(--web-space-4); }
+  .social-links { gap:var(--web-space-1); }
   .masthead .text-link { margin-left:auto; }
   .connection { flex-wrap:wrap; gap:var(--web-space-3); margin-bottom:var(--web-space-4); }
   .connection-state { flex-basis:100%; }

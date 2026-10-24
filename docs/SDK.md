@@ -22,6 +22,14 @@ console.log(colorFrame([12, 34, 56])); // 01 00 22 0c 38 99
 
 Node 可导入 `sdk/index.mjs` 使用纯字节函数；Node 默认没有浏览器蓝牙 API。运行 `node --test tests/sdk.test.mjs` 执行模拟传输测试，测试不会连接真实设备。
 
+## 浏览器兼容性
+
+网页按安全上下文与 `navigator.bluetooth.requestDevice` 是否存在判断连接能力，不按设备型号拒绝访问。目前电脑 Chrome / Edge 与 Android Chrome 提供所需接口。iPhone / iPad 的常规 Safari、Chrome 未提供原生 Web Bluetooth；HTTPS、添加到主屏幕或把网站改成 PWA 都不能自行补上系统没有开放的蓝牙接口。
+
+按产品要求，本站不引导用户下载其他浏览器、App 或扩展。缺少接口时禁用连接并明确显示屏幕预览，调色和灯效预览仍然可用。没有把第三方桥接方案宣传成已验证的 iPhone 支持，也没有改动蓝牙协议来绕过平台权限。
+
+依据：[Chrome 官方蓝牙说明](https://support.google.com/chrome/answer/6362090?hl=zh-Hans)、[Web Bluetooth 实现状态](https://github.com/whatwg/bluetooth/blob/main/implementation-status.md)。
+
 ## 接口与语义
 
 | 接口 | 说明 |

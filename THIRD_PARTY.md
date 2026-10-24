@@ -18,3 +18,14 @@
 ## 硬件照片
 
 四张照片由项目用户提供。网页版本只作缩放、转码与元数据清理；没有生成、补绘或推测被遮挡的细节。见[硬件实拍](docs/HARDWARE.md)。
+
+## 金色水波摄影
+
+- 摄影：emteekay，《Waves》，2023-09-29，作品 ID `YWQTWtMk0Cw`。
+- [原始作品](https://unsplash.com/photos/a-black-and-yellow-photo-of-water-ripples-YWQTWtMk0Cw) · [Unsplash License](https://unsplash.com/license)。它是独立摄影作品，不是鸣潮官方游戏素材。
+- 发布文件：`web/assets/artwork/gold-ripples.avif`（1280 宽，36,499 字节）与 `gold-ripples.webp`（960 宽，48,582 字节）。通过 Unsplash 图片服务缩放与转码，页面以 CSS 降低饱和度、淡化左上区域；没有补绘。
+- 图片随站点同源分发，不向 Unsplash 发起访客请求。各格式作为同一背景的替代资源，不作为独立图库出售或重新许可。
+
+## 社交品牌图标
+
+bilibili、X、Instagram、GitHub 的 SVG 路径取自 [Simple Icons](https://github.com/simple-icons/simple-icons/tree/4672316908c58ef9342f3069fe7ebe50d30d45b2/icons)，固定版本 `4672316908c58ef9342f3069fe7ebe50d30d45b2`，采用 [CC0 1.0](https://github.com/simple-icons/simple-icons/blob/4672316908c58ef9342f3069fe7ebe50d30d45b2/LICENSE.md)。仅以内联单色图标标识用户提供的社交入口；图标对应品牌的商标权仍归各品牌所有，不表示赞助或关联。没有加载图标库、社交插件或第三方脚本。

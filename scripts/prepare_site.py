@@ -1,4 +1,4 @@
-"""Build one self-contained controller HTML, plus optional documentation/SDK."""
+"""Build a self-contained controller with optional same-origin artwork and docs."""
 from pathlib import Path
 import gzip
 import re
@@ -7,6 +7,7 @@ import shutil
 ROOT = Path(__file__).resolve().parents[1]
 DEST = ROOT / 'dist'
 COPY = ('color.js', 'sdk.js', 'principles.html', '_headers', '_routes.json', '404.html', 'LICENSE.txt')
+ARTWORK = ('gold-ripples.avif', 'gold-ripples.webp')
 
 def inline_styles(html, controller=False):
     """Only inline known local CSS. Fonts in tokens.css are small data URIs."""
@@ -27,6 +28,9 @@ def main():
     for name in ('index.html', 'app.js', 'visitors.js', 'style.css', *COPY):
         if not (ROOT / 'web' / name).is_file():
             raise SystemExit('Missing public asset: ' + name)
+    for name in ARTWORK:
+        if not (ROOT / 'web/assets/artwork' / name).is_file():
+            raise SystemExit('Missing background artwork: ' + name)
     html = (ROOT / 'web/index.html').read_text()
     sdk = (ROOT / 'web/sdk.js').read_text()
     app = (ROOT / 'web/app.js').read_text()
@@ -56,10 +60,14 @@ def main():
     # Public assets only. Never copy source environments or hardware dumps.
     if (ROOT / 'web/assets/hardware').exists():
         shutil.copytree(ROOT / 'web/assets/hardware', DEST / 'assets/hardware')
+    (DEST / 'assets/artwork').mkdir(parents=True)
+    for name in ARTWORK:
+        shutil.copy2(ROOT / 'web/assets/artwork' / name, DEST / 'assets/artwork' / name)
     (DEST / 'moonshade').mkdir()
     shutil.copy2(ROOT / 'web/moonshade/OFL-D-DIN.txt', DEST / 'moonshade/OFL-D-DIN.txt')
     raw = html.encode()
-    print(f'Controller: {len(raw):,} bytes raw; {len(gzip.compress(raw)):,} bytes gzip estimate; no external script/style/assets')
+    print(f'Controller: {len(raw):,} bytes raw; {len(gzip.compress(raw)):,} bytes gzip estimate; no third-party requests')
+    print('Optional same-origin background: ' + ', '.join(f'{name} {(DEST / "assets/artwork" / name).stat().st_size:,} bytes' for name in ARTWORK))
     print('Prepared dist/: index.html, ' + ', '.join(COPY))
 
 if __name__ == '__main__':

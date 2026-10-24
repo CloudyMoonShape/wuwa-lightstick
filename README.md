@@ -6,9 +6,11 @@
 
 [![共鸣控制台：色轮、亮度与灯效](docs/screenshots/controller-desktop.png)](https://wuwa.south-wall.com/)
 
-连接自己的应援棒，调色，播放灯效，跟随音乐。蓝牙控制与音频分析都在本机完成，无需账号或控制服务器。首页是一个轻量 HTML，约 32 KB gzip，样式、字体与脚本均内联；硬件照片只在原理页加载。
+连接自己的应援棒，调色，播放灯效，跟随音乐。蓝牙控制与音频分析都在本机完成，无需账号或控制服务器。首页约 34 KB gzip，样式、字体、图标与脚本均内联；另有一张约 36 KB 的金色水波背景，同源低优先级加载，遥控器无需等待它。硬件照片只在原理页加载。
 
 使用电脑 Chrome / Edge 或 Android Chrome，选择 `JFKJ-FBFB`。连接成功后会闪三次蓝灯，稍等即可操作。目前面向主板 **HE-750G24**、固件 **V4.1.8** 的研究样机，其他批次不保证兼容。
+
+iPhone / iPad 的常规 Safari、Chrome 目前只能屏幕预览，网页不能直接连接蓝牙；本站不要求安装其他浏览器或 App。[兼容性说明](docs/SDK.md#浏览器兼容性)
 
 ## 开发
 
@@ -28,7 +30,7 @@ python3 -m http.server 8765 -d web
 
 访问 [localhost:8765](http://localhost:8765)。Node 24 的 `npm test` 检查 SDK、混色与到访计数；`npm run build` 生成可部署的单文件首页。发布步骤见 [部署说明](docs/DEPLOYMENT.md)。
 
-页脚[到访计数](docs/VISITORS.md)按浏览器匿名去重，独立异步加载。控制和音频处理不依赖计数服务。
+页头[到访计数](docs/VISITORS.md)按浏览器匿名去重，独立异步加载。控制和音频处理不依赖计数服务。
 
 ## 验证范围
 
@@ -38,6 +40,6 @@ python3 -m http.server 8765 -d web
 
 允许免费使用、修改、分享与托管；禁止销售软件、收费访问或托管，以及付费捆绑。采用 [Wuwa Lightstick Community License 1.0](LICENSE)，属于源码可用许可，不是标准开源许可。[中文说明](docs/LICENSING-OPTIONS.md)
 
-随附字体另遵循 SIL OFL 1.1，见 [第三方材料说明](THIRD_PARTY.md)。
+随附字体、背景摄影和品牌图标各遵循原许可，见 [第三方材料说明](THIRD_PARTY.md)。
 
 网页与源码均免费公开，使用与分发条款见 [LICENSE](LICENSE)。本项目为独立研究与兼容工具，与游戏、演出主办方或硬件厂家无隶属关系。

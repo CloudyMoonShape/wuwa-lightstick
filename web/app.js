@@ -29,7 +29,7 @@ const client = new LightstickClient({
   onNotification(data) { if (!running) log("<- " + hex(data)); }
 });
 async function connect() {
-  if (!navigator.bluetooth) { setStatus("当前浏览器不支持蓝牙连接，请用桌面 Chrome / Edge 或 Android Chrome；仍可屏幕试玩", "err"); return; }
+  if (!window.isSecureContext || typeof navigator.bluetooth?.requestDevice !== "function") { setStatus("当前浏览器无法连接蓝牙，可以继续屏幕试玩", "err"); return; }
   if (client.ready) { client.disconnect(); return; }
   try { await client.connect(); startEffect(effects[0]); }
   catch (e) {
@@ -458,9 +458,9 @@ function stopAudio() {
 $("stopAudio").onclick = stopAudio;
 $("blackout").onclick = () => { stopAudio(); startEffect(effects.at(-1)); };
 $("flashConsent").onchange = () => { if (!$("flashConsent").checked && ["闪烁","频闪","警灯","爆闪","彩虹跳变"].includes(running?.name)) startEffect(effects[1]); };
-if (!window.isSecureContext || !navigator.bluetooth) {
-  setStatus("仅预览 · 连接请用电脑或 Android Chrome");
-  $("compat").textContent = "当前浏览器可试玩。蓝牙连接请用电脑 Chrome / Edge 或 Android Chrome。";
+if (!window.isSecureContext || typeof navigator.bluetooth?.requestDevice !== "function") {
+  setStatus("屏幕预览 · 当前浏览器无法连接蓝牙");
+  $("compat").textContent = "可以在屏幕上调色、播放灯效；当前浏览器尚未开放网页蓝牙。";
   $("connect").disabled = true;
   $("connect").textContent = "仅预览";
 }
