@@ -1,0 +1,16 @@
+# 原厂固件 dump 只放本机:厂家二进制,体积大且来源不归我们
+/backup/
+# 第三方工具许可证未声明(GitHub 显示 NOASSERTION),不随仓分发;取法见 README
+/vendor/
+/.venv/
+# Ghidra 工程和反编译输出都由厂家固件派生，只放本机
+/re/proj/
+/re/out/
+
+# Local caches and generated public bundle
+__pycache__/
+*.py[cod]
+/node_modules/
+/dist/
+/.wrangler/
+.DS_Store

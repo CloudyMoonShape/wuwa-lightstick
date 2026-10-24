@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="data:,"><meta name="theme-color" content="#101315"><meta name="description" content="免费的鸣潮应援棒网页遥控器。连接蓝牙，选颜色、调亮度、玩灯效。"><title>鸣潮应援棒遥控器</title><link rel="stylesheet" href="style.css"></head><body><main>
+<header><h1>鸣潮应援棒 <span>遥控器</span></h1><a href="principles.html">原理与开发 ↗</a></header>
+<section class="panel" id="playground">
+<div class="connection"><button id="connect" class="primary">连接应援棒</button><button id="blackout">关灯</button><div class="preview" aria-label="灯光颜色预览"><span id="orb"></span><span><strong id="effectName">常亮</strong><small id="mode">屏幕预览</small></span></div></div>
+<p id="status" role="status" aria-live="polite">未连接 · 可先试颜色和灯效</p>
+<p class="note setup">装好电池 → 连接 JFKJ 设备 → 等蓝灯闪完</p>
+<div class="swatches" id="swatches"></div><div class="row colorrow"><label for="color">自选</label><input type="color" id="color" value="#00e5ff"><label for="bright">亮度</label><input type="range" id="bright" min="0" max="100" value="100"><output id="brightv">100%</output></div>
+<div class="sectionhead effectshead"><h2>灯效</h2><div class="row speedrow"><label for="speed">速度</label><input type="range" id="speed" min="10" max="300" value="100"><output id="speedv">1.0×</output></div></div><div class="grid" id="effects"></div>
+<label class="flash"><input id="flashConsent" type="checkbox"> 启用快速闪光（对闪光敏感请勿开启）</label><p id="flashNote" class="note" role="status"></p>
+<p class="compat" id="compat">连接请用桌面 Chrome / Edge 或 Android Chrome，保持页面在前台。无设备也能预览。</p></section>
+  <details class="panel" id="sound"><summary>音乐律动 <span>本地音乐 / 麦克风</span></summary>
+    <div class="sectionhead"><h2>选择音源</h2><button id="stopAudio">停止音源</button></div><p class="note">选择一首本地音乐，或让麦克风听见周围的声音。音频只在你的浏览器中处理。</p>
+    <div class="row">
+      <label>音源</label>
+      <button id="srcFile">本地音乐文件</button>
+      <button id="srcTab">共享标签页声音</button>
+      <button id="srcMic">麦克风</button>
+      <input type="file" id="file" accept="audio/*" hidden>
+      <span id="srcInfo" class="note" style="margin:0"></span>
+    </div>
+    <audio id="player" controls style="width:100%; margin-top:12px; display:none"></audio>
+    <canvas id="meter" width="900" height="80"></canvas>
+    <div class="grid" id="music" style="margin-top:12px"></div>
+    <div style="display:grid; gap:10px; margin-top:12px">
+      <div class="row"><label for="sens">灵敏</label><input type="range" id="sens" min="20" max="300" value="100"><span id="sensv">1.0×</span></div>
+      <div class="row"><label for="sync">同步</label><input type="range" id="sync" min="0" max="400" value="120"><span id="syncv">120 ms</span>
+        <button id="autoSync">估算同步</button></div>
+    </div>
+    <p class="note">「同步」把音乐播放推迟这么多毫秒，帮助调整灯光与声音的同步；只对本地文件和共享标签页有效（麦克风收到的是已经放出来的声音，没法推迟）。同步值仅为估算，可按实际观感微调。</p>
+  </details>
+
+  <details class="panel"><summary>白平衡校准 <span>调整灯珠偏色</span></summary>
+    <h2>白平衡（灯珠三色亮度不一致，按肉眼调）</h2>
+    <div style="display:grid; gap:10px">
+      <div class="row"><label for="gainR">红</label><input type="range" id="gainR" min="5" max="100" value="100"><span id="gainRv"></span></div>
+      <div class="row"><label for="gainG">绿</label><input type="range" id="gainG" min="5" max="100" value="100"><span id="gainGv"></span></div>
+      <div class="row"><label for="gainB">蓝</label><input type="range" id="gainB" min="5" max="100" value="100"><span id="gainBv"></span></div>
+      <div class="row">
+        <button id="calY">校准：黄</button><button id="calC">校准：青</button><button id="calM">校准：品红</button>
+        <button id="calReset">恢复 100%</button>
+      </div>
+    </div>
+    <p class="note">点一个校准色，调滑块直到棒子看起来就是黄 / 青 / 品红。偏橙就降红，偏绿就降绿。设置存在这个浏览器里。三色相等（白、灰）时固件走单独的白光灯珠，不受白平衡影响。</p>
+  </details>
+
+<details class="panel"><summary>连接帮助 <span>找不到设备？</span></summary><p>先确认棒子已装好电池，并关闭其他正在连接它的网页或程序。在浏览器弹窗中选择名称以 JFKJ 开头的设备。连接成功后会闪蓝灯，约一秒后即可使用。</p><p>若找不到设备，请确认系统蓝牙与浏览器蓝牙权限已开启，靠近棒子后重试。连接中断后可点「重新连接」。断开连接不保证棒子熄灭，需要时请使用实体电源开关。</p></details>
+<details class="panel diagnostics"><summary>连接详情 <span>排查问题时展开</span></summary><p class="note">发送帧率 <span id="fps">–</span> fps · 单帧发送耗时 <span id="rtt">–</span> ms（含软件限速，非设备回执延迟）</p><pre id="log"></pre></details>
+<footer><span>共鸣 · CloudyMoonShape · 非官方社区实验项目</span><a href="principles.html">探索原理与协议 ↗</a><p>免费使用与分享 · <a href="LICENSE.txt">社区源码许可</a> · 禁止销售、付费托管及付费捆绑。音频仅本机处理。</p></footer></main><script type="module" src="app.js"></script></body></html>

@@ -1,0 +1,63 @@
+Wuwa Lightstick Community License 1.0
+Copyright (c) 2026 CloudyMoonShape
+https://github.com/CloudyMoonShape
+
+1. Scope and grant
+"Software" means the original code and documentation distributed by the copyright
+holder under this license, including modified versions and substantial portions.
+Subject to the conditions below, you may use, study, copy, modify, and distribute
+the Software, and make it available over a network, without paying a license fee.
+Free community development, free sharing, and free public hosting are permitted.
+
+2. No sale, paid access, or paid bundling
+Unless the copyright holder gives separate written permission, you must not:
+(a) sell, rent, commercially sublicense, or otherwise supply the Software in
+    exchange for money or other consideration;
+(b) charge for access to, hosting of, use of, downloading, or activation of the
+    Software, including subscriptions, paywalls, or mandatory "donations";
+(c) distribute, embed, preinstall, or offer the Software as part of, or as a bonus
+    or inducement for purchasing, a paid product or service, including hardware
+    bundles, paid downloads, installation packages, or paid membership benefits;
+(d) evade these restrictions by renaming or modifying the Software, charging a
+    nominal copying or delivery fee, or describing the Software as "free" while
+    requiring payment for a related bundle or service.
+These restrictions apply to modified versions and substantial portions as well
+as unchanged copies. A genuinely voluntary donation that gives no exclusive
+access, feature, product, service, or other benefit is not payment for access.
+Merely linking to an independently accessible free official website, without
+redistributing or embedding the Software or selling access to it, is not bundling.
+
+3. Notices and downstream rights
+All copies and substantial portions, including modified distributions, must
+retain this license and the copyright notice. Distributions must state that the
+Software may be used and shared free of charge, is subject to these restrictions,
+and identify substantial modifications. You must not impose terms that remove
+the permissions granted here for the covered Software or remove these restrictions.
+Modified versions must retain these terms for the covered Software. You may not
+claim that your distribution is official or endorsed by the copyright holder.
+
+4. Limits
+This license grants no rights in third-party firmware, tools, SDKs, trademarks,
+artwork, or other materials. Their owners' rights and licenses remain separate.
+It does not grant ownership of a protocol or prohibit an independently written
+implementation that does not copy copyright-protected material from the Software.
+It does not restrict rights or exceptions that applicable law does not allow a
+license to restrict. This is a source-available license, not an OSI-approved
+open-source license. Commercial exceptions require separate written permission
+from the copyright holder; this license does not promise such permission.
+
+5. Termination
+Your rights under this license terminate automatically if you violate its terms.
+If this is your first violation and you cease and fully remedy it within 30 days
+of discovering it or receiving notice, your rights are reinstated. Reinstatement
+does not waive claims arising from the violation. Recipients who comply with
+this license retain their own grants.
+
+6. Disclaimer
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, AND NON-INFRINGEMENT. TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE
+AUTHORS AND COPYRIGHT HOLDERS SHALL NOT BE LIABLE FOR ANY CLAIM, DAMAGES, OR
+OTHER LIABILITY ARISING FROM THE SOFTWARE OR ITS USE.
+
+The English text above is the license. Any summary or translation is explanatory.

@@ -1,0 +1,121 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { LightstickClient, colorFrame, frame, validChecksum } from '../sdk/index.mjs';
+
+function mock({failAuth = false, echo = 'correct', authTimeoutMs = 20, wait} = {}) {
+  const writes = [], waits = [], states = [];
+  let active = 0, maxActive = 0;
+  const notify = new EventTarget();
+  notify.startNotifications = async () => notify;
+  const writer = { properties: { writeWithoutResponse: true },
+    async writeValueWithResponse(data) {
+      if (failAuth) throw new Error('auth transport failed');
+      writes.push([...data]);
+      if (echo !== 'none') {
+        const payload = echo === 'correct' ? data : new TextEncoder().encode('wrong-password');
+        notify.value = new DataView(payload.buffer, payload.byteOffset, payload.byteLength);
+        notify.dispatchEvent(new Event('characteristicvaluechanged'));
+      }
+    },
+    async writeValueWithoutResponse(data) {
+      active++; maxActive = Math.max(maxActive, active);
+      await Promise.resolve(); writes.push([...data]); active--;
+    } };
+  const service = { getCharacteristic: async id => id === 0xfa01 ? notify : writer };
+  const device = new EventTarget(); device.name = 'JFKJ-FBFB';
+  device.gatt = { connected: false, async connect() { this.connected = true; return this; },
+    getPrimaryService: async id => { assert.equal(id, 0xfa00); return service; },
+    disconnect() { this.connected = false; device.dispatchEvent(new Event('gattserverdisconnected')); } };
+  const client = new LightstickClient({bluetooth: { requestDevice: async options => {
+    assert.deepEqual(options.optionalServices, [0xfa00]); return device;
+  } }, authTimeoutMs, wait: async ms => { waits.push(ms); if (wait) await wait(ms); }, onState: s => states.push(s)});
+  return { client, device, notify, writes, waits, states, max: () => maxActive };
+}
+
+test('known GATT vectors preserve GRB and checksum', () => {
+  assert.deepEqual([...colorFrame([255, 0, 0])], [1,0,0,255,0,0]);
+  assert.deepEqual([...colorFrame([0,255,0])], [1,0,255,0,0,0]);
+  assert.deepEqual([...colorFrame([0,0,0])], [1,0,0,0,0,255]);
+  assert.deepEqual([...colorFrame([12,34,56])], [1,0,34,12,56,153]);
+  for (const rgb of [[255,255,255],[1,2,3],[0,0,0]]) assert.ok(validChecksum(colorFrame(rgb)));
+  assert.equal(validChecksum([1,2,3]), false);
+});
+test('rejects malformed color/packet input before byte wrapping', () => {
+  for (const value of [[-1,0,0],[256,0,0],[1.5,0,0],['1',0,0],[NaN,0,0],[1,2]]) {
+    assert.throws(() => colorFrame(value), RangeError);
+  }
+  assert.throws(() => frame([]), RangeError);
+});
+test('auth precedes ready and writes; burst updates keep only latest pending frame', async () => {
+  const m = mock(); await m.client.connect();
+  assert.equal(new TextDecoder().decode(Uint8Array.from(m.writes[0])), 'JFKJ-20250421');
+  assert.deepEqual(m.states, ['selecting','connecting','authenticating','ready']);
+  assert.equal(m.waits[0], 1200);
+  const first = m.client.setColor([1,0,0]);
+  const stale = m.client.setColor([2,0,0]);
+  const latest = m.client.setColor([3,0,0]);
+  assert.deepEqual(await Promise.all([first, stale, latest]), [true,false,true]);
+  assert.equal(m.max(), 1);
+  assert.deepEqual(m.writes.slice(1), [[...colorFrame([1,0,0])],[...colorFrame([3,0,0])]]);
+  m.client.disconnect(); assert.equal(m.device.gatt.connected, false);
+  await assert.rejects(m.client.setColor([0,0,0]), /Connect/);
+});
+test('auth write failure disconnects and cannot claim ready', async () => {
+  const m = mock({failAuth: true});
+  await assert.rejects(m.client.connect(), /auth transport/);
+  assert.equal(m.client.ready, false); assert.equal(m.device.gatt.connected, false);
+  assert.equal(m.states.includes('ready'), false);
+});
+test('physical disconnect resets state; reconnect has fresh transport', async () => {
+  const m = mock(); await m.client.connect(); m.device.gatt.disconnect();
+  assert.equal(m.client.state, 'disconnected');
+  await m.client.connect(); assert.equal(m.client.ready, true); m.client.disconnect();
+});
+test('disconnect during pending chooser never starts GATT', async () => {
+  let choose; let started = false;
+  const client = new LightstickClient({bluetooth: {requestDevice: () => new Promise(r => choose = r)}});
+  const connecting = client.connect(); client.disconnect();
+  choose({gatt: {connect: () => { started = true; }}});
+  await assert.rejects(connecting, /cancelled/); assert.equal(started, false);
+});
+test('disconnect during GATT connect closes a late connection', async () => {
+  let finish;
+  const device = new EventTarget();
+  device.gatt = { connected: false, connect() { return new Promise(r => finish = () => { this.connected = true; r(this); }); }, disconnect() { this.connected = false; } };
+  const client = new LightstickClient({bluetooth: {requestDevice: async () => device}});
+  const connecting = client.connect(); await Promise.resolve();
+  client.disconnect(); finish();
+  await assert.rejects(connecting, /cancelled/); assert.equal(device.gatt.connected, false);
+});
+
+for (const echo of ['none', 'wrong']) {
+  test(`missing or incorrect auth echo cannot become ready: ${echo}`, async () => {
+    const m = mock({echo});
+    await assert.rejects(m.client.connect(), /Authentication timed out/);
+    assert.equal(m.client.ready, false);
+    assert.equal(m.device.gatt.connected, false);
+    assert.equal(m.states.includes('ready'), false);
+  });
+}
+test('echo may arrive before write completion but ready still waits for blink', async () => {
+  let finishBlink;
+  const m = mock({wait: () => new Promise(resolve => finishBlink = resolve)});
+  const connecting = m.client.connect();
+  while (!finishBlink) await Promise.resolve();
+  assert.equal(m.client.state, 'authenticating');
+  assert.equal(m.client.ready, false);
+  finishBlink(); await connecting;
+  assert.equal(m.client.ready, true); m.client.disconnect();
+});
+test('disconnect while waiting for echo promptly rejects and ignores late echo', async () => {
+  const m = mock({echo: 'none', authTimeoutMs: 1000});
+  const connecting = m.client.connect();
+  while (!m.writes.length) await Promise.resolve();
+  m.client.disconnect();
+  await assert.rejects(connecting, /closed during authentication/);
+  const data = new TextEncoder().encode('JFKJ-20250421');
+  m.notify.value = new DataView(data.buffer);
+  m.notify.dispatchEvent(new Event('characteristicvaluechanged'));
+  assert.equal(m.client.ready, false);
+  assert.equal(m.states.includes('ready'), false);
+});
