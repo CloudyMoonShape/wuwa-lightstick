@@ -1,6 +1,6 @@
 # 到访计数
 
-页头、连接栏上方显示「N 位共鸣者到访」。N 是启用计数后，成功登记过的浏览器身份数；从 0 开始，不补造此前的访问量，也不表示独立人数或灯棒数量。
+页头、连接栏上方以金色大读数显示 N，下方为「位共鸣者到访」。N 是启用计数后，成功登记过的浏览器身份数；从 0 开始，不补造此前的访问量，也不表示独立人数或灯棒数量。
 
 ## 怎么计数
 
@@ -15,7 +15,7 @@ flowchart LR
   F -->|已登记| H[读取单行总数]
   G --> H
   D --> H
-  H --> I[显示页脚计数]
+  H --> I[显示页头计数]
 ```
 
 浏览器使用 `crypto.randomUUID()` 生成随机 UUID v4，保存在 `localStorage` 的 `wuwa.visitor.v1`。每次打开页面都提交同一个 ID；服务端把它规范为小写、计算 SHA-256，只保存哈希值。`visitor_ids` 的主键去重，`AFTER INSERT` 触发器仅在真正插入时更新 `visitor_totals` 的唯一一行。插入和读总数放在同一个 D1 `batch()` 中，失败时整体回滚；查询总数不扫描访客表。[D1 事务](https://developers.cloudflare.com/d1/worker-api/d1-database/#batch)、[D1 触发器支持](https://developers.cloudflare.com/d1/sql-api/sql-statements/#pragma-recursive_triggers--onoff)、[SQLite 触发器语义](https://www.sqlite.org/lang_createtrigger.html)
@@ -31,10 +31,13 @@ flowchart LR
 页头提供一个默认隐藏的容器：
 
 ```html
-<span id="visitorCount" class="web-body" hidden></span>
+<div id="visitorCount" class="visitor-count" hidden>
+  <span id="visitorTotal" class="ms-readout"></span>
+  <span class="web-small">位共鸣者到访</span>
+</div>
 ```
 
-加载 [web/visitors.js](../web/visitors.js) 一次即可，无导出接口、无初始化参数。源码预览可用 `<script defer src="visitors.js"></script>`；发布时将脚本原样内联到独立 `<script>` 中，避免额外脚本请求。不要让蓝牙初始化等待计数请求。
+加载 [web/visitors.js](../web/visitors.js) 一次即可，无导出接口、无初始化参数。脚本只向 `visitorTotal` 写入格式化数字，成功后显示整个 `visitorCount`；两个 ID 均需保留。源码预览可用 `<script defer src="visitors.js"></script>`；发布时将脚本原样内联到独立 `<script>` 中，避免额外脚本请求。不要让蓝牙初始化等待计数请求。
 
 脚本在 DOM 就绪后延后一个任务执行，每次页面加载最多请求一次，不轮询。请求最多等待 6 秒，失败、响应异常或数据库未配置时保持隐藏；页面控制和动画照常运行。仅两个正式 HTTPS origin 会发请求。`localhost`、分支预览和临时部署域名既不请求接口，也不生成 ID。API 同样拒绝这些域名。
 

@@ -16,7 +16,8 @@
 
   async function start() {
     const node = document.getElementById('visitorCount');
-    if (!node) return;
+    const value = document.getElementById('visitorTotal');
+    if (!node || !value) return;
     node.hidden = true;
     if (!origins.includes(location.origin)) return;
     let timer;
@@ -33,7 +34,7 @@
       if (!response.ok) return;
       const {total} = await response.json();
       if (!Number.isSafeInteger(total) || total < 0) return;
-      node.textContent = `${total.toLocaleString('zh-CN')} 位共鸣者到访`;
+      value.textContent = total.toLocaleString('zh-CN');
       node.hidden = false;
     } catch { /* A counter must never interrupt the controller. */ }
     finally { clearTimeout(timer); }

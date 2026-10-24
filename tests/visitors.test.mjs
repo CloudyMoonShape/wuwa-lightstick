@@ -162,9 +162,10 @@ test('missing binding, missing schema and database failures return a generic unc
 function browser({origin = ORIGIN, loading = false, store = new Map(), storageThrows = false,
   persist = true, fetchImpl = async () => Response.json({total: 1234}), locks,
   createId = () => ID, node = {hidden: false, textContent: ''}} = {}) {
+  const value = {textContent: ''};
   const calls = [], timers = []; let domReady, storageReads = 0;
   const context = {
-    document: {readyState: loading ? 'loading' : 'complete', getElementById: () => node,
+    document: {readyState: loading ? 'loading' : 'complete', getElementById: id => id === 'visitorTotal' ? value : node,
       addEventListener(name, listener, options) {
         assert.equal(name, 'DOMContentLoaded'); assert.equal(options.once, true); domReady = listener;
       }},
@@ -178,7 +179,7 @@ function browser({origin = ORIGIN, loading = false, store = new Map(), storageTh
     fetch(url, options) { calls.push({url, options}); return fetchImpl(url, options); }
   };
   runInNewContext(client, context);
-  return {node, calls, timers, store, ready: () => domReady(), reads: () => storageReads,
+  return {node, value, calls, timers, store, ready: () => domReady(), reads: () => storageReads,
     async run() { const timer = timers.find(item => item.delay === 0); if (timer) await timer.fn(); }};
 }
 
@@ -186,7 +187,7 @@ test('browser waits for DOM ready, saves one ID and repeats it on the next load'
   const store = new Map(), first = browser({loading: true, store});
   assert.equal(first.timers.length, 0); assert.equal(first.calls.length, 0);
   first.ready(); assert.equal(first.calls.length, 0); await first.run();
-  assert.equal(first.node.textContent, '1,234 位共鸣者到访'); assert.equal(first.node.hidden, false);
+  assert.equal(first.value.textContent, '1,234'); assert.equal(first.node.hidden, false);
   assert.equal(store.get(KEY), ID);
   const {url, options} = first.calls[0];
   assert.equal(url, '/api/visitors'); assert.equal(options.method, 'POST');
@@ -230,7 +231,7 @@ test('fetch failures and malformed totals stay hidden without leaking an error',
     async () => new Response('unavailable', {status: 503}), async () => new Response('not json'),
     ...[-1, 1.5, '12', null, Number.MAX_SAFE_INTEGER + 1].map(total => async () => Response.json({total}))]) {
     const page = browser({fetchImpl}); await page.run();
-    assert.equal(page.node.hidden, true); assert.equal(page.node.textContent, '');
+    assert.equal(page.node.hidden, true); assert.equal(page.value.textContent, '');
     assert(page.timers.find(timer => timer.delay === 6000).cleared);
   }
 });
