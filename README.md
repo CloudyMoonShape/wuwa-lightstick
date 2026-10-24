@@ -26,7 +26,9 @@
 python3 -m http.server 8765 -d web
 ```
 
-访问 [localhost:8765](http://localhost:8765)。`npm test` 检查 SDK 与混色算法；`npm run build` 生成可部署的单文件首页。发布步骤见 [部署说明](docs/DEPLOYMENT.md)。
+访问 [localhost:8765](http://localhost:8765)。Node 24 的 `npm test` 检查 SDK、混色与到访计数；`npm run build` 生成可部署的单文件首页。发布步骤见 [部署说明](docs/DEPLOYMENT.md)。
+
+页脚[到访计数](docs/VISITORS.md)按浏览器匿名去重，独立异步加载。控制和音频处理不依赖计数服务。
 
 ## 验证范围
 

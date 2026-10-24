@@ -6,7 +6,7 @@ import shutil
 
 ROOT = Path(__file__).resolve().parents[1]
 DEST = ROOT / 'dist'
-COPY = ('color.js', 'sdk.js', 'principles.html', '_headers', '404.html', 'LICENSE.txt')
+COPY = ('color.js', 'sdk.js', 'principles.html', '_headers', '_routes.json', '404.html', 'LICENSE.txt')
 
 def inline_styles(html, controller=False):
     """Only inline known local CSS. Fonts in tokens.css are small data URIs."""
@@ -24,7 +24,7 @@ def inline_styles(html, controller=False):
     return re.sub(r'<link rel="stylesheet" href="([^"]+)">', include, html)
 
 def main():
-    for name in ('index.html', 'app.js', 'style.css', *COPY):
+    for name in ('index.html', 'app.js', 'visitors.js', 'style.css', *COPY):
         if not (ROOT / 'web' / name).is_file():
             raise SystemExit('Missing public asset: ' + name)
     html = (ROOT / 'web/index.html').read_text()
@@ -41,6 +41,10 @@ def main():
     html, scripts = re.subn(r'<script type="module" src="app.js"></script>', lambda _: '<script type="module">\n' + sdk + '\n' + color + '\n' + app + '\n</script>', html)
     if scripts != 1:
         raise SystemExit('Controller asset tags changed: inspect bundle')
+    visitors = (ROOT / 'web/visitors.js').read_text()
+    html, counters = re.subn(r'<script type="module" src="visitors.js"></script>', lambda _: '<script type="module">\n' + visitors + '\n</script>', html)
+    if counters != 1:
+        raise SystemExit('Visitor counter asset tag changed: inspect bundle')
     if DEST.exists():
         shutil.rmtree(DEST)
     DEST.mkdir()

@@ -18,6 +18,7 @@
 | 文档 | 内容 |
 |---|---|
 | [部署](DEPLOYMENT.md) | 构建轻量静态站并发布到 Cloudflare Pages |
+| [到访计数](VISITORS.md) | 浏览器匿名去重、数据库接入与计数边界 |
 | [展示审查](DESIGN-AUDIT.md) | 视觉、交互、移动端与仓库展示的三轮修正 |
 | [验证](VERIFICATION.md) | 软件检查、实物记录和仍待验证的范围 |
 | [色板审查](COLOR-AUDIT.md) | 从装饰色修正到观感混色的排查记录 |

@@ -100,6 +100,8 @@ button.quiet { background:transparent; color:var(--web-ink-2); padding:var(--web
 #log:empty { display:none; }
 .ms-site-footer { padding-top:var(--web-space-8); }
 .ms-footer { margin-top:var(--web-space-6); }
+.footer-meta { display:grid; gap:var(--web-space-2); }
+#visitorCount { white-space:nowrap; }
 .ms-footer a { min-height:var(--web-space-8); }
 @media(min-width:768px) { .masthead { padding-block:var(--web-space-8); } }
 @media(max-width:767px) {
