@@ -1,0 +1,21 @@
+{
+  "name": "wuwa-lightstick",
+  "pages_build_output_dir": "./dist",
+  "compatibility_date": "2026-10-24",
+  "d1_databases": [],
+  "env": {
+    "preview": {
+      "d1_databases": []
+    },
+    "production": {
+      "d1_databases": [
+        {
+          "binding": "VISITORS_DB",
+          "database_name": "wuwa-lightstick-visitors",
+          "database_id": "2ec23188-5f9f-4338-a608-9d57697e1353",
+          "migrations_dir": "migrations"
+        }
+      ]
+    }
+  }
+}

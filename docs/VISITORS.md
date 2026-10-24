@@ -56,7 +56,9 @@ POST 只接受请求 URL 的同源 `Origin`、`application/json` 和一个 UUID 
 3. 通过 Pages CI 或 Wrangler 编译根目录的 `functions/`。`dist/_routes.json` 应仅包含 `{"version":1,"include":["/api/visitors"],"exclude":[]}`，让首页和说明页继续静态直出。[Functions 路由](https://developers.cloudflare.com/pages/functions/routing/#functions-invocation-routes)
 4. 在隔离测试库验证同 ID 并发登记只加一、绑定失效时返回 503，再验证正式域名 GET 能读取真实总数。不要用测试 ID 填充正式计数，也不要为了调试临时开放预览域名写正式库。
 
-迁移文件可由 `wrangler d1 migrations apply <实际数据库名> --remote` 应用；先确认目标账户、库名和生产环境绑定一致。[D1 迁移](https://developers.cloudflare.com/d1/reference/migrations/)
+仓库的 `wrangler.jsonc` 将 `VISITORS_DB` 仅放在 `env.production`；顶层与 `env.preview` 均无数据库绑定。迁移文件可由 `wrangler d1 migrations apply <实际数据库名> --env production --remote` 应用；先确认目标账户、库名和生产环境绑定一致。[D1 迁移](https://developers.cloudflare.com/d1/reference/migrations/)
+
+自行托管时创建自己的数据库，替换生产配置的 `database_id`，并同步修改前端和接口的正式来源名单。数据库 ID 是资源标识，不是凭据。计数数据库建立时可选择 `apac` 位置提示；提示不是网络延迟保证。
 
 UUID、请求长度与同源限制用于约束接口，不是完整防刷方案。脚本可以伪造 Origin 并反复创建 UUID，因此这个数是社区到访指标，不能用于财务结算或声称精确人数。出现真实滥用时再按访问情况增加边缘限流；本模块没有验证码或设备指纹。
 

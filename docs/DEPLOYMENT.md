@@ -21,6 +21,8 @@ npx wrangler@4.152.0 pages deploy dist --project-name wuwa-lightstick --branch m
 
 首次创建项目后，后续只执行 deploy。通过环境变量提供自己的 `CLOUDFLARE_API_TOKEN` 和 `CLOUDFLARE_ACCOUNT_ID`，不要把值写入版本控制。日常发布需要所选账号的 Pages 权限；首次创建或迁移计数数据库另需 D1 写入权限。数据库凭据不进入网页，运行时通过 `VISITORS_DB` 绑定访问专用库。计数初始化与生产、预览隔离见 [到访计数](VISITORS.md)。
 
+`wrangler.jsonc` 为部署配置来源：生产环境绑定计数专用库，预览环境没有生产库权限。Fork 后请填写自己的数据库 ID 和正式域名名单。控制台本地静态预览不需要云端凭据。
+
 使用 Direct Upload，现阶段不启用 CI 或 Git 集成。Cloudflare 表明 Direct Upload 项目无法直接切换到 Git 集成；未来需要该功能时另建项目。
 
 控制与音频分析全部在浏览器运行，无控制后端、无音频上传。唯一动态接口用于匿名到访计数，不接收蓝牙或音频数据；Cloudflare 仍会处理普通 HTTP 访问数据。Web Bluetooth 需要 HTTPS 或 localhost 及兼容浏览器，访客自己授权选中的设备。
