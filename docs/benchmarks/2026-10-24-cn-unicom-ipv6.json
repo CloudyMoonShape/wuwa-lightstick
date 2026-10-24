@@ -1,0 +1,795 @@
+{
+  "started_at_utc": "2026-10-24T20:16:23.474552+00:00",
+  "finished_at_utc": "2026-10-24T20:16:49.409289+00:00",
+  "source": "Mainland China, China Unicom native IPv6; Cloudflare trace loc=CN, colo=LAX",
+  "protocol": "curl 8.5.0 HTTP/1.1; new process and connection per sample; system DNS cache may be warm; gzip accepted; verified TLS; no retry; 8 s limit",
+  "ssh_exit_code": 0,
+  "ssh_error": "",
+  "samples": [
+    {
+      "iteration": 1,
+      "target": "primary",
+      "exit_code": 0,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "content-encoding": "gzip",
+        "cf-ray": "a4fba8c72ce07eb9-LAX"
+      },
+      "error": "",
+      "metrics": {
+        "status": "200",
+        "dns": 0.000554,
+        "connect": 0.22318,
+        "tls": 0.453547,
+        "ttfb": 0.735458,
+        "total": 0.764641,
+        "wire_bytes": 31472,
+        "remote_ip": "2606:4700:310c::ac42:2ca5",
+        "http": "1.1",
+        "ssl_verify": 0
+      }
+    },
+    {
+      "iteration": 1,
+      "target": "fallback",
+      "exit_code": 0,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "content-encoding": "gzip",
+        "cf-ray": "a4fba8cb9c78cab0-LAX"
+      },
+      "error": "",
+      "metrics": {
+        "status": "200",
+        "dns": 0.000626,
+        "connect": 0.195815,
+        "tls": 0.403495,
+        "ttfb": 0.64603,
+        "total": 0.671023,
+        "wire_bytes": 31472,
+        "remote_ip": "2606:4700:310c::ac42:2f5b",
+        "http": "1.1",
+        "ssl_verify": 0
+      }
+    },
+    {
+      "iteration": 1,
+      "target": "counter",
+      "exit_code": 0,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "no-store",
+        "cf-ray": "a4fba8d03c51a80b-LAX"
+      },
+      "error": "",
+      "metrics": {
+        "status": "200",
+        "dns": 0.000716,
+        "connect": 0.215811,
+        "tls": 0.440061,
+        "ttfb": 0.925375,
+        "total": 0.925489,
+        "wire_bytes": 11,
+        "remote_ip": "2606:4700:310c::ac42:2ca5",
+        "http": "1.1",
+        "ssl_verify": 0
+      }
+    },
+    {
+      "iteration": 2,
+      "target": "primary",
+      "exit_code": 0,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "content-encoding": "gzip",
+        "cf-ray": "a4fba8d5fc36498f-LAX"
+      },
+      "error": "",
+      "metrics": {
+        "status": "200",
+        "dns": 0.000686,
+        "connect": 0.204697,
+        "tls": 0.416104,
+        "ttfb": 0.673001,
+        "total": 0.701422,
+        "wire_bytes": 30648,
+        "remote_ip": "2606:4700:310c::ac42:2f5b",
+        "http": "1.1",
+        "ssl_verify": 0
+      }
+    },
+    {
+      "iteration": 2,
+      "target": "fallback",
+      "exit_code": 0,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "content-encoding": "gzip",
+        "cf-ray": "a4fba8da9971a154-LAX"
+      },
+      "error": "",
+      "metrics": {
+        "status": "200",
+        "dns": 0.000579,
+        "connect": 0.216965,
+        "tls": 0.441716,
+        "ttfb": 0.708988,
+        "total": 0.740366,
+        "wire_bytes": 31472,
+        "remote_ip": "2606:4700:310c::ac42:2ca5",
+        "http": "1.1",
+        "ssl_verify": 0
+      }
+    },
+    {
+      "iteration": 2,
+      "target": "counter",
+      "exit_code": 0,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "no-store",
+        "cf-ray": "a4fba8df0c8f10d6-LAX"
+      },
+      "error": "",
+      "metrics": {
+        "status": "200",
+        "dns": 0.000547,
+        "connect": 0.195613,
+        "tls": 0.404971,
+        "ttfb": 0.813063,
+        "total": 0.813171,
+        "wire_bytes": 11,
+        "remote_ip": "2606:4700:310c::ac42:2f5b",
+        "http": "1.1",
+        "ssl_verify": 0
+      }
+    },
+    {
+      "iteration": 3,
+      "target": "primary",
+      "exit_code": 0,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "content-encoding": "gzip",
+        "cf-ray": "a4fba8e47d586921-LAX"
+      },
+      "error": "",
+      "metrics": {
+        "status": "200",
+        "dns": 0.000683,
+        "connect": 0.212332,
+        "tls": 0.43482,
+        "ttfb": 0.704585,
+        "total": 0.726771,
+        "wire_bytes": 31472,
+        "remote_ip": "2606:4700:310c::ac42:2ca5",
+        "http": "1.1",
+        "ssl_verify": 0
+      }
+    },
+    {
+      "iteration": 3,
+      "target": "fallback",
+      "exit_code": 0,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "content-encoding": "gzip",
+        "cf-ray": "a4fba8e9088fd7a8-LAX"
+      },
+      "error": "",
+      "metrics": {
+        "status": "200",
+        "dns": 0.000594,
+        "connect": 0.204859,
+        "tls": 0.418568,
+        "ttfb": 0.664501,
+        "total": 0.689679,
+        "wire_bytes": 31472,
+        "remote_ip": "2606:4700:310c::ac42:2f5b",
+        "http": "1.1",
+        "ssl_verify": 0
+      }
+    },
+    {
+      "iteration": 3,
+      "target": "counter",
+      "exit_code": 0,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "no-store",
+        "cf-ray": "a4fba8ed8e4907f5-LAX"
+      },
+      "error": "",
+      "metrics": {
+        "status": "200",
+        "dns": 0.000721,
+        "connect": 0.211655,
+        "tls": 0.43201,
+        "ttfb": 0.832049,
+        "total": 0.832153,
+        "wire_bytes": 11,
+        "remote_ip": "2606:4700:310c::ac42:2ca5",
+        "http": "1.1",
+        "ssl_verify": 0
+      }
+    },
+    {
+      "iteration": 4,
+      "target": "primary",
+      "exit_code": 0,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "content-encoding": "gzip",
+        "cf-ray": "a4fba8f2da551ae5-LAX"
+      },
+      "error": "",
+      "metrics": {
+        "status": "200",
+        "dns": 0.000613,
+        "connect": 0.20737,
+        "tls": 0.424627,
+        "ttfb": 0.69325,
+        "total": 0.718791,
+        "wire_bytes": 31472,
+        "remote_ip": "2606:4700:310c::ac42:2f5b",
+        "http": "1.1",
+        "ssl_verify": 0
+      }
+    },
+    {
+      "iteration": 4,
+      "target": "fallback",
+      "exit_code": 0,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "content-encoding": "gzip",
+        "cf-ray": "a4fba8f77de6481d-LAX"
+      },
+      "error": "",
+      "metrics": {
+        "status": "200",
+        "dns": 0.000744,
+        "connect": 0.211044,
+        "tls": 0.431598,
+        "ttfb": 0.690365,
+        "total": 0.715712,
+        "wire_bytes": 31472,
+        "remote_ip": "2606:4700:310c::ac42:2ca5",
+        "http": "1.1",
+        "ssl_verify": 0
+      }
+    },
+    {
+      "iteration": 4,
+      "target": "counter",
+      "exit_code": 0,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "no-store",
+        "cf-ray": "a4fba8fc1c405cfd-LAX"
+      },
+      "error": "",
+      "metrics": {
+        "status": "200",
+        "dns": 0.000738,
+        "connect": 0.210712,
+        "tls": 0.428802,
+        "ttfb": 0.856662,
+        "total": 0.856762,
+        "wire_bytes": 11,
+        "remote_ip": "2606:4700:310c::ac42:2f5b",
+        "http": "1.1",
+        "ssl_verify": 0
+      }
+    },
+    {
+      "iteration": 5,
+      "target": "primary",
+      "exit_code": 0,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "content-encoding": "gzip",
+        "cf-ray": "a4fba901bd612f37-LAX"
+      },
+      "error": "",
+      "metrics": {
+        "status": "200",
+        "dns": 0.00075,
+        "connect": 0.218962,
+        "tls": 0.460752,
+        "ttfb": 0.723636,
+        "total": 0.753589,
+        "wire_bytes": 31472,
+        "remote_ip": "2606:4700:310c::ac42:2ca5",
+        "http": "1.1",
+        "ssl_verify": 0
+      }
+    },
+    {
+      "iteration": 5,
+      "target": "fallback",
+      "exit_code": 0,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "content-encoding": "gzip",
+        "cf-ray": "a4fba9061e4027ec-LAX"
+      },
+      "error": "",
+      "metrics": {
+        "status": "200",
+        "dns": 0.000694,
+        "connect": 0.195837,
+        "tls": 0.39984,
+        "ttfb": 0.624794,
+        "total": 0.651493,
+        "wire_bytes": 31472,
+        "remote_ip": "2606:4700:310c::ac42:2f5b",
+        "http": "1.1",
+        "ssl_verify": 0
+      }
+    },
+    {
+      "iteration": 5,
+      "target": "counter",
+      "exit_code": 0,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "no-store",
+        "cf-ray": "a4fba90a5868398e-LAX"
+      },
+      "error": "",
+      "metrics": {
+        "status": "200",
+        "dns": 0.000724,
+        "connect": 0.202392,
+        "tls": 0.412656,
+        "ttfb": 0.817387,
+        "total": 0.817494,
+        "wire_bytes": 11,
+        "remote_ip": "2606:4700:310c::ac42:2ca5",
+        "http": "1.1",
+        "ssl_verify": 0
+      }
+    },
+    {
+      "iteration": 6,
+      "target": "primary",
+      "exit_code": 0,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "content-encoding": "gzip",
+        "cf-ray": "a4fba90faa5bc171-LAX"
+      },
+      "error": "",
+      "metrics": {
+        "status": "200",
+        "dns": 0.000573,
+        "connect": 0.20486,
+        "tls": 0.418678,
+        "ttfb": 0.649132,
+        "total": 0.674621,
+        "wire_bytes": 31472,
+        "remote_ip": "2606:4700:310c::ac42:2f5b",
+        "http": "1.1",
+        "ssl_verify": 0
+      }
+    },
+    {
+      "iteration": 6,
+      "target": "fallback",
+      "exit_code": 0,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "content-encoding": "gzip",
+        "cf-ray": "a4fba9143e4bccc8-LAX"
+      },
+      "error": "",
+      "metrics": {
+        "status": "200",
+        "dns": 0.00073,
+        "connect": 0.221091,
+        "tls": 0.450605,
+        "ttfb": 0.732172,
+        "total": 0.759437,
+        "wire_bytes": 31472,
+        "remote_ip": "2606:4700:310c::ac42:2ca5",
+        "http": "1.1",
+        "ssl_verify": 0
+      }
+    },
+    {
+      "iteration": 6,
+      "target": "counter",
+      "exit_code": 0,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "no-store",
+        "cf-ray": "a4fba918bbb0efba-LAX"
+      },
+      "error": "",
+      "metrics": {
+        "status": "200",
+        "dns": 0.000557,
+        "connect": 0.19907,
+        "tls": 0.407592,
+        "ttfb": 0.824892,
+        "total": 0.824994,
+        "wire_bytes": 11,
+        "remote_ip": "2606:4700:310c::ac42:2f5b",
+        "http": "1.1",
+        "ssl_verify": 0
+      }
+    },
+    {
+      "iteration": 7,
+      "target": "primary",
+      "exit_code": 0,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "content-encoding": "gzip",
+        "cf-ray": "a4fba91e0f05f210-LAX"
+      },
+      "error": "",
+      "metrics": {
+        "status": "200",
+        "dns": 0.000578,
+        "connect": 0.204429,
+        "tls": 0.415334,
+        "ttfb": 0.673336,
+        "total": 0.700787,
+        "wire_bytes": 31472,
+        "remote_ip": "2606:4700:310c::ac42:2ca5",
+        "http": "1.1",
+        "ssl_verify": 0
+      }
+    },
+    {
+      "iteration": 7,
+      "target": "fallback",
+      "exit_code": 0,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "content-encoding": "gzip",
+        "cf-ray": "a4fba9226c658ad4-LAX"
+      },
+      "error": "",
+      "metrics": {
+        "status": "200",
+        "dns": 0.000732,
+        "connect": 0.19391,
+        "tls": 0.39738,
+        "ttfb": 0.665375,
+        "total": 0.68921,
+        "wire_bytes": 31472,
+        "remote_ip": "2606:4700:310c::ac42:2f5b",
+        "http": "1.1",
+        "ssl_verify": 0
+      }
+    },
+    {
+      "iteration": 7,
+      "target": "counter",
+      "exit_code": 0,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "no-store",
+        "cf-ray": "a4fba926ee548535-LAX"
+      },
+      "error": "",
+      "metrics": {
+        "status": "200",
+        "dns": 0.000596,
+        "connect": 0.199308,
+        "tls": 0.405831,
+        "ttfb": 0.800966,
+        "total": 0.801068,
+        "wire_bytes": 11,
+        "remote_ip": "2606:4700:310c::ac42:2ca5",
+        "http": "1.1",
+        "ssl_verify": 0
+      }
+    },
+    {
+      "iteration": 8,
+      "target": "primary",
+      "exit_code": 0,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "content-encoding": "gzip",
+        "cf-ray": "a4fba92c1fcebd97-LAX"
+      },
+      "error": "",
+      "metrics": {
+        "status": "200",
+        "dns": 0.000638,
+        "connect": 0.201612,
+        "tls": 0.410573,
+        "ttfb": 0.664661,
+        "total": 0.691998,
+        "wire_bytes": 31472,
+        "remote_ip": "2606:4700:310c::ac42:2f5b",
+        "http": "1.1",
+        "ssl_verify": 0
+      }
+    },
+    {
+      "iteration": 8,
+      "target": "fallback",
+      "exit_code": 0,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "content-encoding": "gzip",
+        "cf-ray": "a4fba9309a8c8535-LAX"
+      },
+      "error": "",
+      "metrics": {
+        "status": "200",
+        "dns": 0.000589,
+        "connect": 0.207012,
+        "tls": 0.424113,
+        "ttfb": 0.683737,
+        "total": 0.709161,
+        "wire_bytes": 31472,
+        "remote_ip": "2606:4700:310c::ac42:2ca5",
+        "http": "1.1",
+        "ssl_verify": 0
+      }
+    },
+    {
+      "iteration": 8,
+      "target": "counter",
+      "exit_code": 0,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "no-store",
+        "cf-ray": "a4fba9353b4068ae-LAX"
+      },
+      "error": "",
+      "metrics": {
+        "status": "200",
+        "dns": 0.00074,
+        "connect": 0.209271,
+        "tls": 0.429778,
+        "ttfb": 0.827606,
+        "total": 0.827716,
+        "wire_bytes": 11,
+        "remote_ip": "2606:4700:310c::ac42:2f5b",
+        "http": "1.1",
+        "ssl_verify": 0
+      }
+    },
+    {
+      "iteration": 9,
+      "target": "primary",
+      "exit_code": 0,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "content-encoding": "gzip",
+        "cf-ray": "a4fba93a6e122ea9-LAX"
+      },
+      "error": "",
+      "metrics": {
+        "status": "200",
+        "dns": 0.000705,
+        "connect": 0.205467,
+        "tls": 0.42275,
+        "ttfb": 0.677847,
+        "total": 0.707417,
+        "wire_bytes": 31472,
+        "remote_ip": "2606:4700:310c::ac42:2ca5",
+        "http": "1.1",
+        "ssl_verify": 0
+      }
+    },
+    {
+      "iteration": 9,
+      "target": "fallback",
+      "exit_code": 0,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "content-encoding": "gzip",
+        "cf-ray": "a4fba93ebba8f7bd-LAX"
+      },
+      "error": "",
+      "metrics": {
+        "status": "200",
+        "dns": 0.000574,
+        "connect": 0.19272,
+        "tls": 0.393502,
+        "ttfb": 0.627804,
+        "total": 0.654261,
+        "wire_bytes": 31472,
+        "remote_ip": "2606:4700:310c::ac42:2f5b",
+        "http": "1.1",
+        "ssl_verify": 0
+      }
+    },
+    {
+      "iteration": 9,
+      "target": "counter",
+      "exit_code": 0,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "no-store",
+        "cf-ray": "a4fba9436cf12f34-LAX"
+      },
+      "error": "",
+      "metrics": {
+        "status": "200",
+        "dns": 0.00061,
+        "connect": 0.218445,
+        "tls": 0.449363,
+        "ttfb": 0.89128,
+        "total": 0.891379,
+        "wire_bytes": 11,
+        "remote_ip": "2606:4700:310c::ac42:2ca5",
+        "http": "1.1",
+        "ssl_verify": 0
+      }
+    },
+    {
+      "iteration": 10,
+      "target": "primary",
+      "exit_code": 0,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "content-encoding": "gzip",
+        "cf-ray": "a4fba948eeef8994-LAX"
+      },
+      "error": "",
+      "metrics": {
+        "status": "200",
+        "dns": 0.000712,
+        "connect": 0.207639,
+        "tls": 0.426046,
+        "ttfb": 0.693848,
+        "total": 0.718803,
+        "wire_bytes": 31472,
+        "remote_ip": "2606:4700:310c::ac42:2f5b",
+        "http": "1.1",
+        "ssl_verify": 0
+      }
+    },
+    {
+      "iteration": 10,
+      "target": "fallback",
+      "exit_code": 0,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "content-encoding": "gzip",
+        "cf-ray": "a4fba94daf4658da-LAX"
+      },
+      "error": "",
+      "metrics": {
+        "status": "200",
+        "dns": 0.000676,
+        "connect": 0.2179,
+        "tls": 0.444891,
+        "ttfb": 0.703448,
+        "total": 0.733178,
+        "wire_bytes": 31472,
+        "remote_ip": "2606:4700:310c::ac42:2ca5",
+        "http": "1.1",
+        "ssl_verify": 0
+      }
+    },
+    {
+      "iteration": 10,
+      "target": "counter",
+      "exit_code": 0,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "no-store",
+        "cf-ray": "a4fba9522f7ad00b-LAX"
+      },
+      "error": "",
+      "metrics": {
+        "status": "200",
+        "dns": 0.000563,
+        "connect": 0.206681,
+        "tls": 0.419208,
+        "ttfb": 0.833571,
+        "total": 0.833672,
+        "wire_bytes": 11,
+        "remote_ip": "2606:4700:310c::ac42:2f5b",
+        "http": "1.1",
+        "ssl_verify": 0
+      }
+    }
+  ],
+  "content_verification": {
+    "checks": [
+      {
+        "host": "wuwa.south-wall.com",
+        "edge_address": "2606:4700:310c::ac42:2ca5",
+        "exit_code": 0,
+        "metrics": "200 31472",
+        "decompressed_bytes": 103214,
+        "sha256": "5cdb234f2c6aabf1a2828e169c8b39d2feca4a6a358b901ca4f764a4ad426200",
+        "counter_present": true
+      },
+      {
+        "host": "wuwa.south-wall.com",
+        "edge_address": "2606:4700:310c::ac42:2f5b",
+        "exit_code": 0,
+        "metrics": "200 31472",
+        "decompressed_bytes": 103214,
+        "sha256": "5cdb234f2c6aabf1a2828e169c8b39d2feca4a6a358b901ca4f764a4ad426200",
+        "counter_present": true
+      },
+      {
+        "host": "wuwa-lightstick.pages.dev",
+        "edge_address": "2606:4700:310c::ac42:2ca5",
+        "exit_code": 0,
+        "metrics": "200 31472",
+        "decompressed_bytes": 103214,
+        "sha256": "5cdb234f2c6aabf1a2828e169c8b39d2feca4a6a358b901ca4f764a4ad426200",
+        "counter_present": true
+      },
+      {
+        "host": "wuwa-lightstick.pages.dev",
+        "edge_address": "2606:4700:310c::ac42:2f5b",
+        "exit_code": 0,
+        "metrics": "200 31472",
+        "decompressed_bytes": 103214,
+        "sha256": "5cdb234f2c6aabf1a2828e169c8b39d2feca4a6a358b901ca4f764a4ad426200",
+        "counter_present": true
+      }
+    ],
+    "trace": {
+      "loc": "CN",
+      "colo": "LAX",
+      "warp": "off",
+      "http": "http/1.1"
+    },
+    "trace_exit_code": 0,
+    "expected_sha256": "5cdb234f2c6aabf1a2828e169c8b39d2feca4a6a358b901ca4f764a4ad426200",
+    "all_match": true
+  },
+  "summary": {
+    "primary": {
+      "attempts": 10,
+      "successes": 10,
+      "total_median_s": 0.713104,
+      "total_min_s": 0.674621,
+      "total_max_s": 0.764641,
+      "ttfb_median_s": 0.6855485
+    },
+    "fallback": {
+      "attempts": 10,
+      "successes": 10,
+      "total_median_s": 0.69942,
+      "total_min_s": 0.651493,
+      "total_max_s": 0.759437,
+      "ttfb_median_s": 0.674556
+    },
+    "counter": {
+      "attempts": 10,
+      "successes": 10,
+      "total_median_s": 0.8299345,
+      "total_min_s": 0.801068,
+      "total_max_s": 0.925489,
+      "ttfb_median_s": 0.8298274999999999
+    }
+  }
+}
