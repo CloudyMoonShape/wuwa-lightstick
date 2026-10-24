@@ -7,7 +7,8 @@ import shutil
 ROOT = Path(__file__).resolve().parents[1]
 DEST = ROOT / 'dist'
 COPY = ('color.js', 'sdk.js', 'principles.html', '_headers', '_routes.json', '404.html', 'LICENSE.txt')
-ARTWORK = ('gold-ripples.avif', 'gold-ripples.webp')
+ARTWORK = ('wuwa-key-visual-2bf16e89.avif', 'wuwa-key-visual-0cc8a4a2.webp',
+           'wuwa-key-visual-mobile-c930edae.avif', 'wuwa-key-visual-mobile-64336493.webp')
 
 def inline_styles(html, controller=False):
     """Only inline known local CSS. Fonts in tokens.css are small data URIs."""

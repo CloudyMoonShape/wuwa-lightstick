@@ -1,10 +1,11 @@
 /* MoonShade application extensions. RGB values are control data, not UI colors. */
-/* The owner requested gold water photography as a local MoonShade exception. */
-.wuwa-controller { --wuwa-gold:#d8c38d; --wuwa-art-opacity:.38; position:relative; isolation:isolate; }
-[data-theme=light] .wuwa-controller,.wuwa-controller[data-theme=light] { --wuwa-gold:#765a23; --wuwa-art-opacity:.08; }
-@media(prefers-color-scheme:light) { :root:not([data-theme]) .wuwa-controller { --wuwa-gold:#765a23; --wuwa-art-opacity:.08; } }
-.resonance-field { position:fixed; inset:0; z-index:-1; pointer-events:none; opacity:var(--wuwa-art-opacity); mask-image:linear-gradient(135deg,transparent,black 72%); }
-.resonance-field img { display:block; width:100%; height:100%; object-fit:cover; object-position:50% 62%; filter:saturate(.35); }
+/* Official game artwork is an owner-requested, local MoonShade exception. */
+.wuwa-controller { --wuwa-gold:#d8c38d; --wuwa-art-opacity:.72; position:relative; isolation:isolate; }
+[data-theme=light] .wuwa-controller,.wuwa-controller[data-theme=light] { --wuwa-gold:#765a23; --wuwa-art-opacity:.16; }
+@media(prefers-color-scheme:light) { :root:not([data-theme]) .wuwa-controller { --wuwa-gold:#765a23; --wuwa-art-opacity:.16; } }
+.resonance-field { position:fixed; inset:0; z-index:-1; pointer-events:none; opacity:var(--wuwa-art-opacity); mask-image:linear-gradient(90deg,transparent,black 65%); }
+.resonance-field img { display:block; width:100%; height:100%; object-fit:cover; object-position:center top; }
+.resonance-field::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg,var(--web-bg),transparent 40%,var(--web-bg)); }
 p,h1,h2 { margin:0; }
 button,input { font:inherit; }
 button,a,input,summary { touch-action:manipulation; }
@@ -31,12 +32,12 @@ svg { width:var(--web-space-6); height:var(--web-space-6); fill:none; stroke:cur
 .social-links a:hover,.social-links a:focus-visible { color:var(--wuwa-gold); }
 .text-link { display:inline-flex; align-items:center; min-height:var(--web-space-12); white-space:nowrap; }
 .connection { display:flex; justify-content:space-between; align-items:center; gap:var(--web-space-4); margin-bottom:var(--web-space-8); }
-.connection-state { display:flex; align-items:center; gap:var(--web-space-3); min-width:0; }
+.connection-state { display:flex; align-items:center; gap:var(--web-space-3); min-width:0; background:var(--web-bg); padding:var(--web-space-1) var(--web-space-2); }
 #status { color:var(--web-ink-2); }
 #status.ok { color:var(--web-ink); }
 #status.err { color:var(--web-warn-ink); }
 .connection-actions { display:flex; gap:var(--web-space-2); flex-shrink:0; }
-.primary { min-width:calc(var(--web-space-16) * 2 + var(--web-space-4)); background:transparent; clip-path:none; }
+.primary { min-width:calc(var(--web-space-16) * 2 + var(--web-space-4)); background:var(--web-bg); clip-path:none; }
 .power { display:grid; place-items:center; width:var(--web-space-12); padding:0; }
 .power[aria-pressed=true] { outline:1px solid var(--web-ink-2); outline-offset:calc(-1 * var(--web-space-1)); }
 .controls { align-items:stretch; }

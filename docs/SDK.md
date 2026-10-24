@@ -30,6 +30,21 @@ Node 可导入 `sdk/index.mjs` 使用纯字节函数；Node 默认没有浏览�
 
 依据：[Chrome 官方蓝牙说明](https://support.google.com/chrome/answer/6362090?hl=zh-Hans)、[Web Bluetooth 实现状态](https://github.com/whatwg/bluetooth/blob/main/implementation-status.md)。
 
+### 从网页到灯棒
+
+```mermaid
+flowchart LR
+  P[Cloudflare Pages] -->|下载控制台| W[浏览器里的调色与灯效]
+  W -->|Web Bluetooth| B[本机蓝牙]
+  B -->|BLE GATT · 六字节颜色帧| S[应援棒]
+```
+
+用户点击连接并选择设备后，SDK 连接服务、订阅通知、完成口令回显，再持续写入颜色帧。颜色指令不经过 Cloudflare；加载完页面后，网站网络延迟不会叠加到每次调色上。
+
+手机能连接蓝牙耳机，并不代表网页也能控制 BLE 设备。前者由系统提供功能，后者需要浏览器向 JavaScript 开放 Web Bluetooth。iPhone 的当前限制在这一接口层，修改颜色协议、网页混色算法或 HTTPS 配置都不能补齐它。实现状态文档提到的 Safari 扩展通过原生进程桥接 CoreBluetooth，仍需要用户安装扩展，不属于 Safari 原生支持，也不符合本站免安装的要求。
+
+若将来增加免安装的 iPhone 遥控，需要另一台附近、已支持网页蓝牙的设备承担连接，再通过网络接收 iPhone 指令。这是需要另行实现与验证的中继功能，当前版本没有提供。
+
 ## 接口与语义
 
 | 接口 | 说明 |

@@ -19,12 +19,20 @@
 
 四张照片由项目用户提供。网页版本只作缩放、转码与元数据清理；没有生成、补绘或推测被遮挡的细节。见[硬件实拍](docs/HARDWARE.md)。
 
-## 金色水波摄影
+## 鸣潮官方主视觉
 
-- 摄影：emteekay，《Waves》，2023-09-29，作品 ID `YWQTWtMk0Cw`。
-- [原始作品](https://unsplash.com/photos/a-black-and-yellow-photo-of-water-ripples-YWQTWtMk0Cw) · [Unsplash License](https://unsplash.com/license)。它是独立摄影作品，不是鸣潮官方游戏素材。
-- 发布文件：`web/assets/artwork/gold-ripples.avif`（1280 宽，36,499 字节）与 `gold-ripples.webp`（960 宽，48,582 字节）。通过 Unsplash 图片服务缩放与转码，页面以 CSS 降低饱和度、淡化左上区域；没有补绘。
-- 图片随站点同源分发，不向 Unsplash 发起访客请求。各格式作为同一背景的替代资源，不作为独立图库出售或重新许可。
+- 来源：[鸣潮官网](https://wutheringwaves.kurogames.com/en/)使用的角色群像背景；[官方原始图片](https://wutheringwaves.kurogames.com/website-preface/assets/main-bg-c08dcefb.webp)，1920 × 1080，479,860 字节。来源路径可在官网的 `index-415d4999.js` 中核对，原始资产名为 `desktop/main-bg.webp`。
+- 游戏美术的著作权归库洛游戏及相应权利人所有。官方发布不等于开放许可；本仓库不对这些美术授予社区源码许可，不声称官方合作或授权。
+- 处理仅包括缩放、裁切、压缩和元数据清理，没有生成或补绘人物。桌面 1440 × 810；手机版取原图 `x=660, y=0, width=500, height=1080` 的竖向区域。页面用 CSS 遮罩保护文字可读性。
+
+| 发布文件（`web/assets/artwork/`） | 字节 |
+|---|---:|
+| `wuwa-key-visual-2bf16e89.avif` | 48,834 |
+| `wuwa-key-visual-0cc8a4a2.webp` | 89,284 |
+| `wuwa-key-visual-mobile-c930edae.avif` | 25,527 |
+| `wuwa-key-visual-mobile-64336493.webp` | 47,428 |
+
+每个视口只加载适合自己的一个格式，不向库洛或其他图片服务发起访客请求。文件名含内容 SHA-256 的前八位，替换内容时同步更名，以便安全使用长期缓存。
 
 ## 社交品牌图标
 
