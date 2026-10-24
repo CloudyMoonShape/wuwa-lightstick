@@ -2,8 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { LightstickClient, colorFrame, frame, validChecksum } from '../sdk/index.mjs';
 
-function mock({failAuth = false, echo = 'correct', authTimeoutMs = 20, wait} = {}) {
-  const writes = [], waits = [], states = [];
+function mock({failAuth = false, echo = 'correct', authTimeoutMs = 20, wait,
+  now = () => performance.now(), writeDelay = () => Promise.resolve()} = {}) {
+  const writes = [], waits = [], states = [], writeStarts = [];
   let active = 0, maxActive = 0;
   const notify = new EventTarget();
   notify.startNotifications = async () => notify;
@@ -19,7 +20,8 @@ function mock({failAuth = false, echo = 'correct', authTimeoutMs = 20, wait} = {
     },
     async writeValueWithoutResponse(data) {
       active++; maxActive = Math.max(maxActive, active);
-      await Promise.resolve(); writes.push([...data]); active--;
+      writeStarts.push(now());
+      await writeDelay(); writes.push([...data]); active--;
     } };
   const service = { getCharacteristic: async id => id === 0xfa01 ? notify : writer };
   const device = new EventTarget(); device.name = 'JFKJ-FBFB';
@@ -28,9 +30,54 @@ function mock({failAuth = false, echo = 'correct', authTimeoutMs = 20, wait} = {
     disconnect() { this.connected = false; device.dispatchEvent(new Event('gattserverdisconnected')); } };
   const client = new LightstickClient({bluetooth: { requestDevice: async options => {
     assert.deepEqual(options.optionalServices, [0xfa00]); return device;
-  } }, authTimeoutMs, wait: async ms => { waits.push(ms); if (wait) await wait(ms); }, onState: s => states.push(s)});
-  return { client, device, notify, writes, waits, states, max: () => maxActive };
+  } }, authTimeoutMs, now, wait: async ms => { waits.push(ms); if (wait) await wait(ms); }, onState: s => states.push(s)});
+  return { client, device, notify, writes, waits, states, writeStarts, max: () => maxActive };
 }
+
+test('fast writes stay near 60 Hz without adding transport time to every interval', async () => {
+  let clock = 0;
+  const m = mock({now: () => clock, writeDelay: () => { clock += 5; }, wait: ms => { clock += ms; }});
+  await m.client.connect();
+  for (let i = 1; i <= 61; i++) await m.client.setColor([i, 0, 0]);
+  const span = m.writeStarts.at(-1) - m.writeStarts[0];
+  assert.ok(span >= 1000 && span <= 1030, `60 write intervals took ${span} ms`);
+  assert.equal(m.max(), 1);
+  m.client.disconnect();
+});
+
+test('slow transport remains serial and does not receive an extra frame delay', async () => {
+  let clock = 0;
+  const m = mock({now: () => clock, writeDelay: () => { clock += 35; }, wait: ms => { clock += ms; }});
+  await m.client.connect();
+  for (let i = 1; i <= 5; i++) await m.client.setColor([i, 0, 0]);
+  assert.equal(m.writeStarts.at(-1) - m.writeStarts[0], 140);
+  assert.deepEqual(m.waits, [1200]);
+  assert.equal(m.max(), 1);
+  m.client.disconnect();
+});
+
+test('updates during pacing send the latest color; disconnect cancels waiting colors', async () => {
+  let clock = 0, resume;
+  const m = mock({now: () => clock, writeDelay: () => { clock += 3; }, wait: ms => {
+    if (ms === 1200) { clock += ms; return; }
+    return new Promise(resolve => { resume = () => { clock += ms; resolve(); }; });
+  }});
+  await m.client.connect();
+  await m.client.setColor([1, 0, 0]);
+  const replaced = m.client.setColor([2, 0, 0]);
+  const latest = m.client.setColor([3, 0, 0]);
+  assert.equal(await replaced, false);
+  resume();
+  assert.equal(await latest, true);
+  assert.deepEqual(m.writes.slice(1), [[...colorFrame([1, 0, 0])], [...colorFrame([3, 0, 0])]]);
+  const cancelled = m.client.setColor([4, 0, 0]);
+  m.client.disconnect();
+  await assert.rejects(cancelled, /closed/);
+  resume();
+  await Promise.resolve();
+  assert.equal(m.writes.length, 3);
+  assert.equal(m.max(), 1);
+});
 
 test('known GATT vectors preserve GRB and checksum', () => {
   assert.deepEqual([...colorFrame([255, 0, 0])], [1,0,0,255,0,0]);

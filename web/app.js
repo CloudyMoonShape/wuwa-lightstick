@@ -14,7 +14,7 @@ function log(line) {
 function setStatus(text, cls = "") { $("status").textContent = text; $("status").className = "web-small " + cls; $("connectionMark").dataset.state = cls === "ok" ? "on" : cls === "err" ? "off" : "unknown"; }
 
 // Transport and frame validation are shared with developer examples through sdk.js.
-let sentFrames = 0, rttMs = 0;
+let sentFrames = 0, rttMs = 0, statsSince = performance.now();
 const client = new LightstickClient({
   onState(state, detail) {
     const labels = {selecting:"选择设备…", connecting:"连接中…", authenticating:"等待蓝灯闪完…", ready:"已连接 " + (detail || ""), disconnected:"已断开 · 屏幕预览", error:"连接失败，请检查电池和浏览器蓝牙权限"};
@@ -383,7 +383,9 @@ function tick(now) {
 }
 
 setInterval(() => {
-  $("fps").textContent = running && client.ready ? sentFrames : "–"; sentFrames = 0;
+  const now = performance.now(), elapsed = now - statsSince;
+  $("fps").textContent = running && client.ready ? Math.round(sentFrames * 1000 / elapsed) : "–";
+  sentFrames = 0; statsSince = now;
   $("rtt").textContent = rttMs ? rttMs.toFixed(0) : "–";
 }, 1000);
 

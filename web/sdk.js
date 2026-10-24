@@ -32,11 +32,13 @@ export function validChecksum(data) {
 export class LightstickClient {
   constructor({ onState = () => {}, onNotification = () => {}, bluetooth,
     // Injection makes timing testable; applications should retain these defaults.
-    wait = sleep, authDelayMs = AUTH_BLINK_MS, authTimeoutMs = AUTH_TIMEOUT_MS, minGapMs = 25 } = {}) {
+    wait = sleep, now = () => performance.now(), authDelayMs = AUTH_BLINK_MS,
+    authTimeoutMs = AUTH_TIMEOUT_MS, minGapMs = 1000 / 60 } = {}) {
     this.onState = onState;
     this.onNotification = onNotification;
     this.bluetooth = bluetooth;
     this.wait = wait;
+    this.now = now;
     this.authDelayMs = authDelayMs;
     this.authTimeoutMs = authTimeoutMs;
     this.minGapMs = minGapMs;
@@ -136,11 +138,15 @@ export class LightstickClient {
         s.pending = null;
         try {
           this._check(s);
+          const started = this.now();
           if (s.write.properties.writeWithoutResponse) await s.write.writeValueWithoutResponse(item.data);
           else await s.write.writeValueWithResponse(item.data);
           this._check(s);
           item.resolve(true);
-          await this.wait(this.minGapMs);
+          // Pace write starts, not write completion plus another full interval.
+          // A slower transport already consumed the interval; do not delay it again.
+          const remaining = this.minGapMs - (this.now() - started);
+          if (remaining > 0) await this.wait(Math.ceil(remaining));
         } catch (error) {
           item.reject(error);
           if (this.session === s) { this.disconnect(); this._state('error', error.message); }
