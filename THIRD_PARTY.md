@@ -6,7 +6,7 @@
 
 - 原作：Copyright (C) 2017 Datto Inc.，D-DIN 字体家族。
 - 许可：[SIL Open Font License 1.1 全文](web/moonshade/OFL-D-DIN.txt)。部署副本位于 `/moonshade/OFL-D-DIN.txt`。
-- 本仓库包含经过字符子集化和 WOFF2 转换的版本，主字体名为 **Wuwa UI Readout** 和 **Wuwa UI Expanded**。CSS 中的 D-DIN 名称仅用于匹配设计系统的内部字体别名。
+- 本仓库包含经过字符子集化和 WOFF2 转换的版本，主字体名为 **Wuwa UI Readout** 和 **Wuwa UI Expanded**。CSS 字体名同样使用改后的名称，不沿用保留字体名 D-DIN。
 - `web/moonshade/tokens.css` 内嵌这些字体；构建首页时移除未使用的 Expanded 字体。中文使用系统字体，无外部字体请求。
 
 ## MoonShade 样式

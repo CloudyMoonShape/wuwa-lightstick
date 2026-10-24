@@ -73,7 +73,7 @@
 
 [桌面控制台](screenshots/controller-desktop.png) · [手机控制台](screenshots/controller-mobile.png)
 
-仓库展示采用真实界面截图，无徽章墙或虚构获奖标识。GitHub About 提供一句用途与控制台链接，源码仓库保持 private。
+仓库展示采用真实界面截图，无徽章墙或虚构获奖标识。GitHub About 提供一句用途与控制台链接。
 
 ## 到访计数追加轮
 

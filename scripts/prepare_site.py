@@ -17,7 +17,7 @@ def inline_styles(html, controller=False):
         css = (ROOT / 'web' / name).read_text()
         if controller and name == 'moonshade/tokens.css':
             # The controller title is Chinese; it never uses the Latin display face.
-            css = re.sub(r'@font-face\s*\{font-family:"D-DIN Exp";[^}]+\}', '', css)
+            css = re.sub(r'@font-face\s*\{font-family:"Wuwa UI Expanded";[^}]+\}', '', css)
         css = re.sub(r'/\*.*?\*/', '', css, flags=re.S)
         css = re.sub(r'\s+', ' ', css)
         return '<style>' + css.strip() + '</style>'

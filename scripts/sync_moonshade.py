@@ -22,6 +22,7 @@ tokens = json.loads((project / "tokens.json").read_text())
 tokens["type"]["fonts"] = [f for f in tokens["type"]["fonts"] if f["family"] in ("D-DIN", "D-DIN Exp")]
 tokens["type"]["groups"] = [g for g in tokens["type"]["groups"] if any(s["name"].startswith("web-") for s in g["styles"])]
 faces = []
+renamed = {}
 import base64
 for face in tokens["type"]["fonts"]:
     font = TTFont(project / face["file"])
@@ -39,8 +40,14 @@ for face in tokens["type"]["fonts"]:
     font.flavor = "woff2"
     output = dest / (family.replace(" ", "-").lower() + ".woff2")
     font.save(output)
+    renamed[face["family"]] = family
     data = base64.b64encode(output.read_bytes()).decode()
-    faces.append(f'@font-face {{font-family:"{face["family"]}";src:url(data:font/woff2;base64,{data}) format("woff2");font-weight:{face["weight"]};font-style:normal;font-display:swap;unicode-range:U+0020-00FF,U+2013-2014,U+2212;}}')
+    faces.append(f'@font-face {{font-family:"{family}";src:url(data:font/woff2;base64,{data}) format("woff2");font-weight:{face["weight"]};font-style:normal;font-display:swap;unicode-range:U+0020-00FF,U+2013-2014,U+2212;}}')
+# The CSS family name must not reuse the RFN either, so the stacks point at the renamed subsets.
+for key, stack in tokens["type"]["families"].items():
+    for old, new in renamed.items():
+        stack = stack.replace(f'"{old}"', f'"{new}"')
+    tokens["type"]["families"][key] = stack
 themed, plain = compiler.collect(tokens)
 dark = [(n, v["dark"]) for n, v in themed.items()]
 light = [(n, v["light"]) for n, v in themed.items()]
