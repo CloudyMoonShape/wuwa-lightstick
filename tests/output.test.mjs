@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {outputRate, isColorReply, EffectClock, FrameSender} from '../web/output.js';
-import {LightstickClient, frame, colorFrame} from '../web/sdk.js';
+import {LightstickClient, frame, colorFrame, NOTIFY} from '../web/sdk.js';
 import {breathBrightness} from '../web/dimming.js';
 import {renderColor} from '../web/color.js';
 
@@ -205,7 +205,7 @@ async function simulateBreathing(rate, writeDelay=2) {
   const device=new EventTarget(); device.name='JFKJ-test';
   device.gatt={connected:false,
     async connect(){this.connected=true;return this;},
-    async getPrimaryService(){return{getCharacteristic:async id=>id===0xfa01?notify:writer};},
+    async getPrimaryService(){return{getCharacteristic:async id=>id===NOTIFY?notify:writer};},
     disconnect(){this.connected=false;device.dispatchEvent(new Event('gattserverdisconnected'));}
   };
   const client=new LightstickClient({minGapMs:0,now:time.now,wait:async()=>{},

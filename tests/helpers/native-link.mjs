@@ -1,5 +1,5 @@
 // Host-only GATT double. It models documented dispatch state, not optical output.
-import { LightstickClient, frame } from '../../web/sdk.js';
+import { LightstickClient, frame, NOTIFY } from '../../web/sdk.js';
 export function nativeLink({ reply = 'match', beforeReply = async () => {}, afterReply = async () => {}, replyTimeoutMs = 100 } = {}) {
   const writes = [], notifications = [], notify = new EventTarget(), device = new EventTarget();
   let last = 0, effect = 'off', rgb = [0,0,0], active = 0, maxActive = 0;
@@ -31,7 +31,7 @@ export function nativeLink({ reply = 'match', beforeReply = async () => {}, afte
   };
   device.name = 'JFKJ-MOCK';
   device.gatt = {connected:false, async connect() { this.connected=true; return this; },
-    async getPrimaryService() { return {getCharacteristic:async id => id===0xfa01 ? notify : writer}; },
+    async getPrimaryService() { return {getCharacteristic:async id => id===NOTIFY ? notify : writer}; },
     disconnect() { this.connected=false; device.dispatchEvent(new Event('gattserverdisconnected')); }
   };
   const client = new LightstickClient({bluetooth:{requestDevice:async()=>device}, wait:async()=>{}, minGapMs:0, replyTimeoutMs});

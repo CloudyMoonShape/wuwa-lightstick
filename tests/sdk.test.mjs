@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { LightstickClient, colorFrame, frame, validChecksum } from '../sdk/index.mjs';
+import { LightstickClient, colorFrame, frame, validChecksum, SERVICE, NOTIFY } from '../sdk/index.mjs';
 
 function mock({failAuth = false, echo = 'correct', authTimeoutMs = 20, wait,
   now = () => performance.now(), writeDelay = () => Promise.resolve()} = {}) {
@@ -23,13 +23,13 @@ function mock({failAuth = false, echo = 'correct', authTimeoutMs = 20, wait,
       writeStarts.push(now());
       await writeDelay(); writes.push([...data]); active--;
     } };
-  const service = { getCharacteristic: async id => id === 0xfa01 ? notify : writer };
+  const service = { getCharacteristic: async id => id === NOTIFY ? notify : writer };
   const device = new EventTarget(); device.name = 'JFKJ-FBFB';
   device.gatt = { connected: false, async connect() { this.connected = true; return this; },
-    getPrimaryService: async id => { assert.equal(id, 0xfa00); return service; },
+    getPrimaryService: async id => { assert.equal(id, SERVICE); return service; },
     disconnect() { this.connected = false; device.dispatchEvent(new Event('gattserverdisconnected')); } };
   const client = new LightstickClient({bluetooth: { requestDevice: async options => {
-    assert.deepEqual(options.optionalServices, [0xfa00]); return device;
+    assert.deepEqual(options.optionalServices, [SERVICE]); return device;
   } }, authTimeoutMs, now, wait: async ms => { waits.push(ms); if (wait) await wait(ms); }, onState: s => states.push(s)});
   return { client, device, notify, writes, waits, states, writeStarts, max: () => maxActive };
 }
@@ -165,4 +165,29 @@ test('disconnect while waiting for echo promptly rejects and ignores late echo',
   m.notify.dispatchEvent(new Event('characteristicvaluechanged'));
   assert.equal(m.client.ready, false);
   assert.equal(m.states.includes('ready'), false);
+});
+
+test('browsers with only the legacy writeValue still authenticate and set colors', async () => {
+  // Arrange
+  const writes = [];
+  const notify = new EventTarget();
+  notify.startNotifications = async () => notify;
+  const writer = { properties: { write: true }, async writeValue(data) {
+    writes.push([...data]);
+    notify.value = new DataView(data.buffer, data.byteOffset, data.byteLength);
+    notify.dispatchEvent(new Event('characteristicvaluechanged'));
+  } };
+  const device = new EventTarget(); device.name = 'JFKJ-FBFB';
+  device.gatt = { connected: false, async connect() { this.connected = true; return this; },
+    getPrimaryService: async () => ({ getCharacteristic: async id => id === NOTIFY ? notify : writer }),
+    disconnect() { this.connected = false; } };
+  const client = new LightstickClient({ bluetooth: { requestDevice: async () => device }, wait: async () => {} });
+
+  // Act
+  await client.connect();
+  await client.setColor([255, 0, 0]);
+
+  // Assert
+  assert.deepEqual(writes.at(-1), [...colorFrame([255, 0, 0])]);
+  client.disconnect();
 });

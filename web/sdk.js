@@ -1,11 +1,16 @@
 /** Independent host-side SDK; no vendor code, firmware, OTA or radio transmitter. */
-export const SERVICE = 0xfa00;
-export const NOTIFY = 0xfa01;
-export const WRITE = 0xfa02;
+// Full 128-bit strings: iOS Web Bluetooth browsers such as Bluefy reject the numeric 16-bit alias.
+export const SERVICE = '0000fa00-0000-1000-8000-00805f9b34fb';
+export const NOTIFY = '0000fa01-0000-1000-8000-00805f9b34fb';
+export const WRITE = '0000fa02-0000-1000-8000-00805f9b34fb';
 export const AUTH_BLINK_MS = 1200;
 export const AUTH_TIMEOUT_MS = 4000;
 const password = () => new TextEncoder().encode('JFKJ-20250421');
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+// Older Web Bluetooth implementations (some iOS browsers) only ship the deprecated writeValue().
+const writeWithResponse = (ch, data) => ch.writeValueWithResponse ? ch.writeValueWithResponse(data) : ch.writeValue(data);
+const writeFast = (ch, data) => ch.properties?.writeWithoutResponse && ch.writeValueWithoutResponse
+  ? ch.writeValueWithoutResponse(data) : writeWithResponse(ch, data);
 
 function bytes(values) {
   const out = Array.from(values);
@@ -126,7 +131,7 @@ export class LightstickClient {
       try {
         await Promise.all([
           authenticated,
-          Promise.resolve().then(() => { this._check(s); return s.write.writeValueWithResponse(password()); })
+          Promise.resolve().then(() => { this._check(s); return writeWithResponse(s.write, password()); })
         ]);
       } finally {
         clearTimeout(timer);
@@ -180,8 +185,7 @@ export class LightstickClient {
             }) : Promise.resolve();
             await Promise.all([reply, Promise.resolve().then(async () => {
               this._check(s);
-              if (s.write.properties.writeWithoutResponse) await s.write.writeValueWithoutResponse(item.data);
-              else await s.write.writeValueWithResponse(item.data);
+              await writeFast(s.write, item.data);
               this._check(s);
               this.onWrite(item.data.slice(), this.now() - started);
             })]);
