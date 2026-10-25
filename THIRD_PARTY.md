@@ -36,12 +36,13 @@ The current background is the “To the New World” concert key visual supplied
 
 Copyright remains with Kuro Games and the respective rights holders. Publication is not an open license. The software license does not relicense this artwork or imply endorsement.
 
-Copies are resized, compressed, and stripped of metadata. Desktop uses 1440 × 810; mobile uses 960 × 540 with CSS positioning. Both retain the original image composition. CSS overlays preserve text contrast.
+Copies use WebP quality 78 and contain no source metadata. Desktop selects a 1920 × 1080 or 2560 × 1440 image based on screen size and pixel density. Mobile uses a 798 × 1728 portrait crop from source coordinates `x=1636, y=0, width=798, height=1728`. CSS overlays preserve text contrast.
 
 | File in `web/assets/artwork/` | Bytes |
 |---|---:|
-| `wuwa-concert-desktop-5c336cf1.webp` | 122,402 |
-| `wuwa-concert-mobile-f3b1a20c.webp` | 59,952 |
+| `wuwa-concert-1920-5a4180a5.webp` | 249,970 |
+| `wuwa-concert-2560-7aeee2d3.webp` | 382,762 |
+| `wuwa-concert-portrait-5c75439f.webp` | 177,012 |
 
 The browser loads one same-origin image at low priority. It makes no request to X or Kuro Games. Content hashes prevent stale cached backgrounds.
 

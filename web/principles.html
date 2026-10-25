@@ -18,7 +18,7 @@
 @media(prefers-color-scheme:light) { :root:not([data-theme]) .wuwa-principles { --wuwa-art-opacity:.10; --photo-edge-strength:.45; } }
 .resonance-field { position:fixed; inset:0; z-index:-1; pointer-events:none; opacity:var(--wuwa-art-opacity); mask-image:linear-gradient(90deg,transparent,black 80%); }
 .resonance-field img { display:block; width:100%; height:100%; object-fit:cover; object-position:center top; }
-@media(max-width:767px) { .resonance-field img { object-position:72% top; } }
+@media(max-width:767px) { .resonance-field img { object-position:center top; } }
 .resonance-field::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg,var(--web-bg),transparent 40%,var(--web-bg)); }
 .page-head .ms-headrow { align-items:center; gap:var(--web-space-4); }
 .page-head .ms-headid { align-items:center; gap:var(--web-space-3); }
@@ -102,8 +102,8 @@
 </head>
 <body class="ms-page wuwa-principles">
 <picture class="resonance-field" aria-hidden="true">
-  <source media="(max-width: 767px)" srcset="assets/artwork/wuwa-concert-mobile-f3b1a20c.webp" type="image/webp">
-  <img src="assets/artwork/wuwa-concert-desktop-5c336cf1.webp" alt="" width="1440" height="810" decoding="async" fetchpriority="low" draggable="false">
+  <source media="(max-width: 767px)" srcset="assets/artwork/wuwa-concert-portrait-5c75439f.webp" type="image/webp">
+  <img src="assets/artwork/wuwa-concert-1920-5a4180a5.webp" srcset="assets/artwork/wuwa-concert-1920-5a4180a5.webp 1920w, /assets/artwork/wuwa-concert-2560-7aeee2d3.webp 2560w" sizes="100vw" alt="" width="1920" height="1080" decoding="async" fetchpriority="low" draggable="false">
 </picture>
 <a class="ms-skip" href="#main">跳到正文</a>
 <div class="ms-wrap"><!-- site-header --></div>

@@ -9,7 +9,7 @@ from seo import build_discovery
 ROOT = Path(__file__).resolve().parents[1]
 DEST = ROOT / 'dist'
 COPY = ('color.js', 'dimming.js', 'output.js', 'playback.js', 'sdk.js', 'principles.html', '_headers', '_routes.json', '404.html', 'LICENSE.txt')
-ARTWORK = ('wuwa-concert-desktop-5c336cf1.webp', 'wuwa-concert-mobile-f3b1a20c.webp')
+ARTWORK = ('wuwa-concert-1920-5a4180a5.webp', 'wuwa-concert-2560-7aeee2d3.webp', 'wuwa-concert-portrait-5c75439f.webp')
 CONCERT = ('audience-blue.webp', 'audience-pink.webp')
 
 def inline_styles(html, controller=False):
