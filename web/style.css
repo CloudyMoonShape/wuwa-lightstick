@@ -164,3 +164,13 @@ button.quiet { background:transparent; color:var(--web-ink-2); padding:var(--web
 .footer-credit { white-space:nowrap; color:var(--web-ink-2); }
 @media(max-width:600px) { .footer-caution span { font-size:0; } .footer-caution span::after { content:"闪光敏感请勿开启"; font-size:11px; } .footer-caution { font-size:11px; } .footer-top nav { gap:8px; font-size:11px; } .footer-credit { font-size:11px; } .footer-logo svg { width:88px; } }
 .unified-footer a { color:var(--web-ink-2); text-decoration:none; } .unified-footer a:hover { color:var(--web-ink); } .unified-footer .footer-logo { color:var(--web-ink); }
+
+.aligned-head { padding-top:var(--web-space-6); padding-bottom:var(--web-space-6); }
+.aligned-head .aligned-identity { display:flex; flex-direction:row; align-items:flex-start; gap:var(--web-space-6); }
+.aligned-head .ms-brand { display:flex; flex:none; margin:0; padding:0; }
+.aligned-head .ms-brand svg { display:block; width:142px; height:auto; stroke:none; }
+.aligned-head .header-copy { display:flex; flex-direction:column; gap:var(--web-space-1); }
+.aligned-head .header-copy p,.aligned-head .header-copy h1 { margin:0; font-family:var(--font-sans); font-weight:400; }
+.aligned-head .header-copy .web-small { color:var(--web-ink-2); }
+.aligned-head,.aligned-head .ms-headrow { align-items:start; }
+@media(max-width:767px) { .aligned-head .aligned-identity { flex-direction:column; gap:var(--web-space-3); } .aligned-head .header-copy .web-body { font-size:var(--web-small); } .page-head .ms-headrow { display:flex; justify-content:space-between; } }
