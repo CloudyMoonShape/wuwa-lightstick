@@ -7,7 +7,8 @@
   let saved;
   try { saved = localStorage.getItem(key); } catch {}
   const browserLanguage = () => (navigator.languages || [navigator.language]).map(locale).find(Boolean) || 'en';
-  let manual = locale(new URL(location.href).searchParams.get('lang')) || locale(saved);
+  const initialUrl = new URL(location.href);
+  let manual = locale(initialUrl.searchParams.get('lang')) || locale(initialUrl.pathname.split('/')[1]) || locale(saved);
   let language = manual || browserLanguage();
   const outputs = new Map(), sources = new WeakMap(), reverse = new Map();
   for (const [source, translations] of Object.entries(catalog)) {
@@ -54,18 +55,47 @@
     if (root.matches('meta[name="description"]')) translateValue(root, 'content', root.content, value => { root.content = value; });
     for (const child of root.childNodes) translateDOM(child);
   }
+  function updateMetadata() {
+    const config = window.RESONATOR_SEO;
+    if (!config || !document.querySelector) return;
+    const [name, description, article] = config.copy[language];
+    const title = config.principles ? article : name;
+    const path = manual ? '/' + language + '/' + (config.principles ? 'principles' : '') : (config.principles ? '/principles' : '/');
+    const url = config.origin + path;
+    document.title = title;
+    for (const [selector, content] of Object.entries({
+      'meta[name="description"]': description, 'meta[property="og:title"]':title,
+      'meta[name="twitter:title"]':title,'meta[property="og:description"]':description,
+      'meta[name="twitter:description"]':description,'meta[property="og:url"]':url,
+      'meta[property="og:locale"]':{zh:'zh_CN',en:'en_US',ja:'ja_JP'}[language]
+    })) document.querySelector(selector)?.setAttribute('content', content);
+    document.querySelector('link[rel="canonical"]')?.setAttribute('href',url);
+    document.querySelector('link[type="text/markdown"]')?.setAttribute('href',path.endsWith('/') ? path+'index.md' : path+'.md');
+    const structured = document.querySelector('script[type="application/ld+json"]');
+    if (structured) {
+      const data=JSON.parse(structured.textContent);
+      Object.assign(data,{name:title,description,url,inLanguage:document.documentElement.lang,'@id':url+(config.principles?'#article':'#app')});
+      structured.textContent=JSON.stringify(data);
+    }
+    document.querySelectorAll('.resonator-brand,.site-foot-logo').forEach(link=>{link.href='/'+language+'/';});
+    document.querySelectorAll('.site-foot a').forEach(link=>{if (/\/principles(?:\.html)?$/.test(new URL(link.href,location.href).pathname)) link.href='/'+language+'/principles';});
+    document.querySelectorAll('.site-head > .ms-link').forEach(link=>{link.href='/'+language+'/';});
+  }
   function apply() {
     document.documentElement.lang = language === 'zh' ? 'zh-CN' : language;
     translateDOM();
     document.querySelectorAll('[data-language]').forEach(button => { button.setAttribute('aria-pressed', String(button.dataset.language === language)); });
-    document.querySelectorAll('.site-footer [lang]').forEach(node => { node.lang = document.documentElement.lang; });
+    updateMetadata();
+    document.querySelectorAll('.site-foot [lang]').forEach(node => { node.lang = document.documentElement.lang; });
   }
   function setLanguage(value) {
     manual = locale(value);
     language = manual || browserLanguage();
     try { if (manual) localStorage.setItem(key, manual); else localStorage.removeItem(key); } catch {}
     const url = new URL(location.href);
-    if (manual) url.searchParams.set('lang', manual); else url.searchParams.delete('lang');
+    const isPrinciples = /principles(?:\.html)?\/?$/.test(url.pathname);
+    url.pathname = manual ? '/' + manual + '/' + (isPrinciples ? 'principles' : '') : (isPrinciples ? '/principles' : '/');
+    url.searchParams.delete('lang');
     history.replaceState(null, '', url);
     apply();
     window.dispatchEvent(new CustomEvent('resonatorlanguagechange', {detail: {language}}));

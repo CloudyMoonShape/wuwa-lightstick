@@ -69,3 +69,13 @@ Artwork filenames contain a content hash and use long-lived caching. If you repl
 A successful upload does not prove that the deployed site or hardware works. See [Verification](VERIFICATION.md).
 
 [Cloudflare Direct Upload](https://developers.cloudflare.com/pages/get-started/direct-upload/) documents the deployment method. A Direct Upload project cannot switch directly to Git integration; use a new project if you need that workflow.
+
+## Maintainer deployment
+
+Resonator belongs to the personal Cloudflare account. Never deploy it to the company account. On the maintainer Mac, run every Wrangler command through the account wrapper:
+
+```sh
+~/.codex/skills/cloudflare/scripts/cfw.sh personal pages deploy dist --project-name wuwa-resonator --branch main
+```
+
+If personal account access fails, stop and fix that access. Do not use company credentials. The production D1 database is `resonator-visitors`.

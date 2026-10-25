@@ -1,5 +1,5 @@
 (() => {
-  const origins = ['https://wuwa.south-wall.com', 'https://wuwa-lightstick.pages.dev'];
+  const origins = ['https://wuwa.south-wall.com', 'https://wuwa-resonator.pages.dev'];
   const key = 'wuwa.visitor.v1';
   const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 

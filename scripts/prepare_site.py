@@ -4,6 +4,7 @@ import gzip
 import json
 import re
 import shutil
+from seo import build_discovery
 
 ROOT = Path(__file__).resolve().parents[1]
 DEST = ROOT / 'dist'
@@ -30,7 +31,7 @@ def inline_styles(html, controller=False):
 def shared_chrome(html, page):
     parts = ROOT / 'web/partials'
     extra = (parts / 'controller-header-extra.html').read_text() if page == 'index' else '<a class="ms-link web-small" href="/">回到遥控器</a>'
-    header = (parts / 'header.html').read_text().replace('{{title}}', '共鸣者' if page == 'index' else '原理').replace('{{extra}}', extra)
+    header = (parts / 'header.html').read_text().replace('{{title}}', '共鸣者' if page == 'index' else '原理').replace('{{extra}}', extra).replace('{{heading_tag}}', 'h1' if page == 'index' else 'div')
     return html.replace('<!-- site-header -->', header).replace('<!-- site-footer -->', (parts / 'footer.html').read_text())
 
 def localized(html):
@@ -103,7 +104,8 @@ def main():
         shutil.copy2(ROOT / 'web/assets/concert' / name, DEST / 'assets/concert' / name)
     (DEST / 'moonshade').mkdir()
     shutil.copy2(ROOT / 'web/moonshade/OFL-D-DIN.txt', DEST / 'moonshade/OFL-D-DIN.txt')
-    raw = html.encode()
+    build_discovery(ROOT, DEST)
+    raw = (DEST / 'index.html').read_bytes()
     print(f'Controller: {len(raw):,} bytes raw; {len(gzip.compress(raw)):,} bytes gzip estimate; no third-party requests')
     print('Optional same-origin background: ' + ', '.join(f'{name} {(DEST / "assets/artwork" / name).stat().st_size:,} bytes' for name in ARTWORK))
     print('Prepared dist/: index.html, ' + ', '.join(COPY))

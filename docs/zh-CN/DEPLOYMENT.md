@@ -69,3 +69,13 @@ npx wrangler@4.152.0 pages deploy dist --project-name YOUR_PROJECT --branch main
 上传成功不能证明线上页面或硬件正常。详见[验证](VERIFICATION.md)。
 
 部署方法参见 [Cloudflare Direct Upload](https://developers.cloudflare.com/pages/get-started/direct-upload/)。Direct Upload 项目不能直接切换为 Git 集成；需要此流程时应新建项目。
+
+## 维护者部署
+
+共鸣者属于个人 Cloudflare 账户。不要部署到公司账户。在维护者的 Mac 上，所有 Wrangler 命令都必须通过账户包装脚本运行：
+
+```sh
+~/.codex/skills/cloudflare/scripts/cfw.sh personal pages deploy dist --project-name wuwa-resonator --branch main
+```
+
+个人账户权限不足时，停止并修复权限。不要改用公司凭据。生产数据库为 `resonator-visitors`。

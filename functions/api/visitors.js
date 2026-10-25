@@ -1,4 +1,4 @@
-const ORIGINS = new Set(['https://wuwa.south-wall.com', 'https://wuwa-lightstick.pages.dev']);
+const ORIGINS = new Set(['https://wuwa.south-wall.com', 'https://wuwa-resonator.pages.dev']);
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const MAX_BODY = 256;
 const SELECT_TOTAL = 'SELECT total FROM visitor_totals WHERE id = 1';

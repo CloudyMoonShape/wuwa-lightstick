@@ -7,7 +7,7 @@ import {runInNewContext} from 'node:vm';
 import {onRequest} from '../functions/api/visitors.js';
 
 const ORIGIN = 'https://wuwa.south-wall.com';
-const OTHER_ORIGIN = 'https://wuwa-lightstick.pages.dev';
+const OTHER_ORIGIN = 'https://wuwa-resonator.pages.dev';
 const ID = '12345678-1234-4234-8234-123456789abc';
 const KEY = 'wuwa.visitor.v1';
 const migration = readFileSync(new URL('../migrations/0001_visitors.sql', import.meta.url), 'utf8');
@@ -140,7 +140,7 @@ test('POST requires exact same-origin JSON, and previews cannot access the datab
   for (const type of ['', 'text/plain', 'application/x-www-form-urlencoded']) {
     assert.equal((await request(db, {headers: {'Content-Type': type}})).status, 415);
   }
-  for (const origin of ['http://localhost:8788', 'https://preview.wuwa-lightstick.pages.dev', 'http://wuwa.south-wall.com']) {
+  for (const origin of ['http://localhost:8788', 'https://preview.wuwa-resonator.pages.dev', 'http://wuwa.south-wall.com']) {
     assert.equal((await request(db, {urlOrigin: origin})).status, 404);
     assert.equal((await request(db, {method: 'GET', urlOrigin: origin})).status, 404);
   }
@@ -219,7 +219,7 @@ test('unavailable or non-persisting storage only reads the total', async () => {
 });
 
 test('localhost and deployment previews neither fetch nor create an ID', async () => {
-  for (const origin of ['http://localhost:8000', 'https://preview.wuwa-lightstick.pages.dev', 'null']) {
+  for (const origin of ['http://localhost:8000', 'https://preview.wuwa-resonator.pages.dev', 'null']) {
     const page = browser({origin}); await page.run();
     assert.equal(page.calls.length, 0); assert.equal(page.reads(), 0); assert.equal(page.node.hidden, true);
   }

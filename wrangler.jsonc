@@ -1,5 +1,5 @@
 {
-  "name": "wuwa-lightstick",
+  "name": "wuwa-resonator",
   "pages_build_output_dir": "./dist",
   "compatibility_date": "2026-10-24",
   "d1_databases": [],
@@ -11,8 +11,8 @@
       "d1_databases": [
         {
           "binding": "VISITORS_DB",
-          "database_name": "wuwa-lightstick-visitors",
-          "database_id": "2ec23188-5f9f-4338-a608-9d57697e1353",
+          "database_name": "resonator-visitors",
+          "database_id": "b03d5819-8fd6-4fda-87bc-28db4a37fbdc",
           "migrations_dir": "migrations"
         }
       ]

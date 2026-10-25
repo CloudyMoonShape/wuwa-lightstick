@@ -43,3 +43,5 @@ body:not(.wuwa-controller) .site-identity{grid-row:1/3}
 @media(max-width:767px){.site-head .masthead-nav{grid-column:1;grid-row:3}.language-picker{grid-column:2;grid-row:3}.site-head>.ms-link{grid-column:1;grid-row:3;align-self:center;justify-self:start}.social-links{gap:16px}}
 @media(max-width:767px){.site-head .social-links{gap:4px}}
 @media(max-width:360px){.site-head .social-links{gap:0}.site-head .social-links a{width:40px}}
+
+.site-title{margin:0;font-weight:400}

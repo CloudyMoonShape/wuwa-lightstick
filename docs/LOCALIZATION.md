@@ -9,9 +9,10 @@ The controller and principles page support Chinese, English, and Japanese. Trans
 The page uses the first available setting:
 
 1. A supported `lang` query value: `zh`, `en`, or `ja`.
-2. The user's saved manual choice.
-3. The first supported language in `navigator.languages`.
-4. English.
+2. An explicit `/zh/`, `/en/`, or `/ja/` path.
+3. The user's saved manual choice.
+4. The first supported language in `navigator.languages`.
+5. English.
 
 Browser language tags use their language prefix. For example, `zh-TW` selects Chinese, `en-GB` selects English, and `ja-JP` selects Japanese. The current Chinese translation uses Simplified Chinese. Unsupported values are ignored.
 
@@ -25,7 +26,7 @@ The same query works on `/principles`. An explicit query takes priority over a s
 
 ## Manual selection
 
-The language control updates the visible text and the `lang` query without reloading the page. It does not disconnect the lightstick or restart playback. The browser saves the choice in local storage when storage is available.
+The language control updates the visible text and the language path without reloading the page. It does not disconnect the lightstick or restart playback. The browser saves the choice in local storage when storage is available.
 
 If storage is unavailable, selection still works on the current page. The query also identifies the selected language. A later visit without that query cannot rely on a choice that was not saved.
 

@@ -28,3 +28,5 @@
 - [Public release review](PUBLIC-RELEASE.md)
 
 - [iPhone connection guide](IOS.md)
+
+- [Search and AI discovery](SEO.md)

@@ -28,3 +28,5 @@
 - [公开前检查](PUBLIC-RELEASE.md)
 
 - [iPhone 图文连接教学](IOS.md)
+
+- [搜索与 AI 检索](SEO.md)
