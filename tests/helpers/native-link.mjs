@@ -20,7 +20,7 @@ export function nativeLink({ reply = 'match', beforeReply = async () => {}, afte
         if (data[0] === 1 && [2,4].includes(last)) rgb = [data[3],data[2],data[4]];
         else {
           last = data[0];
-          effect = ({1:'direct',2:'breathe',3:'fade',4:'blink',5:'rgb-step',6:'rgb-breathe',13:'direct',14:'direct'})[last];
+          effect = ({1:'direct',2:'breathe',3:'fade',4:'blink',5:'rgb-step',6:'rgb-breathe',7:'rgb-burst',8:'palette-cycle',13:'direct',14:'direct'})[last];
           if ([1,2,4,13,14].includes(last)) rgb = [data[3],data[2],data[4]];
         }
         if (reply === 'match') emit(frame([data[0] | 0xa0, ...data.slice(1,-1)]));

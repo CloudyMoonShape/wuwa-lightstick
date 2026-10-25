@@ -9,6 +9,8 @@ test('native frames match dispatch layouts, GRB and big-endian interval', () => 
   assert.deepEqual([...nativeEffectFrame('breathe',{rgb:[255,0,0]})],[2,0,0,255,0,255]);
   assert.deepEqual([...nativeEffectFrame('fade')],[3,0,253]);
   assert.deepEqual([...nativeEffectFrame('rgb-breathe')],[6,0,250]);
+  assert.deepEqual([...nativeEffectFrame('rgb-burst')],[7,0,249]);
+  assert.deepEqual([...nativeEffectFrame('palette-cycle')],[8,0,248]);
   assert.deepEqual(nativeEffectFrame('blink',{rgb:[12,34,56],intervalMs:1000}),frame([4,0,34,12,56,3,232]));
   assert.deepEqual(nativeEffectFrame('rgb-step',{intervalMs:1000}),frame([5,0,3,232]));
   for(const intervalMs of [0,65535,-1,1.5,NaN,undefined]) assert.throws(()=>nativeEffectFrame('rgb-step',{intervalMs}),RangeError);
@@ -42,8 +44,8 @@ test('disconnect rejects a pending mode acknowledgment immediately',async()=>{
   m.emit([0xa3,0,0x5d]);assert.equal(m.client.ready,false);
 });
 test('reply statistics include native and direct commands but reject unrelated or corrupt bytes',()=>{
-  for(const body of [[0xa2,0,0,255,0],[0xa3,0],[0xa4,0,0,255,0,1,244],[0xa5,0,1,244],[0xa6,0],[0xad,0,0,0,0],[0xae,0,0,255,0]]) assert.equal(isControlReply(frame(body)),true);
-  for(const data of [[],[0xa2,0,0,255,0,0],frame([0xa2,0]),frame([0xa7,0]),frame([0xa1,1,0,1,0])]) assert.equal(isControlReply(data),false);
+  for(const body of [[0xa2,0,0,255,0],[0xa3,0],[0xa4,0,0,255,0,1,244],[0xa5,0,1,244],[0xa6,0],[0xa7,0],[0xa8,0],[0xad,0,0,0,0],[0xae,0,0,255,0]]) assert.equal(isControlReply(frame(body)),true);
+  for(const data of [[],[0xa2,0,0,255,0,0],frame([0xa2,0]),frame([0xa9,0]),frame([0xa1,1,0,1,0])]) assert.equal(isControlReply(data),false);
 });
 
 async function rig(options={}) {
@@ -64,10 +66,15 @@ test('native breathing does not stream its envelope; base changes use 01 without
   r.visible(false);await r.time.advance(10200);r.visible(true);await r.time.advance(10300);
   assert.equal(r.writes.filter(x=>x[0]===2).length,1);assert.equal(r.maxActive(),1);assert.deepEqual(r.errors,[]);r.close();
 });
-test('fixed palette effects issue one confirmed command and never send base colors',async()=>{
-  const r=await rig();await r.playback.configure({kind:'fade',continuous:true});await r.time.advance(10000);
-  assert.deepEqual(r.writes.map(x=>x[0]),[3]);assert.equal(r.sender.active,false);r.close();
-});
+for(const [kind,command] of [['fade',3],['rgb-breathe',6],['rgb-burst',7],['palette-cycle',8]]) {
+  test(`${kind}: one confirmed command, no streamed base colors, safe return to custom color`,async()=>{
+    const r=await rig();await r.playback.configure({kind,continuous:true});await r.time.advance(10000);
+    assert.deepEqual(r.writes.map(x=>x[0]),[command]);assert.equal(r.state().effect,kind);assert.equal(r.sender.active,false);
+    r.color([255,32,32]);await r.playback.configure({kind:'stream',continuous:true});await r.time.advance(10100);
+    assert.deepEqual(r.writes.slice(-2).map(x=>x[0]),[13,14]);assert.equal(r.state().effect,'direct');
+    assert.deepEqual(r.state().rgb,[255,32,32]);assert.equal(r.maxActive(),1);r.close();
+  });
+}
 test('leaving native breathing and blackout use a reset barrier before colors',async()=>{
   const r=await rig();await r.playback.configure({kind:'breathe',rgb:[255,0,0],continuous:true});await r.time.advance(100);
   await r.playback.configure({kind:'stream',continuous:true});await r.time.advance(200);

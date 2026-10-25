@@ -6,8 +6,9 @@ import { DevicePlayback } from "./playback.js";
 
 const $ = id => document.getElementById(id);
 const hex = b => [...b].map(x => x.toString(16).padStart(2, "0")).join(" ");
-let engine = new URLSearchParams(location.search).get("engine") === "native" ? "native" : "web";
-let trialUsed = engine === "native";
+const requestedEngine = new URLSearchParams(location.search).get("engine");
+let engine = ["web", "music"].includes(requestedEngine) ? requestedEngine : "native";
+let trialUsed = engine !== "web";
 
 function log(line) {
   const el = $("log");
@@ -33,7 +34,7 @@ const client = new LightstickClient({
     sentFrames = 0; replyFrames = 0; statsSince = performance.now();
     if (state === "ready" && running) configurePlayback();
     else playback.reset();
-    if (state === "disconnected") { stopAudio(); startEffect(effects[0]); }
+    if (state === "disconnected") stopAudio();
     log(state + (detail ? " " + detail : ""));
   },
   onNotification(data) {
@@ -88,7 +89,7 @@ const THEMES = [
 
 const effects = [
   { name: "常亮", desc: "单色", fn: (t, c) => c },
-  { name: "呼吸", desc: "缓慢明暗", breathing: true, fn: (t, c) => c },
+  { name: "调速呼吸", desc: "自选呼吸节奏", breathing: true, fn: (t, c) => c },
   { name: "闪烁", desc: "一亮一灭", fn: (t, c) => (t * 2) % 1 < 0.5 ? c : [0, 0, 0] },
   { name: "频闪", desc: "短促爆闪", fn: (t, c) => (t * 6) % 1 < 0.18 ? c : [0, 0, 0] },
   { name: "心跳", desc: "咚-咚", fn: (t, c) => {
@@ -115,9 +116,14 @@ const nativeEffects = [
   { name: "三色渐变", native: "fade", fixedPalette: true, fn: t => hsv(t * 120) },
   { name: "三色呼吸", native: "rgb-breathe", fixedPalette: true,
     fn: t => [[255,0,0],[0,255,0],[0,0,255]][Math.floor(t / 2.6) % 3] },
+  // Display-only approximation: the firmware's 15-color palette is independent.
+  { name: "多色轮播", native: "palette-cycle", fixedPalette: true,
+    fn: t => hsv(Math.floor(t / .58) % 15 * 24) },
   { name: "闪烁", native: "blink", timed: true, fn: (t, c) => c },
   { name: "三色跳变", native: "rgb-step", timed: true, fixedPalette: true,
     fn: t => [[255,0,0],[0,255,0],[0,0,255]][Math.floor(t * 4) % 3] },
+  { name: "三色连闪", native: "rgb-burst", fixedPalette: true,
+    fn: t => Math.floor(t / .095) % 2 ? [0,0,0] : [[255,0,0],[0,255,0],[0,0,255]][Math.floor(t / .95) % 3] },
 ];
 
 function theme(cols, t) {
@@ -142,6 +148,7 @@ const BEAT_DECAY_S = 0.18;       // 节拍脉冲衰减时间常数
 const SILENCE_RMS = 0.003;       // 约 -50 dBFS，比这小当静音，不出拍
 
 let actx = null, analyser = null, delay = null, srcNode = null, srcStream = null;
+let audioRequest = 0;
 let spec = null, prevSpec = null, wave = null;
 const au = { bass: 0, mid: 0, high: 0, level: 0, centroid: 0, beat: false, pulse: 0, beats: 0,
   flux: 0, thresh: 0 };
@@ -173,12 +180,17 @@ function setSource(node, stream, audible, info) {
   node.connect(analyser);
   if (audible) node.connect(delay);
   $("srcInfo").textContent = info;
-  if (stream) stream.getAudioTracks().forEach(track => track.addEventListener("ended", stopAudio, {once:true}));
+  $("stopAudio").disabled = false;
+  if (stream) stream.getAudioTracks().forEach(track => track.addEventListener("ended", () => {
+    if (srcStream === stream) stopAudio();
+  }, {once:true}));
   actx.resume();
   if (!running || !running.music) startEffect(musicEffects[0]);
 }
 
 async function useFile(file) {
+  if (engine !== "music") return;
+  const request = ++audioRequest;
   ensureAudio();
   const p = $("player");
   p.hidden = false;
@@ -187,31 +199,35 @@ async function useFile(file) {
   p.style.display = "block";
   if (!p._node) p._node = actx.createMediaElementSource(p);
   setSource(p._node, null, true, file.name);
-  try { await p.play(); } catch(e) { $("srcInfo").textContent = "无法播放这个文件，请换一个音频文件"; }
+  try { await p.play(); } catch(e) { if (request === audioRequest) $("srcInfo").textContent = "无法播放这个文件，请换一个音频文件"; }
 }
 
 async function useTab() {
+  const request = ++audioRequest;
   ensureAudio();
   try {
     // Chrome 要求同时要视频；suppressLocalAudioPlayback 让被共享的标签页自己静音，只听这里推迟过的那一路
     const s = await navigator.mediaDevices.getDisplayMedia({
       video: true, audio: { suppressLocalAudioPlayback: true, echoCancellation: false,
         noiseSuppression: false, autoGainControl: false } });
+    if (request !== audioRequest || engine !== "music") { s.getTracks().forEach(t => t.stop()); return; }
     s.getVideoTracks().forEach(t => t.stop());
     if (!s.getAudioTracks().length) { $("srcInfo").textContent = "没拿到声音：共享时要勾上「同时分享标签页音频」"; return; }
     $("player").style.display = "none";
     setSource(actx.createMediaStreamSource(s), s, true, "标签页声音");
-  } catch (e) { $("srcInfo").textContent = "共享取消：" + e.message; }
+  } catch (e) { if (request === audioRequest) $("srcInfo").textContent = "共享取消：" + e.message; }
 }
 
 async function useMic() {
+  const request = ++audioRequest;
   ensureAudio();
   try {
     const s = await navigator.mediaDevices.getUserMedia({
       audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
+    if (request !== audioRequest || engine !== "music") { s.getTracks().forEach(t => t.stop()); return; }
     $("player").style.display = "none";
     setSource(actx.createMediaStreamSource(s), s, false, "麦克风");
-  } catch (e) { $("srcInfo").textContent = "麦克风被拒：" + e.message; }
+  } catch (e) { if (request === audioRequest) $("srcInfo").textContent = "麦克风被拒：" + e.message; }
 }
 
 function applySync() {
@@ -324,6 +340,7 @@ const musicEffects = [
     } },
 ];
 const PALETTE_RGB = [0, 2, 4, 6, 3, 1].map(i => hexToRgb(namedColors[i]));
+const selectedEffects = {native: nativeEffects[0], web: effects[5], music: musicEffects[0]};
 
 // ---- 白平衡 ----
 
@@ -374,7 +391,7 @@ const playback = new DevicePlayback({ client, sender, canStream: () => !document
   onError: error => { $("playbackState").textContent = "切换失败，请重新连接"; log(error.message); }
 });
 let lastPreview = "", lastOutput = "";
-const FLASH_EFFECTS = new Set(["闪烁", "频闪", "警灯", "爆闪", "彩虹跳变", "三色跳变"]);
+const FLASH_EFFECTS = new Set(["闪烁", "频闪", "警灯", "爆闪", "彩虹跳变", "三色跳变", "三色连闪"]);
 
 function configurePlayback(forceReset = false) {
   if (!client.ready || !running) return;
@@ -386,13 +403,17 @@ function configurePlayback(forceReset = false) {
 }
 
 function colorChanged() {
+  if (running?.music) { sender.invalidate(); return; }
   stopAudio();
   if (["breathe", "blink"].includes(running?.native)) sender.invalidate();
   else startEffect(effects[0]);
 }
 
 function startEffect(fx) {
-  if (fx.music && engine !== "web") { engine = "web"; renderEffects(); }
+  const previousEngine = engine;
+  if (fx.music && engine !== "music") { engine = "music"; renderEffects(); }
+  if (!fx.music && !fx.native && fx.name !== "关灯" && engine === "music") { engine = "native"; trialUsed = true; renderEffects(); }
+  if (previousEngine !== engine) updateEngineUrl();
   if (engine === "native" && fx === effects[0]) fx = nativeEffects[0];
   if (FLASH_EFFECTS.has(fx.name) && !$("flashConsent").checked) { $("flashing").open = true; $("flashNote").textContent = "先开启「允许快速闪光」，或选择呼吸、渐变。"; return; }
   $("flashNote").textContent = "";
@@ -400,6 +421,7 @@ function startEffect(fx) {
   if ((fx.breathing || fx.native) && running !== fx) effectClock.reset(performance.now());
   if (fx !== running) { musicRgb = [0,0,0]; sender.invalidate(); }
   running = fx;
+  if (fx.name !== "关灯") selectedEffects[engine] = fx;
   lastOutput = "";
   document.querySelectorAll("[data-effect]").forEach(b => { b.classList.toggle("on", b.dataset.name === fx.name); b.setAttribute("aria-pressed", String(b.dataset.name === fx.name)); });
   $("blackout").setAttribute("aria-pressed", String(fx.name === "关灯"));
@@ -433,6 +455,7 @@ function sampleFrame(now, visualDt) {
     const envelope = ["breathe", "rgb-breathe"].includes(running.native) ? (1 - Math.cos(time / 2.6 * Math.PI * 2)) / 2 : running.native === "blink" ? (time * 2 % 1 < .5 ? 1 : 0) : 1;
     return { rgb, k: envelope * (running.fixedPalette ? 1 : ceiling), out: balance(base, ceiling) };
   }
+  if (running.music && !srcNode) return {rgb:[0,0,0], k:0, out:[0,0,0]};
   // Audio analysis and stateful music effects still advance only with the UI.
   // Extra Bluetooth samples must not count a beat twice or speed up hue drift.
   if (running.music && visualDt !== undefined) musicRgb = running.fn(time, base, visualDt);
@@ -483,28 +506,49 @@ const effectIcons = {
 };
 effectIcons["三色渐变"] = effectIcons["多色渐变"];
 effectIcons["三色呼吸"] = effectIcons["呼吸变色"];
+effectIcons["调速呼吸"] = effectIcons["呼吸"];
+effectIcons["多色轮播"] = '<path d="M5 4h14v16H5zM5 9h14M5 15h14M10 4v5m4 0v6m-4 0v5"/>';
+effectIcons["节拍脉冲"] = effectIcons["心跳"];
+effectIcons["节拍换色"] = effectIcons["呼吸变色"];
+effectIcons["频谱色"] = '<path d="M4 17V9m4 8V5m4 12V3m4 14V7m4 10v-6"/>';
+effectIcons["三频混色"] = effectIcons["多色渐变"];
+effectIcons["幻彩律动"] = effectIcons["幻彩渐变"];
 function renderEffects() {
-  const list = engine === "native" ? nativeEffects : effects;
-  for (const [grid, entries] of [["effects", list.filter(fx => fx.name !== "关灯" && !FLASH_EFFECTS.has(fx.name))], ["flashEffects", list.filter(fx => FLASH_EFFECTS.has(fx.name))], ["music", musicEffects]]) {
+  const list = engine === "native" ? nativeEffects : engine === "music" ? musicEffects : effects;
+  const regular = list.filter(fx => fx.name !== "关灯" && !FLASH_EFFECTS.has(fx.name));
+  for (const [grid, entries] of [["effects", engine === "music" ? [] : regular], ["flashEffects", list.filter(fx => FLASH_EFFECTS.has(fx.name))], ["music", engine === "music" ? regular : []]]) {
     $(grid).replaceChildren();
+    $(grid).dataset.count = entries.length;
     for (const fx of entries) {
       const b = document.createElement("button");
       b.className = "web-small"; b.dataset.name = fx.name; b.dataset.effect = "";
       b.innerHTML = (effectIcons[fx.name] ? `<svg viewBox="0 0 24 24" aria-hidden="true">${effectIcons[fx.name]}</svg>` : "") + `<span>${fx.name}</span>`;
       b.title = fx.desc || fx.name;
+      b.setAttribute("aria-pressed", String(fx === running));
+      b.classList.toggle("on", fx === running);
       b.onclick = () => startEffect(fx);
       $(grid).append(b);
     }
   }
   document.querySelector(".effects-panel").dataset.engine = engine;
   document.querySelectorAll('[name="engine"]').forEach(input => { input.checked = input.value === engine; });
-  $("sound").hidden = engine === "native";
+  $("sound").hidden = engine !== "music";
+  $("effectControls").hidden = engine === "music";
+  $("flashing").open = false;
 }
 renderEffects();
-document.querySelectorAll('[name="engine"]').forEach(input => { input.onchange = () => {
-  stopAudio(); engine = input.value; trialUsed ||= engine === "native";
-  renderEffects(); startEffect(engine === "native" ? nativeEffects[1] : effects[1]);
+function updateEngineUrl() {
   const url = new URL(location.href); url.searchParams.set("engine", engine); history.replaceState(null, "", url);
+}
+document.querySelectorAll('[name="engine"]').forEach(input => { input.onchange = () => {
+  stopAudio(); engine = input.value; trialUsed ||= engine !== "web";
+  if (engine === "music") $("srcInfo").textContent = "选择音源";
+  renderEffects();
+  const selected = selectedEffects[engine];
+  startEffect(FLASH_EFFECTS.has(selected.name) && !$("flashConsent").checked
+    ? engine === "native" ? nativeEffects[1] : engine === "music" ? musicEffects[0] : effects[1]
+    : selected);
+  updateEngineUrl();
 }; });
 $("srcFile").onclick = () => $("file").click();
 $("file").onchange = () => {
@@ -547,22 +591,24 @@ document.addEventListener("visibilitychange", () => {
   playback.resume();
 });
 loadGains();
-startEffect(engine === "native" ? nativeEffects[1] : effects[0]);
+startEffect(requestedEngine === "native" ? nativeEffects[1] : requestedEngine === "web" ? effects[0] : selectedEffects[engine]);
 
 function stopAudio() {
+  audioRequest++;
   const stream = srcStream; srcStream = null;
   if (stream) stream.getTracks().forEach(t => t.stop());
   if (srcNode) srcNode.disconnect(); srcNode = null;
   $("player").pause(); $("player").hidden = true; $("player").style.display = "none";
   $("srcInfo").textContent = "音源已停止";
+  $("stopAudio").disabled = true;
   if (actx?.state === "running") actx.suspend().catch(error => log(error.message));
   const meter=$("meter"); meter.getContext("2d").clearRect(0,0,meter.width,meter.height);
   for (const key of Object.keys(au)) au[key] = 0;
-  if (running?.music) startEffect(effects[0]);
+  musicRgb = [0,0,0]; sender.invalidate();
 }
 $("stopAudio").onclick = stopAudio;
 $("blackout").onclick = () => { stopAudio(); startEffect(effects.at(-1)); };
-$("flashConsent").onchange = () => { if (!$("flashConsent").checked && FLASH_EFFECTS.has(running?.name)) startEffect(engine === "native" ? nativeEffects[1] : effects[1]); };
+$("flashConsent").onchange = () => { if (!$("flashConsent").checked && FLASH_EFFECTS.has(running?.name)) startEffect(engine === "native" ? nativeEffects[1] : engine === "music" ? musicEffects[0] : effects[1]); };
 if (!window.isSecureContext || typeof navigator.bluetooth?.requestDevice !== "function") {
   setStatus("屏幕预览 · 当前浏览器无法连接蓝牙");
   $("compat").textContent = "可以在屏幕上调色、播放灯效；当前浏览器尚未开放网页蓝牙。";
@@ -570,6 +616,7 @@ if (!window.isSecureContext || typeof navigator.bluetooth?.requestDevice !== "fu
   $("connect").textContent = "仅预览";
 }
 if (!navigator.mediaDevices?.getDisplayMedia) $("srcTab").disabled = true;
+if (!navigator.mediaDevices?.getUserMedia) $("srcMic").disabled = true;
 window.addEventListener("pagehide", () => { stopAudio(); client.disconnect(); });
 
 // Native canvas color wheel: hue around the rim, saturation toward the center.

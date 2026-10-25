@@ -114,7 +114,7 @@
   <section class="ms-section ms-wrap" id="paths" aria-labelledby="paths-title">
     <div class="ms-section-head"><div><span class="ms-section-label">04</span><h2 class="ms-h2" id="paths-title">两条通信路径</h2></div></div>
     <div class="ms-grid">
-      <article class="ms-prose path"><h3 class="ms-h3">蓝牙控制</h3><p>同一条 GATT 连接，可以把灯效交给网页或灯棒计算。</p><ol><li><strong>网页播放。</strong>动画与音乐分析生成颜色，经过观感混色、亮度曲线和 8 位取整，再逐帧发送。速度与配色可自由调整。</li><li><strong>灯棒播放。</strong>发送一次模式和基础色，内部定时器负责呼吸、渐变或闪烁；改变颜色和亮度时才更新。三色预设使用固件自己的配色。</li></ol><p>内置试验已接入 <code>02–06</code>；切回网页先用 <code>0d</code> 停止内部效果。连续发色可走 <code>0e</code>，等值白色仍用 <code>01</code> 保留调暗能力。</p><p class="ms-small">内置指令经过静态追踪和软件检查，仍待实物验收；实体按键呼吸使用另一内部模式。<a href="/?engine=native">打开内置试验</a>。</p></article>
+      <article class="ms-prose path"><h3 class="ms-h3">蓝牙控制</h3><p>首页把原生灯效、延伸灯效和音乐律动放在同一级。它们共用一条 GATT 连接。</p><ol><li><strong>网页播放。</strong>动画与音乐分析生成颜色，经过观感混色、亮度曲线和 8 位取整，再逐帧发送。速度与配色可自由调整。</li><li><strong>灯棒播放。</strong>发送一次模式和基础色，内部定时器负责呼吸、渐变或闪烁；改变颜色和亮度时才更新。三色预设使用固件自己的配色。</li></ol><p>原生灯效已接入 <code>02–08</code>；切回网页先用 <code>0d</code> 停止内部效果。连续发色可走 <code>0e</code>，等值白色仍用 <code>01</code> 保留调暗能力。</p><p class="ms-small">原生单色呼吸已有用户实物顺滑度反馈，其余效果仍需逐项验收。实体按键呼吸使用另一内部模式。<a href="/?engine=native">打开原生灯效</a>。</p></article>
       <article class="ms-prose path"><h3 class="ms-h3">现场广播</h3><p>静态分析发现固件绕过常规 GATT，在 <code>2478 MHz</code> 接收特殊射频包，使用 RGB 顺序、另一种加和校验与 XOR 混淆。</p><p>这一链路尚未完成空口实测。普通网页蓝牙不能发送它，广播脚本只生成字节。</p><p class="ms-small">不要在活动现场尝试广播。它可能影响其他棒子；类型 6 会永久改写分组号，掉电不恢复。</p></article>
     </div>
   </section>
@@ -124,7 +124,7 @@
     <dl class="ms-prose evidence">
       <div class="evidence-row"><dt class="ms-h3">实物反馈</dt><dd><p>研究样机已测试口令握手、GRB 设色、原版网页灯效与音乐律动。新版基础颜色与观感混色已有用户实物反馈。</p><p class="ms-small">当前全部灯效、音频路径和时序仍未逐项验收；实物反馈不等于仪器测量，也不能外推到其他批次。</p></dd></div>
       <div class="evidence-row"><dt class="ms-h3">静态逆向</dt><dd><p>内置灯效参数、定时任务、按键与 GATT 的差异、连续设色、射频包结构与分组号持久化。</p><p class="ms-small">代码分析不等于实际发射或接收测试。</p></dd></div>
-      <div class="evidence-row"><dt class="ms-h3">仍待确认</dt><dd><p>内置灯效的实际平滑度与退出行为、<code>07–0c</code> 的完整效果、白化实际初值，以及其他批次的兼容性。</p><p class="ms-small">尚不能把这些结论当作稳定接口或兼容保证。</p></dd></div>
+      <div class="evidence-row"><dt class="ms-h3">仍待确认</dt><dd><p>其他内置灯效的实际观感与退出行为、<code>09–0c</code> 的完整效果、白化实际初值，以及其他批次的兼容性。</p><p class="ms-small">尚不能把这些结论当作稳定接口或兼容保证。</p></dd></div>
     </dl>
   </section>
 

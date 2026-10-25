@@ -45,23 +45,23 @@
     </section>
     <section class="effects-panel ms-card" aria-labelledby="effectsHeading">
       <div class="sectionhead"><h2 class="ms-h2" id="effectsHeading">灯效</h2><div class="preview web-small" aria-label="灯光预览"><span id="orb" aria-hidden="true"></span><strong id="effectName">常亮</strong><span id="mode" class="ms-sr">屏幕预览</span></div></div>
-      <fieldset class="ms-switch engine-switch"><legend class="ms-sr">播放方式</legend><label><input type="radio" name="engine" value="web" checked><span>网页</span></label><label><input type="radio" name="engine" value="native"><span>灯棒 · 试验</span></label></fieldset>
+      <fieldset class="ms-switch engine-switch"><legend class="ms-sr">灯效类型</legend><label><input type="radio" name="engine" value="native" checked><span>原生灯效</span></label><label><input type="radio" name="engine" value="web"><span>延伸灯效</span></label><label><input type="radio" name="engine" value="music"><span>音乐律动</span></label></fieldset>
+      <div id="effectControls">
       <div class="effect-grid" id="effects" role="group" aria-label="灯效"></div>
-      <p id="nativeNote" class="web-small note feedback"></p><p id="playbackState" class="web-small note feedback" role="status"></p>
       <div class="control-block speed-control"><div class="control-label"><label for="speed" class="web-small">速度</label><output id="speedv" for="speed" class="web-data">1.0×</output></div><input type="range" id="speed" min="10" max="300" value="100"></div>
-      <details class="flash-options" id="flashing"><summary class="web-small">闪光灯效</summary><div class="detail-body"><label class="web-small check"><input id="flashConsent" type="checkbox"> 允许快速闪光</label><p class="web-small note">对闪光敏感请勿开启。</p><div class="effect-grid compact" id="flashEffects" role="group" aria-label="闪光灯效"></div></div></details>
-      <p id="flashNote" class="web-small note feedback" role="status"></p>
-      <details id="sound"><summary class="web-small">音乐律动</summary>
-        <div class="detail-body">
+      </div>
+      <section id="sound" aria-label="音乐律动" hidden>
           <div class="audio-sources"><button id="srcFile" class="web-small">音乐文件</button><button id="srcTab" class="web-small">标签页</button><button id="srcMic" class="web-small">麦克风</button><input type="file" id="file" accept="audio/*" hidden></div>
-          <div class="audio-state web-small"><span id="srcInfo" role="status">选择音源</span><button id="stopAudio" class="web-small quiet">停止</button></div>
+          <div class="audio-state web-small"><span id="srcInfo" role="status">选择音源</span><button id="stopAudio" class="web-small quiet" disabled>停止</button></div>
           <audio id="player" controls hidden></audio><canvas id="meter" width="900" height="80" aria-label="音频频谱"></canvas>
           <div class="effect-grid compact" id="music" role="group" aria-label="音乐灯效"></div>
           <div class="row"><label for="sens" class="web-small">灵敏度</label><input type="range" id="sens" min="20" max="300" value="100"><output id="sensv" for="sens" class="web-data">1.0×</output></div>
           <details class="audio-timing"><summary class="web-small">声音同步</summary><div class="detail-body"><div class="row"><label for="sync" class="web-small">延后</label><input type="range" id="sync" min="0" max="400" value="120"><output id="syncv" for="sync" class="web-data">120 ms</output></div><button id="autoSync" class="web-small quiet">估算延迟</button><p class="web-small note">推迟音乐以贴合灯光，仅适用于文件和标签页。估算后可按观感微调。</p></div></details>
           <p class="web-small note">音频只在本机处理。</p>
-        </div>
-      </details>
+      </section>
+      <p id="nativeNote" class="web-small note feedback"></p><p id="playbackState" class="web-small note feedback" role="status"></p>
+      <details class="flash-options" id="flashing"><summary class="web-small">闪光灯效</summary><div class="detail-body"><label class="web-small check"><input id="flashConsent" type="checkbox"> 允许快速闪光</label><p class="web-small note">对闪光敏感请勿开启。</p><div class="effect-grid compact" id="flashEffects" role="group" aria-label="闪光灯效"></div></div></details>
+      <p id="flashNote" class="web-small note feedback" role="status"></p>
     </section>
   </div>
 </section>

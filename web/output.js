@@ -12,7 +12,7 @@ export function isColorReply(data) {
 }
 
 export function isControlReply(data) {
-  const lengths = { 0xa1: 6, 0xa2: 6, 0xa3: 3, 0xa4: 8, 0xa5: 5, 0xa6: 3, 0xad: 6, 0xae: 6 };
+  const lengths = { 0xa1: 6, 0xa2: 6, 0xa3: 3, 0xa4: 8, 0xa5: 5, 0xa6: 3, 0xa7: 3, 0xa8: 3, 0xad: 6, 0xae: 6 };
   return lengths[data[0]] === data.length && data[1] === 0 &&
     (Array.from(data).reduce((sum, byte) => sum + byte, 0) & 255) === 0;
 }

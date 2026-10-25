@@ -37,6 +37,8 @@ export function nativeEffectFrame(kind, { rgb, intervalMs } = {}) {
   if (kind === 'breathe') return directFrame(2, rgb);
   if (kind === 'fade') return frame([3, 0]);
   if (kind === 'rgb-breathe') return frame([6, 0]);
+  if (kind === 'rgb-burst') return frame([7, 0]);
+  if (kind === 'palette-cycle') return frame([8, 0]);
   if (!['blink', 'rgb-step'].includes(kind)) throw new RangeError('Unknown native effect');
   if (!Number.isInteger(intervalMs) || intervalMs < 1 || intervalMs > 65534) {
     throw new RangeError('Native interval must be an integer from 1 to 65534 ms');

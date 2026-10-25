@@ -82,7 +82,7 @@ await stick.stopNativeEffect();     // 明确退出并熄灯
 await stick.setContinuousColor([80, 0, 0]); // 此后可连续发送新颜色
 ```
 
-`breathe` 接收原始 `rgb`；`blink` 接收 `rgb` 和 `intervalMs`；`rgb-step` 仅接收 `intervalMs`；`fade` / `rgb-breathe` 不接收可调参数。毫秒间隔为整数 1–65534。SDK 不自动应用网页观感混色。最小交互示例见 [native.html](../sdk/examples/native.html)。
+`breathe` 接收原始 `rgb`；`blink` 接收 `rgb` 和 `intervalMs`；`rgb-step` 仅接收 `intervalMs`；`fade` / `rgb-breathe` / `palette-cycle` / `rgb-burst` 不接收可调参数。`palette-cycle` 为 15 色轮播（`08 00 f8`），`rgb-burst` 为三色连闪（`07 00 f9`）；使用连闪前由应用征得用户开启闪光。毫秒间隔为整数 1–65534。SDK 不自动应用网页观感混色。最小交互示例见 [native.html](../sdk/examples/native.html)。
 
 启动与退出默认等待 1500 ms 匹配回复；可用 `replyTimeoutMs` 配置。所有调用仍共用一个在途写入和一个最新待发项；被后续调用覆盖的待发命令返回 false。开发者应串行 await 模式切换，检查返回值，然后才发送颜色；网页由 `DevicePlayback` 统一处理。回包可能早于浏览器写操作完成，SDK 会同时等待两者。
 
@@ -97,8 +97,8 @@ await stick.setContinuousColor([80, 0, 0]); // 此后可连续发送新颜色
 | `0x01` | 六字节设色帧 `01 xx G R B checksum`，xx 当前取 0 | GRB、红绿及熄灯由原工具实测。 |
 | `R=G=B≠0` | 固件改用白光通道 | 既有逆向与白平衡测试记录；等值 RGB 不应当作 RGB 三通道独立混色。 |
 | `0xa1` 回包首字节 | 灯效模式 2/4 的设色回包可能以此开头 | 既有记录；不是另一个公开发色命令。 |
-| `0x02–0x06` | 已追踪的内置灯效入口 | 静态布局与 SDK 模拟验证；未完成实物验收。 |
-| `0x07–0x0c` | 预设 / 组合图案候选 | 未开放设备调用封装。 |
+| `0x02–0x08` | 已接入的内置灯效入口 | 静态布局与 SDK 模拟验证；`02` 主观顺滑度获用户实物确认，其余未逐项验收。 |
+| `0x09–0x0c` | 组合 / 七色轮播 / 白光及红蓝图案 | 未开放设备调用封装。 |
 | `0x0d` / `0x0e` | 强制停止后直出 / 连续设色 | 已追踪；等值非零 RGB 在这两个分支会开满 W。 |
 
 ## 固件函数地图（特定备份，不是通用 ABI）
