@@ -15,7 +15,7 @@
 .site-foot nav { display:flex; justify-content:end; align-items:center; gap:var(--web-space-4); flex-wrap:wrap; }
 .site-foot a { color:var(--web-ink-2); text-decoration:none; }
 .site-foot a:hover,.site-foot .site-foot-logo { color:var(--web-ink); }
-@media(max-width:767px) { .site-identity { flex-direction:column; gap:var(--web-space-3); } .site-head { grid-template-columns:minmax(0,1fr); } .site-head .visitor-count { justify-self:start; } .site-foot nav { gap:8px; font-size:11px; } .site-foot-logo svg { width:72px; } }
+@media(max-width:767px) { .site-identity { flex-direction:column; gap:var(--web-space-3); } .site-head { grid-template-columns:minmax(0,1fr) auto; column-gap:var(--web-space-3); } .site-head .visitor-count { grid-column:2; grid-row:1; justify-self:end; align-self:start; } .site-foot nav { gap:8px; font-size:11px; } .site-foot-logo svg { width:72px; } }
 
 .footer-centered { display:flex; flex-direction:column; align-items:center; gap:var(--web-space-4); padding-block:var(--web-space-8); margin-top:var(--web-space-4); border-top:1px solid var(--web-line); }
 .footer-centered nav { justify-content:center; gap:var(--web-space-3); }
@@ -27,4 +27,4 @@
 .resonator-brand { display:block; flex:none; color:var(--web-ink); text-decoration:none; }
 .site-identity .resonator-brand svg { width:230px; height:auto; }
 .resonator-brand:focus-visible { outline:2px solid currentColor; outline-offset:6px; }
-@media(max-width:767px) { .site-identity { align-items:flex-start; } .site-identity .resonator-brand svg { width:201px; } }
+@media(max-width:767px) { .site-identity { display:contents; } .resonator-brand { grid-column:1; grid-row:1; } .site-heading { grid-column:1/-1; grid-row:2; } .site-identity .resonator-brand svg { width:clamp(150px,50vw,201px); max-width:100%; } }
