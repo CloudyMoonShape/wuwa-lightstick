@@ -22,3 +22,9 @@
 .footer-centered nav a,.footer-created a { text-decoration:underline; text-underline-offset:.2em; }
 .footer-created { margin:0; color:var(--web-ink-2); }
 .footer-centered .site-foot-logo { padding-bottom:var(--web-space-2); }
+
+.site-identity { align-items:center; }
+.resonator-brand { display:block; flex:none; color:var(--web-ink); text-decoration:none; }
+.site-identity .resonator-brand svg { width:230px; height:auto; }
+.resonator-brand:focus-visible { outline:2px solid currentColor; outline-offset:6px; }
+@media(max-width:767px) { .site-identity { align-items:flex-start; } .site-identity .resonator-brand svg { width:201px; } }
