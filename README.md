@@ -4,7 +4,7 @@
 
 **[打开控制台 ↗](https://wuwa.south-wall.com/)**　[工作原理](https://wuwa.south-wall.com/principles)　[开发文档](docs/README.md)
 
-[![共鸣控制台：色轮、亮度与灯效](docs/screenshots/controller-desktop.png)](https://wuwa.south-wall.com/)
+[![共鸣控制台：原生灯效、延伸灯效与独立音乐入口](docs/screenshots/controller-desktop.png)](https://wuwa.south-wall.com/)
 
 连接自己的应援棒，调色，播放灯效，跟随音乐。蓝牙控制与音频分析都在本机完成，无需账号或控制服务器。首页约 40 KB gzip，样式、字体、图标与脚本均内联。鸣潮官方主视觉同源低优先级加载，AVIF 桌面约 49 KB、手机约 26 KB；遥控器无需等待背景。硬件照片只在原理页加载。
 
