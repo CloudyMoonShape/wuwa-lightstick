@@ -13,7 +13,7 @@
 
 研究用サンプルは基板 `HE-750G24`、ファームウェア `V4.1.8` です。別の製品やバージョンの動作は保証していません。
 
-iPhone と iPad の Safari、Chrome にはネイティブ Web Bluetooth がなく、画面プレビューのみ利用できます。接続ガイドは Bluefy や beacio Safari 拡張機能などの任意の橋渡し手段も説明します。これらの利用にはインストールが必要です。通常の Safari や Chrome が直接対応するという意味ではありません。
+iPhone と iPad の Safari、Chrome にはネイティブ Web Bluetooth がなく、画面プレビューのみ利用できます。接続にはBluefyブラウザーのインストールが必要です。通常の Safari や Chrome が直接対応するという意味ではありません。
 
 ## 言語を選ぶ
 

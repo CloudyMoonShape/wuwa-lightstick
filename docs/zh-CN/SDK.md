@@ -27,7 +27,7 @@ Node 可导入 `sdk/index.mjs` 使用纯字节函数；Node 默认没有浏览�
 
 网页按安全上下文与 `navigator.bluetooth.requestDevice` 是否存在判断连接能力，不按设备型号拒绝访问。Windows、macOS、ChromeOS 和 Android 上的 Chrome 提供所需接口；Windows 与 macOS 上的 Edge 也支持控制器所需接口。Linux Chrome 的支持仍属试验性质，不能假定默认可用。iPhone / iPad 的常规 Safari、Chrome 未提供原生 Web Bluetooth；HTTPS、添加到主屏幕或把网站改成 PWA 都不能自行补上系统没有开放的蓝牙接口。
 
-缺少接口时保留屏幕预览，连接按钮变为「怎么连接」，打开连接说明弹窗并停在访问者设备对应的分页。iPhone / iPad 分页给出国区 App Store 可下载的两条免费路线：Bluefy 浏览器与 beacio Safari 扩展，二者都是第三方桥接，不是浏览器原生支持；微信 / QQ 分页提示换到浏览器打开。没有改动蓝牙协议来绕过平台权限。
+缺少接口时保留屏幕预览，连接按钮变为「怎么连接」，打开连接说明弹窗并停在访问者设备对应的分页。iPhone / iPad 分页只介绍 Bluefy 浏览器，需要安装第三方 App，不是 Safari 或 Chrome 原生支持；微信 / QQ 分页提示换到浏览器打开。没有改动蓝牙协议来绕过平台权限。
 
 iOS 桥接会把 UUID 交给系统蓝牙，因此 SDK 导出的 `SERVICE`、`NOTIFY`、`WRITE` 是完整 128 位字符串，不是 16 位数字；缺少 `writeValueWithResponse()` 或 `writeValueWithoutResponse()` 时退回旧的 `writeValue()`。
 

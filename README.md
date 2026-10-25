@@ -28,7 +28,7 @@ Choose a color. Play an effect. Make the light follow your music. No account or 
 
 The website supports Chinese, English, and Japanese. It uses your browser language unless you choose another language. See [language selection](docs/LOCALIZATION.md).
 
-Safari and Chrome on iPhone or iPad do not provide native Web Bluetooth. They support screen previews only. The connection guide describes optional bridges such as Bluefy and the beacio Safari extension. Those options require installation and are not native browser support. Open the connection guide for device-specific steps. See [browser support](docs/SDK.md).
+Safari and Chrome on iPhone or iPad do not provide native Web Bluetooth. They support screen previews only. Use the Bluefy browser to connect. It requires installation and is not native Safari or Chrome support. Open the connection guide for device-specific steps. See [browser support](docs/SDK.md).
 
 The research sample has board `HE-750G24` and firmware `V4.1.8`. Other hardware or firmware versions can behave differently. Flashing effects require a separate opt-in.
 

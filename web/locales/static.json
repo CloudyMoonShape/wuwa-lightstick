@@ -629,21 +629,9 @@
     "en": ".",
     "ja": "で始まる機器を選んでください。"
   },
-  "方法二：beacio（继续用 Safari）": {
-    "en": "Option 2: beacio (use Safari)",
-    "ja": "方法2：beacio（Safariを使う）"
-  },
   "并安装，打开一次。": {
     "en": "and install it. Open the app once.",
     "ja": "を検索してインストールし、一度起動します。"
-  },
-  "回到 Safari 打开本站，点地址栏左侧「大小」图标（aA）→「管理扩展」→ 打开 beacio。": {
-    "en": "Return to Safari and open this site. Select the page settings icon (aA) beside the address bar, then “Manage Extensions”, and enable beacio.",
-    "ja": "Safariでこのサイトを開きます。アドレスバー横のページ設定アイコン（aA）から「機能拡張を管理」を選び、beacioを有効にします。"
-  },
-  "再点「大小」图标 → beacio →": {
-    "en": "Select the page settings icon again, then beacio, then",
-    "ja": "もう一度ページ設定アイコンを選び、beacio →"
   },
   "Enable on all websites": {
     "en": "Enable on all websites",
@@ -657,10 +645,6 @@
   "刷新页面，点「连接应援棒」。": {
     "en": "Reload the page and select “Connect lightstick”.",
     "ja": "ページを再読み込みし、「応援棒を接続」を選びます。"
-  },
-  "beacio 只对 Safari 有效。两个 App 尚未与本站逐项实测，一个卡顿时可试另一个；音乐律动的「标签页」音源在 iPhone 上不可用。": {
-    "en": "beacio works only in Safari. Neither app has completed all tests with this site. If one stalls, try the other. The browser-tab audio source is not available on iPhone.",
-    "ja": "beacioはSafari専用です。どちらのアプリも当サイトとの全項目の実機テストは完了していません。片方がうまく動かない場合は、もう片方を試してください。iPhoneでは音楽の「ブラウザーのタブ」音源は使えません。"
   },
   "微信、QQ 里打开的网页都不能连接，需要换到浏览器：": {
     "en": "Pages opened inside WeChat or QQ cannot connect. Open the page in a browser:",
@@ -766,12 +750,12 @@
     "en": "Wait until the website shows Connected. Then choose a color or effect.",
     "ja": "サイトに「接続済み」と表示されたら、色やエフェクトを選べます。"
   },
-  "截图已确认 Bluefy 可以连接此灯棒；不代表所有灯效和音乐功能都已逐项验证。beacio 尚未实测，只对 Safari 有效。iPhone 不支持「标签页」音源。": {
-    "en": "These screenshots confirm a Bluefy connection to this lightstick. They do not verify every effect or music feature. beacio has not been tested and works only with Safari. Tab audio is not available on iPhone.",
-    "ja": "このスクリーンショットでは、Bluefyからこのペンライトへの接続を確認しています。すべてのエフェクトや音楽機能を検証したものではありません。beacioは未検証で、Safari専用です。iPhoneではタブ音声を利用できません。"
+  "iPhone / iPad 的 Safari、Chrome 不能直接连接。请使用支持网页蓝牙的 Bluefy，按下图操作。Bluefy 由第三方开发。": {
+    "en": "Safari and Chrome on iPhone / iPad cannot connect directly. Use Bluefy with Web Bluetooth support and follow the steps below. Bluefy is made by a third party.",
+    "ja": "iPhone / iPadのSafariとChromeからは直接接続できません。Web Bluetooth対応のBluefyを使い、下の手順に従ってください。Bluefyは第三者が開発したアプリです。"
   },
-  "iPhone / iPad 的 Safari、Chrome 不能直接连接。可以使用支持网页蓝牙的 Bluefy，或 Safari 的 beacio 扩展。以下截图以 Bluefy 为例；两个工具都由第三方开发。": {
-    "en": "Safari and Chrome on iPhone / iPad cannot connect directly. Use Bluefy with Web Bluetooth support, or the beacio Safari extension. These screenshots show Bluefy. Both tools are made by third parties.",
-    "ja": "iPhone / iPadのSafariとChromeからは直接接続できません。Web Bluetooth対応のBluefy、またはSafariのbeacio拡張機能を使います。以下はBluefyの操作例です。どちらも第三者が開発したツールです。"
+  "截图已确认 Bluefy 可以连接此灯棒；不代表所有灯效和音乐功能都已逐项验证。iPhone 不支持「标签页」音源。": {
+    "en": "These screenshots confirm a Bluefy connection to this lightstick. They do not verify every effect or music feature. Tab audio is not available on iPhone.",
+    "ja": "このスクリーンショットでは、Bluefyからこのペンライトへの接続を確認しています。すべてのエフェクトや音楽機能を検証したものではありません。iPhoneではタブ音声を利用できません。"
   }
 }
