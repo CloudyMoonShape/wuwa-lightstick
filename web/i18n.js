@@ -57,7 +57,7 @@
   function apply() {
     document.documentElement.lang = language === 'zh' ? 'zh-CN' : language;
     translateDOM();
-    document.querySelectorAll('[data-language]').forEach(select => { select.value = manual || 'auto'; });
+    document.querySelectorAll('[data-language]').forEach(button => { button.setAttribute('aria-pressed', String(button.dataset.language === language)); });
     document.querySelectorAll('.site-footer [lang]').forEach(node => { node.lang = document.documentElement.lang; });
   }
   function setLanguage(value) {
@@ -71,7 +71,7 @@
     window.dispatchEvent(new CustomEvent('resonatorlanguagechange', {detail: {language}}));
   }
   window.ResonatorI18n = {t, setLanguage, translateDOM, get language() { return language; }};
-  document.addEventListener('change', event => { if (event.target.matches('[data-language]')) setLanguage(event.target.value); });
+  document.addEventListener('click', event => { const button = event.target.closest('[data-language]'); if (button) setLanguage(button.dataset.language); });
   apply();
   const observer = new MutationObserver(records => {
     for (const record of records) {
