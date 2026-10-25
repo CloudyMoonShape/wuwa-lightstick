@@ -6,7 +6,7 @@ Evidence below was recorded on or before 2026-10-24. A software test, a simulate
 
 ## Documentation release check — 2026-10-24
 
-The documentation audit passed 68 existing automated tests and the site build. The documentation checker passed 295 local links across 48 Markdown files and 24 translation pairs. Current desktop, mobile, and principles screenshots were captured from the live site. Python research scripts passed compilation after text-only edits. No hardware test was performed for this documentation update.
+The documentation audit passed 68 existing automated tests and the site build. The documentation checker passed 297 local links across 48 Markdown files and 24 translation pairs. Current desktop, mobile, and principles screenshots were captured from the live site. Python research scripts passed compilation after text-only edits. No hardware test was performed for this documentation update.
 
 The build reported 167,707 bytes of controller HTML and a 46,298-byte gzip estimate. These are build measurements, not transfer timings. Public-release limitations remain in [Public release review](PUBLIC-RELEASE.md).
 

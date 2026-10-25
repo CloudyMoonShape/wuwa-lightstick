@@ -1,6 +1,7 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/assets/resonator-dark.svg">
-  <img alt="Resonator" src="docs/assets/resonator-light.svg" width="360">
+  <source media="(prefers-color-scheme: light)" srcset="docs/assets/resonator-light.svg">
+  <img alt="Resonator" src="docs/assets/resonator.svg" width="360">
 </picture>
 
 Control your Wuthering Waves concert lightstick from a browser.
