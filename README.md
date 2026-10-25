@@ -6,7 +6,7 @@
 
 [![共鸣控制台：色轮、亮度与灯效](docs/screenshots/controller-desktop.png)](https://wuwa.south-wall.com/)
 
-连接自己的应援棒，调色，播放灯效，跟随音乐。蓝牙控制与音频分析都在本机完成，无需账号或控制服务器。首页约 34 KB gzip，样式、字体、图标与脚本均内联。鸣潮官方主视觉同源低优先级加载，AVIF 桌面约 49 KB、手机约 26 KB；遥控器无需等待背景。硬件照片只在原理页加载。
+连接自己的应援棒，调色，播放灯效，跟随音乐。蓝牙控制与音频分析都在本机完成，无需账号或控制服务器。首页约 39 KB gzip，样式、字体、图标与脚本均内联。鸣潮官方主视觉同源低优先级加载，AVIF 桌面约 49 KB、手机约 26 KB；遥控器无需等待背景。硬件照片只在原理页加载。
 
 使用电脑 Chrome / Edge 或 Android Chrome，选择 `JFKJ-FBFB`。连接成功后会闪三次蓝灯，稍等即可操作。目前面向主板 **HE-750G24**、固件 **V4.1.8** 的研究样机，其他批次不保证兼容。
 
@@ -17,6 +17,7 @@ iPhone / iPad 的常规 Safari、Chrome 目前只能屏幕预览，网页不能�
 网页、SDK 与研究资料都在这里，厂家固件和本机环境不随仓库分发。
 
 - [SDK](docs/SDK.md) — 接入蓝牙、设色与断开连接。
+- [灯棒内置试验](docs/NATIVE-EFFECTS.md) — 呼吸、渐变与连续设色；[打开试验入口](https://wuwa.south-wall.com/?engine=native)。
 - [观感混色](docs/COLOR-MIXING.md) — 色轮、色相映射与白光通道处理。
 - [硬件实拍](docs/HARDWARE.md) · [控制协议](docs/PROTOCOL.md) — 辨认样机、GATT 帧与只读备份。
 - [函数与证据](docs/FUNCTIONS.md) — 已知入口、参数含义与待验证项。
@@ -42,4 +43,4 @@ python3 -m http.server 8765 -d web
 
 随附字体、游戏美术和品牌图标的权利归属及使用说明见 [第三方材料说明](THIRD_PARTY.md)。
 
-网页与源码均免费公开，使用与分发条款见 [LICENSE](LICENSE)。本项目为独立研究与兼容工具，与游戏、演出主办方或硬件厂家无隶属关系。
+网页免费开放，源码的使用与分发条款见 [LICENSE](LICENSE)。本项目为独立研究与兼容工具，与游戏、演出主办方或硬件厂家无隶属关系。

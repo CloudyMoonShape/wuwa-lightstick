@@ -19,10 +19,30 @@ export function frame(body) {
   return Uint8Array.from([...data, (-data.reduce((a, b) => a + b, 0)) & 255]);
 }
 export function colorFrame(rgb) {
+  return directFrame(1, rgb);
+}
+function directFrame(command, rgb) {
   const data = bytes(rgb);
   if (data.length !== 3) throw new RangeError('Expected exactly [red, green, blue]');
   const [r, g, b] = data;
-  return frame([1, 0, g, r, b]);
+  return frame([command, 0, g, r, b]);
+}
+// 0x0e skips repeated effect teardown, but equal nonzero RGB means FULL white.
+// Keep 0x01 for dimmable white. Establish direct mode with stopNativeEffect first.
+export function continuousColorFrame(rgb) {
+  const data = bytes(rgb);
+  return directFrame(data[0] > 0 && data.every(v => v === data[0]) ? 1 : 14, data);
+}
+export function nativeEffectFrame(kind, { rgb, intervalMs } = {}) {
+  if (kind === 'breathe') return directFrame(2, rgb);
+  if (kind === 'fade') return frame([3, 0]);
+  if (kind === 'rgb-breathe') return frame([6, 0]);
+  if (!['blink', 'rgb-step'].includes(kind)) throw new RangeError('Unknown native effect');
+  if (!Number.isInteger(intervalMs) || intervalMs < 1 || intervalMs > 65534) {
+    throw new RangeError('Native interval must be an integer from 1 to 65534 ms');
+  }
+  const timing = [intervalMs >> 8, intervalMs & 255];
+  return kind === 'blink' ? frame([...directFrame(4, rgb).slice(0, -1), ...timing]) : frame([5, 0, ...timing]);
 }
 export function validChecksum(data) {
   const values = bytes(data);
@@ -30,17 +50,19 @@ export function validChecksum(data) {
 }
 
 export class LightstickClient {
-  constructor({ onState = () => {}, onNotification = () => {}, bluetooth,
+  constructor({ onState = () => {}, onNotification = () => {}, onWrite = () => {}, bluetooth,
     // Injection makes timing testable; applications should retain these defaults.
     wait = sleep, now = () => performance.now(), authDelayMs = AUTH_BLINK_MS,
-    authTimeoutMs = AUTH_TIMEOUT_MS, minGapMs = 1000 / 60 } = {}) {
+    authTimeoutMs = AUTH_TIMEOUT_MS, replyTimeoutMs = 1500, minGapMs = 1000 / 60 } = {}) {
     this.onState = onState;
     this.onNotification = onNotification;
+    this.onWrite = onWrite;
     this.bluetooth = bluetooth;
     this.wait = wait;
     this.now = now;
     this.authDelayMs = authDelayMs;
     this.authTimeoutMs = authTimeoutMs;
+    this.replyTimeoutMs = replyTimeoutMs;
     this.minGapMs = minGapMs;
     this.session = null;
     this.state = 'disconnected';
@@ -83,6 +105,7 @@ export class LightstickClient {
         if (data.length === expected.length && data.every((b, i) => b === expected[i])) {
           s.acceptAuth?.();
         }
+        if (s.expectedReply?.length === data.length && data.every((b, i) => b === s.expectedReply[i])) s.acceptReply?.();
         this.onNotification(data);
       };
       s.notify.addEventListener('characteristicvaluechanged', s.notification);
@@ -119,13 +142,20 @@ export class LightstickClient {
     }
   }
   setColor(rgb) {
-    const data = colorFrame(rgb);
+    return this._enqueue(colorFrame(rgb));
+  }
+  setContinuousColor(rgb) { return this._enqueue(continuousColorFrame(rgb)); }
+  setNativeEffect(kind, options) { return this._enqueue(nativeEffectFrame(kind, options), true); }
+  // 0x01 only changes the base color while native breathing/blinking is active.
+  // 0x0d always tears down the effect, even after a physical button press.
+  stopNativeEffect() { return this._enqueue(directFrame(13, [0, 0, 0]), true); }
+  _enqueue(data, confirm = false) {
     if (!this.ready) return Promise.reject(new Error('Connect before setting a color'));
     const s = this.session;
     return new Promise((resolve, reject) => {
       // No stale animation backlog: superseded frames resolve false.
       if (s.pending) s.pending.resolve(false);
-      s.pending = { data, resolve, reject };
+      s.pending = { data, confirm, resolve, reject };
       void this._pump(s);
     });
   }
@@ -139,8 +169,24 @@ export class LightstickClient {
         try {
           this._check(s);
           const started = this.now();
-          if (s.write.properties.writeWithoutResponse) await s.write.writeValueWithoutResponse(item.data);
-          else await s.write.writeValueWithResponse(item.data);
+          let timer;
+          try {
+            const reply = item.confirm ? new Promise((resolve, reject) => {
+              s.expectedReply = frame([item.data[0] | 0xa0, ...item.data.slice(1, -1)]);
+              s.acceptReply = resolve; s.rejectReply = reject;
+              timer = setTimeout(() => reject(new Error('Native command timed out: no matching device reply')), this.replyTimeoutMs);
+            }) : Promise.resolve();
+            await Promise.all([reply, Promise.resolve().then(async () => {
+              this._check(s);
+              if (s.write.properties.writeWithoutResponse) await s.write.writeValueWithoutResponse(item.data);
+              else await s.write.writeValueWithResponse(item.data);
+              this._check(s);
+              this.onWrite(item.data.slice(), this.now() - started);
+            })]);
+          } finally {
+            clearTimeout(timer);
+            s.expectedReply = null; s.acceptReply = null; s.rejectReply = null;
+          }
           this._check(s);
           item.resolve(true);
           // Pace write starts, not write completion plus another full interval.
@@ -160,6 +206,7 @@ export class LightstickClient {
     this.session = null;
     if (s) {
       s.rejectAuth?.(new Error('Connection closed during authentication'));
+      s.rejectReply?.(new Error('Connection closed during native command'));
       s.pending?.reject(new Error('Connection closed'));
       s.pending = null;
       s.notify?.removeEventListener('characteristicvaluechanged', s.notification);

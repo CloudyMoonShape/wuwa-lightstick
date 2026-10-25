@@ -112,9 +112,9 @@
   </section>
 
   <section class="ms-section ms-wrap" id="paths" aria-labelledby="paths-title">
-    <div class="ms-section-head"><div><span class="ms-section-label">04</span><h2 class="ms-h2" id="paths-title">两条控制路径</h2></div></div>
+    <div class="ms-section-head"><div><span class="ms-section-label">04</span><h2 class="ms-h2" id="paths-title">两条通信路径</h2></div></div>
     <div class="ms-grid">
-      <article class="ms-prose path"><h3 class="ms-h3">网页灯效</h3><p>呼吸、渐变和律动，都是网页算出的一串颜色，再通过蓝牙 GATT 逐帧发送 <code>01</code> 设色指令。</p><p>亮度滑块经过短暂平滑和温和调光曲线，呼吸使用连续明暗包络；只缩放整体亮度，保留观感混色比例，最终再取整为每通道 0–255。低亮度仍受档位数量限制。</p><p>音频频谱与低频变化用于判断节拍。蓝牙有传输延迟，本地音频可延后播放来对齐；麦克风已听到的声音无法倒回去延后。</p><p class="ms-small">网页灯效不等于固件内置灯效。命令 <code>02–0c</code> 的参数与效果仍未逐项确认。</p></article>
+      <article class="ms-prose path"><h3 class="ms-h3">蓝牙控制</h3><p>同一条 GATT 连接，可以把灯效交给网页或灯棒计算。</p><ol><li><strong>网页播放。</strong>动画与音乐分析生成颜色，经过观感混色、亮度曲线和 8 位取整，再逐帧发送。速度与配色可自由调整。</li><li><strong>灯棒播放。</strong>发送一次模式和基础色，内部定时器负责呼吸、渐变或闪烁；改变颜色和亮度时才更新。三色预设使用固件自己的配色。</li></ol><p>内置试验已接入 <code>02–06</code>；切回网页先用 <code>0d</code> 停止内部效果。连续发色可走 <code>0e</code>，等值白色仍用 <code>01</code> 保留调暗能力。</p><p class="ms-small">内置指令经过静态追踪和软件检查，仍待实物验收；实体按键呼吸使用另一内部模式。<a href="/?engine=native">打开内置试验</a>。</p></article>
       <article class="ms-prose path"><h3 class="ms-h3">现场广播</h3><p>静态分析发现固件绕过常规 GATT，在 <code>2478 MHz</code> 接收特殊射频包，使用 RGB 顺序、另一种加和校验与 XOR 混淆。</p><p>这一链路尚未完成空口实测。普通网页蓝牙不能发送它，广播脚本只生成字节。</p><p class="ms-small">不要在活动现场尝试广播。它可能影响其他棒子；类型 6 会永久改写分组号，掉电不恢复。</p></article>
     </div>
   </section>
@@ -123,8 +123,8 @@
     <div class="ms-section-head"><div><span class="ms-section-label">05</span><h2 class="ms-h2" id="evidence-title">验证范围</h2></div></div>
     <dl class="ms-prose evidence">
       <div class="evidence-row"><dt class="ms-h3">实物反馈</dt><dd><p>研究样机已测试口令握手、GRB 设色、原版网页灯效与音乐律动。新版基础颜色与观感混色已有用户实物反馈。</p><p class="ms-small">当前全部灯效、音频路径和时序仍未逐项验收；实物反馈不等于仪器测量，也不能外推到其他批次。</p></dd></div>
-      <div class="evidence-row"><dt class="ms-h3">静态逆向</dt><dd><p>函数地址、射频包结构、分组号持久化。</p><p class="ms-small">代码分析不等于实际发射或接收测试。</p></dd></div>
-      <div class="evidence-row"><dt class="ms-h3">仍待确认</dt><dd><p><code>02–0c</code> 的完整参数、白化实际初值，以及其他批次的兼容性。</p><p class="ms-small">尚不能把这些结论当作稳定接口或兼容保证。</p></dd></div>
+      <div class="evidence-row"><dt class="ms-h3">静态逆向</dt><dd><p>内置灯效参数、定时任务、按键与 GATT 的差异、连续设色、射频包结构与分组号持久化。</p><p class="ms-small">代码分析不等于实际发射或接收测试。</p></dd></div>
+      <div class="evidence-row"><dt class="ms-h3">仍待确认</dt><dd><p>内置灯效的实际平滑度与退出行为、<code>07–0c</code> 的完整效果、白化实际初值，以及其他批次的兼容性。</p><p class="ms-small">尚不能把这些结论当作稳定接口或兼容保证。</p></dd></div>
     </dl>
   </section>
 
@@ -133,7 +133,7 @@
     <div class="ms-viewer">
       <details name="development"><summary>校验怎么算</summary><div class="ms-viewer-body ms-prose"><p>前五个字节的和为 S，校验取 <code>(256 − (S mod 256)) mod 256</code>。加上它后，总和的低八位就是 0。这种校验只能发现部分传输错误，不能防止恶意控制。</p></div></details>
       <details name="development"><summary>处理函数</summary><div class="ms-viewer-body ms-prose"><p>写回调 <code>0x1fff4290</code> 将输入复制到 <code>0x1fffc343</code>；约 10 ms 后，由 <code>0x1fff6774</code> 完成口令、校验与命令分发。灯效任务入口为 <code>0x1fff7c60</code>。这些是研究描述，不是厂家的函数名，也不是跨版本稳定地址。</p></div></details>
-      <details name="development"><summary>SDK 与资料</summary><div class="ms-viewer-body ms-prose"><p>仓库提供自行实现的控制 SDK、离线字节测试与 Ghidra 工程重建脚本。开发入口是 <code>docs/SDK.md</code>、<code>docs/FUNCTIONS.md</code> 和 <code>re/README.md</code>。<a href="assets/hardware/board-back.webp">主控板背面照片</a>可辅助查看走线与焊点。</p><p>厂家固件、第三方工具及厂家 SDK 不随仓库分发。遵守<a href="LICENSE.txt">社区源码许可</a>：允许免费使用、二次开发与分享，禁止销售、付费托管和付费捆绑。不要向 OTA 服务 <code>5833ff01</code> 写入。</p></div></details>
+      <details name="development"><summary>SDK 与资料</summary><div class="ms-viewer-body ms-prose"><p>仓库提供自行实现的控制 SDK、离线字节测试与 Ghidra 工程重建脚本。开发入口是 <code>docs/SDK.md</code>、<code>docs/FUNCTIONS.md</code> 、<code>docs/NATIVE-EFFECTS.md</code> 和 <code>re/README.md</code>。<a href="assets/hardware/board-back.webp">主控板背面照片</a>可辅助查看走线与焊点。</p><p>厂家固件、第三方工具及厂家 SDK 不随仓库分发。遵守<a href="LICENSE.txt">社区源码许可</a>：允许免费使用、二次开发与分享，禁止销售、付费托管和付费捆绑。不要向 OTA 服务 <code>5833ff01</code> 写入。</p></div></details>
     </div>
   </section>
 </main>

@@ -52,9 +52,14 @@ flowchart LR
 | `frame(body)` | 纯函数，追加负和校验；不发送任何内容。输入必须为非空、0–255 的整数序列。 |
 | `colorFrame([r,g,b])` | 纯函数，返回 `01 00 G R B checksum` 的 `Uint8Array`。严格校验三个颜色值。 |
 | `validChecksum(bytes)` | 检查非空字节序列总和 mod 256 是否为 0；不是语义校验或身份验证。 |
-| `new LightstickClient(options)` | 可选 `onState` 和 `onNotification` 回调。回调应保持简短，不抛异常。 |
+| `new LightstickClient(options)` | 可选 `onState`、`onNotification` 和 `onWrite(bytes, elapsedMs)` 回调。回调应保持简短，不抛异常。 |
 | `connect()` | 弹设备选择器、连接 FA00、订阅 FA01、向 FA02 写口令、在 4000 ms 内收到完全一致的口令回显，再等待 1200 ms 蓝灯动画；返回设备。并发连接调用会拒绝。 |
 | `setColor([r,g,b])` | 返回 Promise；真正完成浏览器写入返回 `true`；被更新颜色替换的待发帧返回 `false`。断开或写入失败则拒绝。 |
+| `nativeEffectFrame(kind, options)` | 纯函数，严格生成 `breathe`、`fade`、`blink`、`rgb-step`、`rgb-breathe` 帧。参数见下。 |
+| `continuousColorFrame(rgb)` | 非中性色 / 全零用 `0e`；等值非零白色保留 `01`，防止意外满亮白光。 |
+| `setNativeEffect(kind, options)` | 启动内置效果；等待匹配 FA01 回复及写入完成才返回 true；超时断开。 |
+| `stopNativeEffect()` | 发送 `0d` 零色并等待匹配回复；停止效果并熄灯。 |
+| `setContinuousColor(rgb)` | 连续直出颜色；调用前先 `await stopNativeEffect()` 建立直接输出模式。 |
 | `disconnect()` | 取消尚未发送的颜色、移除监听、关闭 GATT。连接中的异步步骤也会检查取消状态。 |
 | `ready`, `state`, `device` | 连接就绪布尔值、阶段字符串、当前设备（未连接时为 null）。 |
 
@@ -64,7 +69,24 @@ flowchart LR
 
 网页在输出数值变化时才发帧，常亮、呼吸极值附近或低亮度时的次数可能低于上限。网页的 `FrameSender` 现在独立于屏幕刷新采样，并可通过 `?rate=90` / `?rate=120` 试验更高发送率；该实例设置 `minGapMs: 0`，由外层统一限速，公开 SDK 默认不变。具体时序和固件约 10 ms 延后处理的边界见 [高发送率试验](OUTPUT-TIMING.md)。
 
-连接详情按实际经过时间统计完成写入和有效设色回包次数；两个数值都不是光学刷新率或已测得的完整延迟。制作灯效时在网页计算 RGB 并反复调用 `setColor`，同时捕获 Promise 拒绝；不要用未知原生命令模拟既有网页灯效。新 SDK 的连接管理经过模拟测试，仍需真实硬件回归；此前实测结论来自原控制台和命令行工具。
+连接详情统计实际完成的控制写入和有效控制回包；不是光学刷新率或完整延迟。内置灯效稳定后通常为 0 次写入/秒。新命令经过静态追踪与模拟传输测试，仍需真实硬件回归；此前实测结论来自原控制台和命令行工具。
+
+## 内置灯效 SDK（试验）
+
+```js
+// 以下放在用户点击连接后的异步处理函数内，捕获异常。
+await stick.setNativeEffect('breathe', {rgb: [255, 32, 32]});
+// 内部计时器持续呼吸，不要循环重发启动命令。
+await stick.setColor([255, 16, 16]); // 更新基础色，保留呼吸阶段
+await stick.stopNativeEffect();     // 明确退出并熄灯
+await stick.setContinuousColor([80, 0, 0]); // 此后可连续发送新颜色
+```
+
+`breathe` 接收原始 `rgb`；`blink` 接收 `rgb` 和 `intervalMs`；`rgb-step` 仅接收 `intervalMs`；`fade` / `rgb-breathe` 不接收可调参数。毫秒间隔为整数 1–65534。SDK 不自动应用网页观感混色。最小交互示例见 [native.html](../sdk/examples/native.html)。
+
+启动与退出默认等待 1500 ms 匹配回复；可用 `replyTimeoutMs` 配置。所有调用仍共用一个在途写入和一个最新待发项；被后续调用覆盖的待发命令返回 false。开发者应串行 await 模式切换，检查返回值，然后才发送颜色；网页由 `DevicePlayback` 统一处理。回包可能早于浏览器写操作完成，SDK 会同时等待两者。
+
+`01` 在 `02` / `04` 中只改基础色，不能当作退出命令；`03` 启动渐变，也不是复位。内置呼吸速度固定，实体按键呼吸另走内部模式 7，不能承诺两者完全一致。完整证据与白光特例见 [内置能力](NATIVE-EFFECTS.md)。
 
 ## 已知固件行为与证据等级
 
@@ -75,8 +97,9 @@ flowchart LR
 | `0x01` | 六字节设色帧 `01 xx G R B checksum`，xx 当前取 0 | GRB、红绿及熄灯由原工具实测。 |
 | `R=G=B≠0` | 固件改用白光通道 | 既有逆向与白平衡测试记录；等值 RGB 不应当作 RGB 三通道独立混色。 |
 | `0xa1` 回包首字节 | 灯效模式 2/4 的设色回包可能以此开头 | 既有记录；不是另一个公开发色命令。 |
-| `0x02–0x0c` | 固件分发器中的其他命令入口 | 参数长度、取值范围与具体效果尚未逐项验证；不提供编造的命名或设备调用封装。 |
-| `0x03` | 原逆向笔记记录“清色并进入另一种状态” | 状态语义未确定，不能当作安全复位 API。 |
+| `0x02–0x06` | 已追踪的内置灯效入口 | 静态布局与 SDK 模拟验证；未完成实物验收。 |
+| `0x07–0x0c` | 预设 / 组合图案候选 | 未开放设备调用封装。 |
+| `0x0d` / `0x0e` | 强制停止后直出 / 连续设色 | 已追踪；等值非零 RGB 在这两个分支会开满 W。 |
 
 ## 固件函数地图（特定备份，不是通用 ABI）
 
@@ -94,7 +117,7 @@ flowchart LR
 
 复现方法见 [Ghidra 重建](../re/README.md)。贡献新发现时记录硬件版本、自己的固件哈希、函数地址、输入/响应原始字节、可复现步骤与实测现象；分别标注推断和实测，不能把反编译器猜测的函数签名当成事实。
 
-现场广播字节生成保留在 `scripts/venue_packet.py`，与 SDK 的 GRB GATT 帧不是同一种协议；广播是 RGB。该脚本不发射。不要在演出/活动现场发包；类型 6 会把他人分组写入 flash。SDK 不提供广播发射、未知命令设备调用或 OTA 入口，也不向 `5833ff01` 写入。
+现场广播字节生成保留在 `scripts/venue_packet.py`，与 SDK 的 GRB GATT 帧不是同一种协议；广播是 RGB。该脚本不发射。不要在演出/活动现场发包；类型 6 会把他人分组写入 flash。SDK 只封装已追踪布局的 GATT 命令，不提供广播发射、任意命令设备调用或 OTA 入口，也不向 `5833ff01` 写入。
 
 ## 与网页色轮的关系
 

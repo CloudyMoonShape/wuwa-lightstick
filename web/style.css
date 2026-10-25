@@ -81,6 +81,9 @@ summary:hover { color:var(--web-ink); }
 .preview strong { font-weight:400; white-space:nowrap; }
 #orb { width:var(--web-space-16); height:var(--web-space-2); background:var(--web-ink); }
 .effect-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:var(--web-space-2); }
+.engine-switch { margin-bottom:var(--web-space-4); }
+.effects-panel[data-engine=native] #effects { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.color-panel[aria-disabled=true] #wheel { cursor:default; }
 .effect-grid button { position:relative; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:var(--web-space-3); padding:var(--web-space-4) var(--web-space-1); min-height:var(--web-space-24); background:var(--web-bg); }
 .effect-grid svg { color:var(--web-ink-2); }
 .effect-grid button.on { background:var(--web-line); }

@@ -36,6 +36,10 @@ $GH re/proj app -import backup/st17h66b-flash-20261021-235341-read1.bin -overwri
 
 后两个对已有工程跑，加 `-process -noanalysis`。
 
+## 内置灯效调查
+
+2026-10-24 新增 [内置能力与函数证据](../docs/NATIVE-EFFECTS.md)。运行 `python3 re/inspect_native.py /path/to/your/read1.bin` 可复核参考哈希、运行地址映射、GATT / 按键跳转目标和 1300 ms 常量。脚本不会写入设备，也不输出固件内容；不同哈希会拒绝沿用参考地址，需要重新分析。
+
 ## 关键地址
 
 | 地址 | 内容 |

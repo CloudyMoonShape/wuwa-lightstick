@@ -1,10 +1,13 @@
 import { LightstickClient } from "./sdk.js";
 import { rgbToHsv, wheelRgb, renderColor } from "./color.js";
 import { brightnessDrive, BrightnessSmoother, breathBrightness, breathHue } from "./dimming.js";
-import { outputRate, isColorReply, EffectClock, FrameSender } from "./output.js";
+import { outputRate, isControlReply, EffectClock, FrameSender } from "./output.js";
+import { DevicePlayback } from "./playback.js";
 
 const $ = id => document.getElementById(id);
 const hex = b => [...b].map(x => x.toString(16).padStart(2, "0")).join(" ");
+let engine = new URLSearchParams(location.search).get("engine") === "native" ? "native" : "web";
+let trialUsed = engine === "native";
 
 function log(line) {
   const el = $("log");
@@ -28,34 +31,31 @@ const client = new LightstickClient({
     $("mode").textContent = state === "ready" ? "正在控制应援棒" : "屏幕预览";
     sender.invalidate();
     sentFrames = 0; replyFrames = 0; statsSince = performance.now();
-    if (state === "ready" && !document.hidden && running) sender.start();
-    else sender.stop();
+    if (state === "ready" && running) configurePlayback();
+    else playback.reset();
     if (state === "disconnected") { stopAudio(); startEffect(effects[0]); }
     log(state + (detail ? " " + detail : ""));
   },
   onNotification(data) {
-    if (client.ready && isColorReply(data)) replyFrames++;
+    if (client.ready && isControlReply(data)) replyFrames++;
     if (!running) log("<- " + hex(data));
+  },
+  onWrite(data, elapsed) {
+    sentFrames++;
+    rttMs = rttMs ? rttMs * .9 + elapsed * .1 : elapsed;
   }
 });
 async function connect() {
   if (!window.isSecureContext || typeof navigator.bluetooth?.requestDevice !== "function") { setStatus("当前浏览器无法连接蓝牙，可以继续屏幕试玩", "err"); return; }
   if (client.ready) { client.disconnect(); return; }
-  try { await client.connect(); startEffect(effects[0]); }
+  try { await client.connect(); }
   catch (e) {
     if (e.name === "NotFoundError") setStatus("未选择设备 · 继续预览");
     log(e.message);
   }
 }
 function sendColor(rgb) {
-  const started = performance.now();
-  return client.setColor(rgb).then(sent => {
-    if (!sent) return false;
-    const elapsed = performance.now() - started;
-    rttMs = rttMs ? rttMs * .9 + elapsed * .1 : elapsed;
-    sentFrames++;
-    return true;
-  });
+  return playback.sendColor(rgb);
 }
 
 // ---- 颜色工具 ----
@@ -108,6 +108,16 @@ const effects = [
       return on ? (p < 0.5 ? [255, 0, 0] : [0, 0, 255]) : [0, 0, 0];
     } },
   { name: "关灯", desc: "全灭", fn: () => [0, 0, 0] },
+];
+const nativeEffects = [
+  { name: "常亮", native: "stream", fn: (t, c) => c },
+  { name: "呼吸", native: "breathe", fn: (t, c) => c },
+  { name: "三色渐变", native: "fade", fixedPalette: true, fn: t => hsv(t * 120) },
+  { name: "三色呼吸", native: "rgb-breathe", fixedPalette: true,
+    fn: t => [[255,0,0],[0,255,0],[0,0,255]][Math.floor(t / 2.6) % 3] },
+  { name: "闪烁", native: "blink", timed: true, fn: (t, c) => c },
+  { name: "三色跳变", native: "rgb-step", timed: true, fixedPalette: true,
+    fn: t => [[255,0,0],[0,255,0],[0,0,255]][Math.floor(t * 4) % 3] },
 ];
 
 function theme(cols, t) {
@@ -356,21 +366,54 @@ const sender = new FrameSender({
   sendFrame: sendColor,
   onError: error => log("发送失败 " + error.message)
 });
+const playback = new DevicePlayback({ client, sender, canStream: () => !document.hidden && !!running,
+  onMode: mode => {
+    $("mode").textContent = mode === "stream" ? "正在控制应援棒" : "灯棒自主播放 · 屏幕仅示意";
+    $("playbackState").textContent = mode === "stream" ? "" : "灯棒已确认";
+  },
+  onError: error => { $("playbackState").textContent = "切换失败，请重新连接"; log(error.message); }
+});
 let lastPreview = "", lastOutput = "";
-const FLASH_EFFECTS = new Set(["闪烁", "频闪", "警灯", "爆闪", "彩虹跳变"]);
+const FLASH_EFFECTS = new Set(["闪烁", "频闪", "警灯", "爆闪", "彩虹跳变", "三色跳变"]);
+
+function configurePlayback(forceReset = false) {
+  if (!client.ready || !running) return;
+  const kind = running.native || "stream";
+  if (kind !== "stream") $("playbackState").textContent = "等待灯棒确认…";
+  void playback.configure({ kind, continuous: trialUsed, forceReset,
+    rgb: balance(hexToRgb($("color").value), brightnessDrive(+$("bright").value / 100)),
+    intervalMs: running.timed ? Math.round(250 / (+$("speed").value / 100)) : undefined });
+}
+
+function colorChanged() {
+  stopAudio();
+  if (["breathe", "blink"].includes(running?.native)) sender.invalidate();
+  else startEffect(effects[0]);
+}
 
 function startEffect(fx) {
+  if (fx.music && engine !== "web") { engine = "web"; renderEffects(); }
+  if (engine === "native" && fx === effects[0]) fx = nativeEffects[0];
   if (FLASH_EFFECTS.has(fx.name) && !$("flashConsent").checked) { $("flashing").open = true; $("flashNote").textContent = "先开启「允许快速闪光」，或选择呼吸、渐变。"; return; }
   $("flashNote").textContent = "";
   $("effectName").textContent = fx.name;
-  if (fx.breathing && running !== fx) effectClock.reset(performance.now());
+  if ((fx.breathing || fx.native) && running !== fx) effectClock.reset(performance.now());
   if (fx !== running) { musicRgb = [0,0,0]; sender.invalidate(); }
   running = fx;
+  lastOutput = "";
   document.querySelectorAll("[data-effect]").forEach(b => { b.classList.toggle("on", b.dataset.name === fx.name); b.setAttribute("aria-pressed", String(b.dataset.name === fx.name)); });
   $("blackout").setAttribute("aria-pressed", String(fx.name === "关灯"));
   $("speed").disabled = ["常亮", "关灯"].includes(fx.name) || !!fx.music;
+  if (fx.native && !fx.timed) $("speed").disabled = true;
+  $("speedv").textContent = fx.native && !fx.timed && fx.native !== "stream" ? "固定" : (+$("speed").value / 100).toFixed(1) + "×";
+  document.querySelector(".color-panel").inert = !!fx.fixedPalette;
+  document.querySelector(".color-panel").setAttribute("aria-disabled", String(!!fx.fixedPalette));
+  $("calibration").inert = !!fx.fixedPalette;
+  $("brightv").textContent = fx.fixedPalette ? "预设" : $("bright").value + "%";
+  $("playbackState").textContent = "";
+  $("nativeNote").textContent = fx.fixedPalette ? "颜色与亮度由灯棒预设；屏幕仅示意。" : fx.native === "breathe" ? "固定周期约 2.6 秒；屏幕仅示意。" : fx.native === "blink" ? "灯棒自主闪烁；屏幕仅示意。" : "";
   if (!raf) { visualTime = performance.now(); raf = requestAnimationFrame(tick); }
-  if (client.ready && !document.hidden) sender.start();
+  configurePlayback(fx.name === "关灯" && trialUsed);
 }
 
 function stopEffect() {
@@ -381,10 +424,15 @@ function stopEffect() {
 }
 
 function sampleFrame(now, visualDt) {
-  const {time, elapsed} = effectClock.advance(now, +$("speed").value / 100);
+  const {time, elapsed} = effectClock.advance(now, running.native && !running.timed ? 1 : +$("speed").value / 100);
   const base = hexToRgb($("color").value);
   const level = brightnessSmoother.advance(+$("bright").value / 100, elapsed);
   const ceiling = brightnessDrive(level);
+  if (running.native && running.native !== "stream") {
+    const rgb = running.fn(time, base);
+    const envelope = ["breathe", "rgb-breathe"].includes(running.native) ? (1 - Math.cos(time / 2.6 * Math.PI * 2)) / 2 : running.native === "blink" ? (time * 2 % 1 < .5 ? 1 : 0) : 1;
+    return { rgb, k: envelope * (running.fixedPalette ? 1 : ceiling), out: balance(base, ceiling) };
+  }
   // Audio analysis and stateful music effects still advance only with the UI.
   // Extra Bluetooth samples must not count a beat twice or speed up hue drift.
   if (running.music && visualDt !== undefined) musicRgb = running.fn(time, base, visualDt);
@@ -407,7 +455,7 @@ function tick() {
   }
   const key = out.join();
   if (key !== lastOutput) {
-    $("outputRgb").textContent = `输出 RGB ${out.join(", ")} · ${out[0]>0 && out.every(x=>x===out[0]) ? "白光通道" : "RGB 通道"}`;
+    $("outputRgb").textContent = running.fixedPalette ? "灯棒预设 · 不提供实时 RGB 读回" : `${running.native && running.native !== "stream" ? "基础" : "输出"} RGB ${out.join(", ")} · ${out[0]>0 && out.every(x=>x===out[0]) ? "白光通道" : "RGB 通道"}`;
     lastOutput = key;
   }
 }
@@ -433,16 +481,31 @@ const effectIcons = {
   "呼吸变色": '<path d="M3 16c4 0 4-8 9-8s5 8 9 8M6 4h12"/>',
   "烛光": '<path d="M12 3c1 5 6 7 6 12a6 6 0 0 1-12 0c0-3 3-6 6-12Z"/><path d="M12 13c-3 3-2 6 0 7"/>',
 };
-for (const [grid, list] of [["effects", effects.filter(fx => fx.name !== "关灯" && !FLASH_EFFECTS.has(fx.name))], ["flashEffects", effects.filter(fx => FLASH_EFFECTS.has(fx.name))], ["music", musicEffects]]) {
-  for (const fx of list) {
-    const b = document.createElement("button");
-    b.className = "web-small"; b.dataset.name = fx.name; b.dataset.effect = "";
-    b.innerHTML = (effectIcons[fx.name] ? `<svg viewBox="0 0 24 24" aria-hidden="true">${effectIcons[fx.name]}</svg>` : "") + `<span>${fx.name}</span>`;
-    b.title = fx.desc;
-    b.onclick = () => startEffect(fx);
-    $(grid).append(b);
+effectIcons["三色渐变"] = effectIcons["多色渐变"];
+effectIcons["三色呼吸"] = effectIcons["呼吸变色"];
+function renderEffects() {
+  const list = engine === "native" ? nativeEffects : effects;
+  for (const [grid, entries] of [["effects", list.filter(fx => fx.name !== "关灯" && !FLASH_EFFECTS.has(fx.name))], ["flashEffects", list.filter(fx => FLASH_EFFECTS.has(fx.name))], ["music", musicEffects]]) {
+    $(grid).replaceChildren();
+    for (const fx of entries) {
+      const b = document.createElement("button");
+      b.className = "web-small"; b.dataset.name = fx.name; b.dataset.effect = "";
+      b.innerHTML = (effectIcons[fx.name] ? `<svg viewBox="0 0 24 24" aria-hidden="true">${effectIcons[fx.name]}</svg>` : "") + `<span>${fx.name}</span>`;
+      b.title = fx.desc || fx.name;
+      b.onclick = () => startEffect(fx);
+      $(grid).append(b);
+    }
   }
+  document.querySelector(".effects-panel").dataset.engine = engine;
+  document.querySelectorAll('[name="engine"]').forEach(input => { input.checked = input.value === engine; });
+  $("sound").hidden = engine === "native";
 }
+renderEffects();
+document.querySelectorAll('[name="engine"]').forEach(input => { input.onchange = () => {
+  stopAudio(); engine = input.value; trialUsed ||= engine === "native";
+  renderEffects(); startEffect(engine === "native" ? nativeEffects[1] : effects[1]);
+  const url = new URL(location.href); url.searchParams.set("engine", engine); history.replaceState(null, "", url);
+}; });
 $("srcFile").onclick = () => $("file").click();
 $("file").onchange = () => {
   const file = $("file").files[0];
@@ -460,12 +523,12 @@ for (const [name, c] of PALETTE) {
   b.className = "swatch web-small"; b.style.setProperty("--swatch", c); b.dataset.color = c;
   b.title = `${name} · ${c.toUpperCase()}`;
   b.setAttribute("aria-label", `选择${name} ${c.toUpperCase()}`);
-  b.onclick = () => { $("color").value = c; syncWheel(); stopAudio(); startEffect(effects[0]); };
+  b.onclick = () => { $("color").value = c; syncWheel(); colorChanged(); };
   $("swatches").append(b);
 }
-$("color").oninput = () => { syncWheel(); stopAudio(); startEffect(effects[0]); };
+$("color").oninput = () => { syncWheel(); colorChanged(); };
 $("bright").oninput = () => { $("brightv").textContent = $("bright").value + "%"; };
-$("speed").oninput = () => { $("speedv").textContent = (+$("speed").value / 100).toFixed(1) + "×"; };
+$("speed").oninput = () => { $("speedv").textContent = (+$("speed").value / 100).toFixed(1) + "×"; if (running?.timed) configurePlayback(); };
 $("connect").onclick = connect;
 GAIN_IDS.forEach(id => { $(id).oninput = () => { showGains(); sender.invalidate(); }; });
 $("calY").onclick = () => calibrate("#ffff00");
@@ -481,11 +544,10 @@ $("sendRate").onchange = () => {
   history.replaceState(null, "", url);
 };
 document.addEventListener("visibilitychange", () => {
-  if (client.ready && running && !document.hidden) sender.start();
-  else sender.stop();
+  playback.resume();
 });
 loadGains();
-startEffect(effects[0]);
+startEffect(engine === "native" ? nativeEffects[1] : effects[0]);
 
 function stopAudio() {
   const stream = srcStream; srcStream = null;
@@ -500,7 +562,7 @@ function stopAudio() {
 }
 $("stopAudio").onclick = stopAudio;
 $("blackout").onclick = () => { stopAudio(); startEffect(effects.at(-1)); };
-$("flashConsent").onchange = () => { if (!$("flashConsent").checked && ["闪烁","频闪","警灯","爆闪","彩虹跳变"].includes(running?.name)) startEffect(effects[1]); };
+$("flashConsent").onchange = () => { if (!$("flashConsent").checked && FLASH_EFFECTS.has(running?.name)) startEffect(engine === "native" ? nativeEffects[1] : effects[1]); };
 if (!window.isSecureContext || typeof navigator.bluetooth?.requestDevice !== "function") {
   setStatus("屏幕预览 · 当前浏览器无法连接蓝牙");
   $("compat").textContent = "可以在屏幕上调色、播放灯效；当前浏览器尚未开放网页蓝牙。";
@@ -538,7 +600,7 @@ function syncWheel() {
 function selectWheel(h,s) {
   selectedHue=((h%360)+360)%360;
   $("color").value="#"+wheelRgb(selectedHue,s).map(x=>Math.round(x).toString(16).padStart(2,"0")).join("");
-  syncWheel(); stopAudio(); startEffect(effects[0]);
+  syncWheel(); colorChanged();
 }
 function pointWheel(event) {
   const rect=wheel.getBoundingClientRect(),dx=(event.clientX-rect.left)*size/rect.width-center,dy=(event.clientY-rect.top)*size/rect.height-center;
