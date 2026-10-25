@@ -15,7 +15,7 @@ def inline_styles(html, controller=False):
     """Only inline known local CSS. Fonts in tokens.css are small data URIs."""
     def include(match):
         name = match.group(1)
-        if name not in ('style.css', 'moonshade/tokens.css', 'moonshade/bundle.css'):
+        if name not in ('style.css', 'chrome.css', 'moonshade/tokens.css', 'moonshade/bundle.css'):
             raise SystemExit('Unexpected stylesheet: ' + name)
         css = (ROOT / 'web' / name).read_text()
         if controller and name == 'moonshade/tokens.css':
@@ -25,6 +25,12 @@ def inline_styles(html, controller=False):
         css = re.sub(r'\s+', ' ', css)
         return '<style>' + css.strip() + '</style>'
     return re.sub(r'<link rel="stylesheet" href="([^"]+)">', include, html)
+
+def shared_chrome(html, page):
+    parts = ROOT / 'web/partials'
+    extra = (parts / 'controller-header-extra.html').read_text() if page == 'index' else '<a class="ms-link web-small" href="/">回到遥控器</a>'
+    header = (parts / 'header.html').read_text().replace('{{title}}', '共鸣' if page == 'index' else '原理').replace('{{extra}}', extra)
+    return html.replace('<!-- site-header -->', header).replace('<!-- site-footer -->', (parts / 'footer.html').read_text())
 
 def main():
     for name in ('index.html', 'app.js', 'visitors.js', 'style.css', *COPY):
@@ -36,7 +42,7 @@ def main():
     for name in CONCERT:
         if not (ROOT / 'web/assets/concert' / name).is_file():
             raise SystemExit('Missing concert photo: ' + name)
-    html = (ROOT / 'web/index.html').read_text()
+    html = shared_chrome((ROOT / 'web/index.html').read_text(), 'index')
     sdk = (ROOT / 'web/sdk.js').read_text()
     app = (ROOT / 'web/app.js').read_text()
     sdk = re.sub(r'^export ', '', sdk, flags=re.M)
@@ -69,7 +75,7 @@ def main():
     (DEST / 'index.html').write_text(html)
     for name in COPY:
         shutil.copy2(ROOT / 'web' / name, DEST / name)
-    (DEST / 'principles.html').write_text(inline_styles((ROOT / 'web/principles.html').read_text()))
+    (DEST / 'principles.html').write_text(inline_styles(shared_chrome((ROOT / 'web/principles.html').read_text(), 'principles')))
     (DEST / '404.html').write_text(inline_styles((ROOT / 'web/404.html').read_text(), controller=True))
     # Public assets only. Never copy source environments or hardware dumps.
     if (ROOT / 'web/assets/hardware').exists():
