@@ -9,6 +9,7 @@ DEST = ROOT / 'dist'
 COPY = ('color.js', 'dimming.js', 'output.js', 'playback.js', 'sdk.js', 'principles.html', '_headers', '_routes.json', '404.html', 'LICENSE.txt')
 ARTWORK = ('wuwa-key-visual-2bf16e89.avif', 'wuwa-key-visual-0cc8a4a2.webp',
            'wuwa-key-visual-mobile-c930edae.avif', 'wuwa-key-visual-mobile-64336493.webp')
+CONCERT = ('audience-blue.webp', 'audience-pink.webp')
 
 def inline_styles(html, controller=False):
     """Only inline known local CSS. Fonts in tokens.css are small data URIs."""
@@ -32,6 +33,9 @@ def main():
     for name in ARTWORK:
         if not (ROOT / 'web/assets/artwork' / name).is_file():
             raise SystemExit('Missing background artwork: ' + name)
+    for name in CONCERT:
+        if not (ROOT / 'web/assets/concert' / name).is_file():
+            raise SystemExit('Missing concert photo: ' + name)
     html = (ROOT / 'web/index.html').read_text()
     sdk = (ROOT / 'web/sdk.js').read_text()
     app = (ROOT / 'web/app.js').read_text()
@@ -73,6 +77,9 @@ def main():
     (DEST / 'assets/artwork').mkdir(parents=True)
     for name in ARTWORK:
         shutil.copy2(ROOT / 'web/assets/artwork' / name, DEST / 'assets/artwork' / name)
+    (DEST / 'assets/concert').mkdir()
+    for name in CONCERT:
+        shutil.copy2(ROOT / 'web/assets/concert' / name, DEST / 'assets/concert' / name)
     (DEST / 'moonshade').mkdir()
     shutil.copy2(ROOT / 'web/moonshade/OFL-D-DIN.txt', DEST / 'moonshade/OFL-D-DIN.txt')
     raw = html.encode()

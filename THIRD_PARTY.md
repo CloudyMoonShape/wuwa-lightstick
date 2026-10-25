@@ -19,6 +19,10 @@
 
 四张照片由项目用户提供。网页版本只作缩放、转码与元数据清理；没有生成、补绘或推测被遮挡的细节。见[硬件实拍](docs/HARDWARE.md)。
 
+## 演出照片
+
+说明页的两张演出照片由用户提供，位于 `web/assets/concert/`。只做 WebP 压缩与元数据清理，保留完整画面及原有标志；图片权利归相应权利人，项目代码许可证不重新许可图片。来源范围与尺寸见[配图记录](web/assets/concert/README.md)。照片展示演出效果，不作为无线协议或现场设备配置的证据。
+
 ## 鸣潮官方主视觉
 
 - 来源：[鸣潮官网](https://wutheringwaves.kurogames.com/en/)使用的角色群像背景；[官方原始图片](https://wutheringwaves.kurogames.com/website-preface/assets/main-bg-c08dcefb.webp)，1920 × 1080，479,860 字节。来源路径可在官网的 `index-415d4999.js` 中核对，原始资产名为 `desktop/main-bg.webp`。

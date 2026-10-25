@@ -5,19 +5,82 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" href="data:,">
 <meta name="color-scheme" content="dark light">
-<meta name="description" content="从 RGB 到六字节蓝牙帧，再到主控板与灯珠。共鸣的离线设色实验、实物记录与开发原理。">
-<title>原理 · 共鸣</title>
+<meta name="description" content="你可以用网页控制鸣潮应援棒。看清内部硬件、蓝牙控制和演唱会场控原理，再去 GitHub 探索源码与研究记录。">
+<title>它怎么工作 · 共鸣</title>
 <link rel="stylesheet" href="moonshade/tokens.css">
 <link rel="stylesheet" href="moonshade/bundle.css">
-<style>
-:root{color-scheme:dark light}
-.page-head .ms-headrow{align-items:center;gap:var(--web-space-4)}.product-name{color:var(--web-ink);text-decoration:none;white-space:nowrap}.page-head .ms-headid{align-items:center;gap:var(--web-space-3)}.page-head .page-name{margin:0;color:var(--web-ink-2)}.page-head .back{white-space:nowrap}.intro{padding-top:var(--web-space-6)}.intro-copy{max-width:var(--web-measure);color:var(--web-ink-2)}.intro .ms-unitline{gap:var(--web-space-2) var(--web-space-6)}.lab-column{min-width:0}.lab-heading{display:flex;align-items:baseline;justify-content:space-between;gap:var(--web-space-4);margin-bottom:var(--web-space-4)}.drive-preview{height:var(--web-space-16);background:var(--drive-color);margin-block:var(--web-space-4) var(--web-space-6)}.rgb-control{display:grid;grid-template-columns:var(--web-space-6) minmax(0,1fr) var(--web-space-12);gap:var(--web-space-4);align-items:center;margin-block:var(--web-space-2)}.rgb-control output{--digits:3}.rgb-control input{appearance:none;-webkit-appearance:none;width:100%;min-width:0;height:var(--web-space-8);margin:0;background:transparent;cursor:pointer}.rgb-control input::-webkit-slider-runnable-track{height:var(--web-space-1);background:var(--web-ink-2)}.rgb-control input::-moz-range-track{height:var(--web-space-1);background:var(--web-ink-2)}.rgb-control input::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:var(--web-space-4);height:var(--web-space-6);margin-top:calc((var(--web-space-1) - var(--web-space-6))/2);border:0;border-radius:var(--radius-none);background:var(--web-ink)}.rgb-control input::-moz-range-thumb{width:var(--web-space-4);height:var(--web-space-6);border:0;border-radius:var(--radius-none);background:var(--web-ink)}.rgb-control input:focus-visible{outline:calc(var(--web-space-1)/2) solid var(--web-focus);outline-offset:var(--web-space-1)}.rgb-presets{display:flex;flex-wrap:wrap;gap:var(--web-space-2);margin-top:var(--web-space-4)}.rgb-presets button{display:flex;align-items:center;justify-content:center;gap:var(--web-space-2);min-height:calc(var(--web-space-8) + var(--web-space-2));min-width:calc(var(--web-space-8) + var(--web-space-2));padding:var(--web-space-2) var(--web-space-1);border:0;border-radius:var(--radius-none);background:transparent;cursor:pointer;white-space:nowrap;transition:color var(--web-fade) ease-out}.rgb-presets button::before{content:"";display:block;align-self:flex-end;width:var(--web-space-1);height:var(--web-space-1);margin-bottom:var(--web-space-1);background:var(--web-dim)}.rgb-presets button[aria-pressed=true]{color:var(--web-ink)}.rgb-presets button[aria-pressed=true]::before{align-self:center;height:var(--web-space-4);margin-bottom:0;background:var(--web-ink)}.rgb-presets button:hover{color:var(--web-ink)}.packet-note{margin:0 0 var(--web-space-6)}.packet-ruler{margin-bottom:var(--web-space-2)}.bytes{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:var(--web-space-1);margin-block:var(--web-space-2) var(--web-space-6)}.byte{min-width:0;padding-block:var(--web-space-4);text-align:center;background:var(--web-surface)}.byte strong{--digits:2;display:block;min-width:0;text-align:center}.byte small{display:block;margin-top:var(--web-space-2);white-space:nowrap}.formula{overflow-wrap:anywhere}.formula p{margin:var(--web-space-2) 0 0}.channel-status{margin:var(--web-space-6) 0 0}.lab-notes{margin-top:var(--web-space-6)}.lab-notes p{margin:0}.lab-notes p+p{margin-top:var(--web-space-2)}.hardware-intro{margin-bottom:var(--web-space-6)}.hardware-grid figure{margin:0;min-width:0}.hardware-grid img{display:block;width:100%;height:auto}.hardware-grid a{display:block}.hardware-grid figcaption{margin-top:var(--web-space-2)}.hardware-grid figcaption p{margin:var(--web-space-2) 0 0}.hardware-more{min-width:0}.hardware-parts{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--ms-gutter)}.hardware-note{margin-top:var(--web-space-6)}.path p{margin:var(--web-space-4) 0 0}.path h3{margin-bottom:var(--web-space-4)}.path .ms-small{margin-top:var(--web-space-4)}.connection-list li+li{margin-top:var(--web-space-4)}.connection-note{margin-top:var(--web-space-6)}.evidence{margin:0}.evidence-row{padding-block:var(--web-space-4)}.evidence-row:first-child{padding-top:0}.evidence-row dt{margin-bottom:var(--web-space-2)}.evidence-row dd{margin:0}.evidence-row dd p{margin:0}.evidence-row dd p+p{margin-top:var(--web-space-2)}.reading summary{white-space:nowrap}.reading .ms-viewer-body{max-width:var(--web-measure)}.ms-site-footer a{white-space:nowrap}
-@media(min-width:768px){.hardware-more{grid-column:span 2}.hardware-parts{grid-template-columns:repeat(2,minmax(0,1fr))}.hardware-grid>.hardware-more{padding-inline:0}.hardware-parts>figure{padding-inline:var(--ms-hang)}}
-@media(prefers-reduced-motion:reduce){.rgb-presets button{transition:none}}
-</style>
 <link rel="canonical" href="https://wuwa.south-wall.com/principles">
+<style>
+:root { color-scheme:dark light; }
+/* The same compressed artwork as the controller, softened for reading. */
+.wuwa-principles { --wuwa-art-opacity:.24; --photo-edge-strength:1; position:relative; isolation:isolate; }
+[data-theme=light] .wuwa-principles,.wuwa-principles[data-theme=light] { --wuwa-art-opacity:.10; --photo-edge-strength:.45; }
+@media(prefers-color-scheme:light) { :root:not([data-theme]) .wuwa-principles { --wuwa-art-opacity:.10; --photo-edge-strength:.45; } }
+.resonance-field { position:fixed; inset:0; z-index:-1; pointer-events:none; opacity:var(--wuwa-art-opacity); mask-image:linear-gradient(90deg,transparent,black 80%); }
+.resonance-field img { display:block; width:100%; height:100%; object-fit:cover; object-position:center top; }
+.resonance-field::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg,var(--web-bg),transparent 40%,var(--web-bg)); }
+.page-head .ms-headrow { align-items:center; gap:var(--web-space-4); }
+.page-head .ms-headid { align-items:center; gap:var(--web-space-3); }
+.page-head .page-name { margin:0; color:var(--web-ink-2); }
+.page-head .back { display:inline-flex; align-items:center; min-height:var(--web-space-12); white-space:nowrap; }
+.intro { padding-top:var(--web-space-8); }
+.intro .ms-title { font-family:var(--font-sans); }
+.editorial-split { align-items:center; }
+.copy { min-width:0; }
+.copy p,.hardware-grid p,.uses-grid p { max-width:var(--web-measure); margin:var(--web-space-3) 0 0; color:var(--web-ink-2); }
+.intro .copy p { margin-top:var(--web-space-6); }
+.article-photo { margin:0; min-width:0; }
+.photo-surface { display:block; position:relative; }
+.photo-surface::after {
+  content:""; position:absolute; inset:0; pointer-events:none; opacity:var(--photo-edge-strength);
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--web-ink) 14%,transparent);
+  background:linear-gradient(180deg,color-mix(in srgb,var(--web-bg) 16%,transparent),transparent var(--web-space-8),transparent calc(100% - var(--web-space-8)),color-mix(in srgb,var(--web-bg) 38%,transparent)),linear-gradient(90deg,color-mix(in srgb,var(--web-bg) 28%,transparent),transparent var(--web-space-6),transparent calc(100% - var(--web-space-6)),color-mix(in srgb,var(--web-bg) 28%,transparent));
+}
+.article-photo img { display:block; width:100%; height:auto; }
+.hardware-grid,.uses-grid { margin-top:var(--web-space-6); }
+.hardware-grid figcaption { margin-top:var(--web-space-4); }
+.hardware-grid .ms-h3 { color:var(--web-ink); }
+.hardware-grid p { margin-top:var(--web-space-2); }
+.signal-path { display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto minmax(0,1fr); align-items:center; gap:var(--web-space-6); margin:var(--web-space-8) 0 0; padding-block:var(--web-space-6); }
+.flow-node { display:grid; justify-items:center; gap:var(--web-space-3); min-width:0; }
+.flow-node svg { display:block; width:100%; max-width:var(--web-space-24); height:auto; aspect-ratio:1; fill:none; stroke:currentColor; stroke-width:1.5; }
+.flow-node p { margin:0; white-space:nowrap; }
+.flow-arrow { width:var(--web-space-8); height:var(--web-space-8); fill:none; stroke:var(--web-ink-2); stroke-width:1.5; }
+.connection .signal-path { margin-top:var(--web-space-4); gap:var(--web-space-2); }
+.connection .flow-arrow { width:var(--web-space-4); height:var(--web-space-4); }
+.project-callout { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:var(--web-space-6); padding-block:var(--web-space-8); border-top:1px solid var(--web-line); }
+.project-callout .ms-action { min-height:var(--web-space-12); white-space:nowrap; }
+.github-icon { width:var(--web-space-6); height:var(--web-space-6); fill:currentColor; stroke:none; }
+.principles-footer { padding-top:var(--web-space-8); }
+.community-footer { display:grid; grid-template-columns:minmax(0,1fr) auto; grid-template-areas:"project links" "disclaimer brand"; align-items:center; gap:var(--web-space-1) var(--web-space-6); margin-top:var(--web-space-4); padding-top:var(--web-space-3); border-top:1px dashed var(--web-line); text-transform:none; letter-spacing:0; }
+.community-footer p { margin:0; }
+.footer-project { grid-area:project; color:var(--web-ink); }
+.footer-disclaimer { grid-area:disclaimer; }
+.footer-links { grid-area:links; display:flex; align-items:center; gap:var(--web-space-2); justify-self:end; white-space:nowrap; }
+.footer-links a { display:inline-flex; align-items:center; min-height:var(--web-space-8); }
+.footer-brand { grid-area:brand; display:inline-flex; align-items:center; gap:var(--web-space-2); justify-self:end; font-family:var(--font-mono); white-space:nowrap; }
+.footer-warning { align-items:baseline; column-gap:var(--web-space-3); }
+.footer-warning p { text-transform:none; letter-spacing:0; }
+@media(max-width:767px) {
+  .signal-path { gap:var(--web-space-2); margin-top:var(--web-space-4); padding-block:var(--web-space-4); }
+  .flow-node svg { max-width:var(--web-space-16); }
+  .flow-arrow { width:var(--web-space-4); height:var(--web-space-4); }
+  .hardware-grid .article-photo { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); align-items:center; gap:var(--web-space-4); }
+  .hardware-grid figcaption { margin-top:0; }
+  .project-callout .ms-action { justify-content:center; width:100%; }
+  .community-footer { grid-template-columns:minmax(0,1fr); grid-template-areas:"project" "disclaimer" "links" "brand"; }
+  .footer-links { margin-top:var(--web-space-2); }
+  .footer-links a { min-height:calc(var(--web-space-12) - var(--web-space-1)); }
+}
+</style>
 </head>
-<body class="ms-page">
+<body class="ms-page wuwa-principles">
+<picture class="resonance-field" aria-hidden="true">
+  <source media="(max-width: 767px)" srcset="assets/artwork/wuwa-key-visual-mobile-c930edae.avif" type="image/avif">
+  <source media="(max-width: 767px)" srcset="assets/artwork/wuwa-key-visual-mobile-64336493.webp" type="image/webp">
+  <source srcset="assets/artwork/wuwa-key-visual-2bf16e89.avif" type="image/avif">
+  <img src="assets/artwork/wuwa-key-visual-0cc8a4a2.webp" alt="" width="1440" height="810" decoding="async" fetchpriority="low" draggable="false">
+</picture>
 <a class="ms-skip" href="#main">跳到正文</a>
 <header class="ms-header ms-header--compact ms-wrap page-head">
   <div class="ms-headrow">
@@ -27,171 +90,128 @@
 </header>
 <main id="main">
   <section class="ms-section ms-wrap intro" aria-labelledby="page-title">
-    <div class="ms-verdict ms-verdict--plain ms-plate">
-      <div class="ms-verdict-body">
-        <h1 class="ms-title" id="page-title">RGB → GRB</h1>
-        <p class="intro-copy">一个颜色，六个字节。主控板接收这帧指令，再把它变成灯珠的光。</p>
-        <p class="ms-unitline"><span class="ms-unit">HE-750G24</span><span class="ms-unit">V4.1.8</span></p>
+    <div class="ms-grid editorial-split">
+      <div class="copy">
+        <h1 class="ms-title" id="page-title">这支灯棒，<br>你也能控制</h1>
+        <p>网页可以通过蓝牙控制你的鸣潮应援棒。你可以换颜色、调亮度和播放灯效。你无需拆机或更换固件。</p>
       </div>
-    </div>
-  </section>
-
-  <section class="ms-section ms-wrap" id="lab" aria-labelledby="lab-title">
-    <div class="ms-section-head"><div><span class="ms-section-label">01</span><h2 class="ms-h2" id="lab-title">颜色与字节</h2></div></div>
-    <div class="ms-grid">
-      <div class="lab-column">
-        <div class="lab-heading"><h3 class="ms-h3">驱动 RGB</h3><span class="ms-unit ms-asis">0–255</span></div>
-        <!-- This swatch is functional color data, not a MoonShade interface accent. -->
-        <div class="drive-preview" id="lamp" style="--drive-color:rgb(255,0,0)" aria-hidden="true"></div>
-        <label class="rgb-control ms-label" for="r">R<input id="r" type="range" min="0" max="255" value="255" aria-label="红色驱动值"><output class="ms-readout ms-readout--sm" id="rv" for="r">255</output></label>
-        <label class="rgb-control ms-label" for="g">G<input id="g" type="range" min="0" max="255" value="0" aria-label="绿色驱动值"><output class="ms-readout ms-readout--sm" id="gv" for="g">0</output></label>
-        <label class="rgb-control ms-label" for="b">B<input id="b" type="range" min="0" max="255" value="0" aria-label="蓝色驱动值"><output class="ms-readout ms-readout--sm" id="bv" for="b">0</output></label>
-        <div class="rgb-presets" aria-label="颜色预设">
-          <button class="ms-label" type="button" data-rgb="255,0,0" aria-pressed="true">红</button>
-          <button class="ms-label" type="button" data-rgb="0,255,0" aria-pressed="false">绿</button>
-          <button class="ms-label" type="button" data-rgb="0,0,255" aria-pressed="false">蓝</button>
-          <button class="ms-label" type="button" data-rgb="180,180,180" aria-label="等值白，RGB 均为 180" aria-pressed="false">白</button>
-          <button class="ms-label" type="button" data-rgb="0,0,0" aria-pressed="false">熄灭</button>
-        </div>
-      </div>
-      <div class="lab-column">
-        <div class="lab-heading"><h3 class="ms-h3">六字节指令</h3><span class="ms-unit">FA02</span></div>
-        <p class="packet-note ms-small">先绿，再红，最后蓝。保留字节固定为 <code>00</code>。</p>
-        <div class="ms-dim packet-ruler"><span class="ms-asis">6 bytes</span></div>
-        <div class="bytes" id="bytes" role="group" aria-label="六字节设色帧">
-          <div class="byte"><strong class="ms-readout ms-readout--sm">01</strong><small class="ms-label">命令</small></div>
-          <div class="byte"><strong class="ms-readout ms-readout--sm">00</strong><small class="ms-label">保留</small></div>
-          <div class="byte"><strong class="ms-readout ms-readout--sm">00</strong><small class="ms-label">G</small></div>
-          <div class="byte"><strong class="ms-readout ms-readout--sm">FF</strong><small class="ms-label">R</small></div>
-          <div class="byte"><strong class="ms-readout ms-readout--sm">00</strong><small class="ms-label">B</small></div>
-          <div class="byte"><strong class="ms-readout ms-readout--sm">00</strong><small class="ms-label">校验</small></div>
-        </div>
-        <div class="formula"><p class="ms-label ms-asis" id="formula">校验 = (−256) mod 256 = 0 (0x00)</p><p class="ms-small" id="sum">完整帧相加 = 256；除以 256 的余数 = 0。</p></div>
-        <p class="channel-status ms-unit" id="channel" role="status">RGB 通道</p>
-      </div>
-    </div>
-    <div class="ms-prose ms-small lab-notes"><p>遥控器先做观感混色；实验台直接封装驱动值，不重复应用混色。所有计算留在本页，不会连接设备。</p><p>非零等值 RGB 会切换到独立白光通道，并非三色混白；全零关灯。屏幕色块仅作示意，不代表实际亮度与色彩。</p></div>
-  </section>
-
-  <section class="ms-section ms-wrap" id="hardware" aria-labelledby="hardware-title">
-    <div class="ms-section-head"><div><span class="ms-section-label">02</span><h2 class="ms-h2" id="hardware-title">字节的终点</h2></div></div>
-    <div class="ms-prose hardware-intro"><p>六字节设色帧由主控板解析，最终驱动顶部的 RGBW 灯珠。下面是研究样机的装配、主控板与 LED 模组。</p></div>
-    <div class="ms-grid ms-grid--trio hardware-grid">
-      <figure>
-        <a href="assets/hardware/assembly.webp" aria-label="查看样机装配照片"><img src="assets/hardware/assembly.webp" width="960" height="1280" loading="lazy" decoding="async" alt="拆开外壳的应援棒，主控板、顶部透镜和电池仓与外壳并列"></a>
-        <figcaption class="ms-small"><span class="ms-code">FIG 02.1</span><p>样机装配：主控板位于手柄上部，灯珠在透镜下方。</p></figcaption>
+      <figure class="article-photo">
+        <div class="photo-surface"><img src="assets/concert/audience-blue.webp" width="954" height="635" decoding="async" alt="演唱会观众举起蓝色应援棒，舞台上方亮起蓝色灯光"></div>
       </figure>
-      <details class="ms-fold hardware-more" id="hardware-more">
-        <summary>主控板与灯珠</summary>
-        <div class="ms-fold-body hardware-parts">
-          <figure>
-            <a href="assets/hardware/board-front.webp" aria-label="查看主控板正面照片"><img src="assets/hardware/board-front.webp" width="960" height="1280" loading="lazy" decoding="async" alt="HE-750G24 主控板正面，可见 ST17H66B 主控、按键和板载天线"></a>
-            <figcaption class="ms-small"><span class="ms-code">FIG 02.2</span><p>主控板：HE-750G24，U1 丝印 ST17H66B。</p></figcaption>
-          </figure>
-          <figure>
-            <a href="assets/hardware/led-module.webp" aria-label="查看 LED 模组照片"><img src="assets/hardware/led-module.webp" width="960" height="1280" loading="lazy" decoding="async" alt="HE-590L5 LED 模组，灯珠旁可见 B、W、正极和 R 标记"></a>
-            <figcaption class="ms-small"><span class="ms-code">FIG 02.3</span><p>LED 模组：独立白光与 RGB 通道，W 标记可见。</p></figcaption>
-          </figure>
+    </div>
+  </section>
+
+  <section class="ms-section ms-wrap" aria-labelledby="inside-title">
+    <h2 class="ms-h2" id="inside-title">里面有什么</h2>
+    <div class="ms-grid ms-grid--trio hardware-grid">
+      <figure class="article-photo">
+        <a class="photo-surface" href="assets/hardware/assembly.webp" aria-label="放大查看拆开的研究样机"><img src="assets/hardware/assembly.webp" width="960" height="1280" loading="lazy" decoding="async" alt="拆开的研究样机，主板、电池仓和手柄外壳并排放置"></a>
+        <figcaption><h3 class="ms-h3">手柄与电池</h3><p>三节 AAA 电池给灯棒供电。控制板和电池仓都装在手柄内。图中是拆开的研究样机。</p></figcaption>
+      </figure>
+      <figure class="article-photo">
+        <a class="photo-surface" href="assets/hardware/board-front.webp" aria-label="放大查看控制板"><img src="assets/hardware/board-front.webp" width="960" height="1280" loading="lazy" decoding="async" alt="控制板正面，可见实体按键、主控芯片和板载天线"></a>
+        <figcaption><h3 class="ms-h3">控制板</h3><p>控制板接收无线指令。板上的芯片执行指令。实体按键用于切换内置灯效。</p></figcaption>
+      </figure>
+      <figure class="article-photo">
+        <a class="photo-surface" href="assets/hardware/led-module.webp" aria-label="放大查看灯板"><img src="assets/hardware/led-module.webp" width="960" height="1280" loading="lazy" decoding="async" alt="灯板上的复合灯珠，可见白光区域和彩色发光区域"></a>
+        <figcaption><h3 class="ms-h3">灯板</h3><p>灯板用红、绿、蓝三种光混色。芯片改变各路亮度，得到不同颜色。白光使用独立通道。</p></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="ms-section ms-wrap connection" aria-labelledby="connection-title">
+    <div class="ms-grid editorial-split">
+      <div>
+        <h2 class="ms-h2" id="connection-title">网页怎样控制它</h2>
+        <div class="signal-path" role="group" aria-label="网页通过蓝牙连接你选中的灯棒，直接发送控制指令">
+          <div class="flow-node">
+            <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M6 12h52v40H6zM6 22h52M12 17h4m4 0h4"/><path d="M19 29h26v16H19z" fill="currentColor" stroke="none"/></svg>
+            <p class="ms-h3">网页</p>
+          </div>
+          <svg class="flow-arrow" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><path d="M3 16h25m-8-8 8 8-8 8"/></svg>
+          <div class="flow-node">
+            <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="m20 19 25 26-13 12V7l13 12-25 26"/></svg>
+            <p class="ms-h3">蓝牙</p>
+          </div>
+          <svg class="flow-arrow" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><path d="M3 16h25m-8-8 8 8-8 8"/></svg>
+          <div class="flow-node">
+            <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M25 30h14v28H25zM27 8h10v22H27zM25 34h14M29 42h6"/><path d="M27 8h10v22H27z" fill="currentColor" stroke="none"/><path d="M18 11h-5m33 0h5M20 4l-4-4m28 4 4-4"/></svg>
+            <p class="ms-h3">你的灯棒</p>
+          </div>
         </div>
-      </details>
-    </div>
-    <p class="ms-small hardware-note">实物照片用于辨认结构；白光切换逻辑来自固件分析，照片本身不承担颜色或亮度测量。</p>
-  </section>
-
-  <section class="ms-section ms-wrap" id="connection" aria-labelledby="connection-title">
-    <div class="ms-section-head"><div><span class="ms-section-label">03</span><h2 class="ms-h2" id="connection-title">连接流程</h2></div></div>
-    <div class="ms-prose">
-      <ol class="connection-list">
-        <li><strong>选择棒子。</strong>通过浏览器设备选择器连接，研究样机的广播名是 <code>JFKJ-FBFB</code>。</li>
-        <li><strong>完成握手。</strong>8 秒内向 FA02 写入口令 <code>JFKJ-20250421</code>，等待 FA01 回显确认。</li>
-        <li><strong>等蓝灯闪完。</strong>三次蓝灯约 0.9 秒；网页预留 1.2 秒，CLI 预留 1.5 秒。</li>
-        <li><strong>发送颜色。</strong>向 FA02 写入六字节设色帧，FA01 返回处理通知。</li>
-      </ol>
-      <p class="ms-small connection-note">FA02 负责写入，FA01 返回通知。共享口令来自固件明文，不是设备所有权验证。</p>
+      </div>
+      <div class="copy">
+        <p>灯棒内置了蓝牙。我们分析了它的控制指令，并把这些指令做成网页按钮。在支持网页蓝牙的浏览器中，你可以选择自己的灯棒并连接。</p>
+        <p>你选好颜色后，浏览器把颜色指令发给灯棒。芯片读取指令，再调整灯珠。指令直接从你的设备发出，不经过网站服务器。</p>
+        <p>灯珠和屏幕的出光不同。网页会先调整混色比例，再发送颜色。这些比例来自实物试调，不同批次的灯棒仍可能有色差。</p>
+      </div>
     </div>
   </section>
 
-  <section class="ms-section ms-wrap" id="paths" aria-labelledby="paths-title">
-    <div class="ms-section-head"><div><span class="ms-section-label">04</span><h2 class="ms-h2" id="paths-title">两条通信路径</h2></div></div>
-    <div class="ms-grid">
-      <article class="ms-prose path"><h3 class="ms-h3">蓝牙控制</h3><p>首页把原生灯效、延伸灯效和音乐律动放在同一级。它们共用一条 GATT 连接。</p><ol><li><strong>网页播放。</strong>动画与音乐分析生成颜色，经过观感混色、亮度曲线和 8 位取整，再逐帧发送。速度与配色可自由调整。</li><li><strong>灯棒播放。</strong>发送一次模式和基础色，内部定时器负责呼吸、渐变或闪烁；改变颜色和亮度时才更新。三色预设使用固件自己的配色。</li></ol><p>原生灯效已接入 <code>02–08</code>；切回网页先用 <code>0d</code> 停止内部效果。连续发色可走 <code>0e</code>，等值白色仍用 <code>01</code> 保留调暗能力。</p><p class="ms-small">原生单色呼吸已有用户实物顺滑度反馈，其余效果仍需逐项验收。实体按键呼吸使用另一内部模式。<a href="/?engine=native">打开原生灯效</a>。</p></article>
-      <article class="ms-prose path"><h3 class="ms-h3">现场广播</h3><p>静态分析发现固件绕过常规 GATT，在 <code>2478 MHz</code> 接收特殊射频包，使用 RGB 顺序、另一种加和校验与 XOR 混淆。</p><p>这一链路尚未完成空口实测。普通网页蓝牙不能发送它，广播脚本只生成字节。</p><p class="ms-small">不要在活动现场尝试广播。它可能影响其他棒子；类型 6 会永久改写分组号，掉电不恢复。</p></article>
+  <section class="ms-section ms-wrap venue" aria-labelledby="venue-title">
+    <div class="ms-grid editorial-split">
+      <div class="copy">
+        <h2 class="ms-h2" id="venue-title">演唱会怎样一起变色</h2>
+        <p>样机固件里有一套现场接收逻辑。它接收专用发射器的无线广播。一次广播可以让多支灯棒执行指令，无需逐支配对。</p>
+        <p>每支灯棒保存一个组号。广播可设置颜色、亮度和灯效。分组指令可以让不同组显示不同颜色。</p>
+        <p>收到有效场控指令后，固件会锁住按键。持续约 30 分钟没有收到此类指令后，按键恢复。</p>
+        <p class="web-small">以上来自样机固件分析，尚未做现场无线验证。照片只展示演出效果。</p>
+      </div>
+      <figure class="article-photo">
+        <div class="photo-surface"><img src="assets/concert/audience-pink.webp" width="953" height="632" loading="lazy" decoding="async" alt="演出现场的观众举起粉色应援棒，舞台上有表演者和角色人偶"></div>
+      </figure>
+    </div>
+    <div class="signal-path venue-path" role="group" aria-label="现场发射器广播指令，多组灯棒接收同一广播，再按各自组号执行">
+      <div class="flow-node">
+        <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M10 37h44v18H10zM16 44h17m-17 5h10M44 37V14m-4 31h5m-3 4h3M35 10q9-9 18 0M39 15q5-5 10 0"/></svg>
+        <p class="ms-h3">现场发射器</p>
+      </div>
+      <svg class="flow-arrow" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><path d="M3 16h25m-8-8 8 8-8 8"/></svg>
+      <div class="flow-node">
+        <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M28 28q4-4 8 0m-16-8q12-12 24 0M12 12q20-20 40 0M32 28v28m-12 0 12-28 12 28m-19-9h14m-11-9h8"/></svg>
+        <p class="ms-h3">无线广播</p>
+      </div>
+      <svg class="flow-arrow" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><path d="M3 16h25m-8-8 8 8-8 8"/></svg>
+      <div class="flow-node">
+        <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M32 4v9M12 24V13h40v11M32 13v11M7 26h10v19H7zM27 26h10v19H27zM47 26h10v19H47zM7 45v14h10V45M27 45v14h10V45M47 45v14h10V45M10 50h4m16 0h4m16 0h4"/></svg>
+        <p class="ms-h3">多组灯棒</p>
+      </div>
     </div>
   </section>
 
-  <section class="ms-section ms-wrap" id="evidence" aria-labelledby="evidence-title">
-    <div class="ms-section-head"><div><span class="ms-section-label">05</span><h2 class="ms-h2" id="evidence-title">验证范围</h2></div></div>
-    <dl class="ms-prose evidence">
-      <div class="evidence-row"><dt class="ms-h3">实物反馈</dt><dd><p>研究样机已测试口令握手、GRB 设色、原版网页灯效与音乐律动。新版基础颜色与观感混色已有用户实物反馈。</p><p class="ms-small">当前全部灯效、音频路径和时序仍未逐项验收；实物反馈不等于仪器测量，也不能外推到其他批次。</p></dd></div>
-      <div class="evidence-row"><dt class="ms-h3">静态逆向</dt><dd><p>内置灯效参数、定时任务、按键与 GATT 的差异、连续设色、射频包结构与分组号持久化。</p><p class="ms-small">代码分析不等于实际发射或接收测试。</p></dd></div>
-      <div class="evidence-row"><dt class="ms-h3">仍待确认</dt><dd><p>其他内置灯效的实际观感与退出行为、<code>09–0c</code> 的完整效果、白化实际初值，以及其他批次的兼容性。</p><p class="ms-small">尚不能把这些结论当作稳定接口或兼容保证。</p></dd></div>
-    </dl>
+  <section class="ms-section ms-wrap" aria-labelledby="uses-title">
+    <h2 class="ms-h2" id="uses-title">你能用它做什么</h2>
+    <div class="ms-grid ms-grid--trio uses-grid">
+      <article>
+        <h3 class="ms-h3">选颜色</h3>
+        <p>用色轮选择喜欢的颜色。调整亮度，用作桌面灯光或拍照道具。</p>
+      </article>
+      <article>
+        <h3 class="ms-h3">播放灯效</h3>
+        <p>让亮度逐渐升降，形成呼吸效果。也可以让颜色连续变化。原生灯效由灯棒自行播放。延伸灯效由网页连续发送指令。</p>
+      </article>
+      <article>
+        <h3 class="ms-h3">跟随音乐</h3>
+        <p>浏览器分析你提供的音频，把音量和节拍转成灯光变化。分析在你的设备上完成，本站不上传音频。</p>
+      </article>
+    </div>
   </section>
 
-  <section class="ms-section ms-wrap reading" id="development" aria-labelledby="development-title">
-    <div class="ms-section-head"><div><span class="ms-section-label">06</span><h2 class="ms-h2" id="development-title">继续开发</h2></div></div>
-    <div class="ms-viewer">
-      <details name="development"><summary>校验怎么算</summary><div class="ms-viewer-body ms-prose"><p>前五个字节的和为 S，校验取 <code>(256 − (S mod 256)) mod 256</code>。加上它后，总和的低八位就是 0。这种校验只能发现部分传输错误，不能防止恶意控制。</p></div></details>
-      <details name="development"><summary>处理函数</summary><div class="ms-viewer-body ms-prose"><p>写回调 <code>0x1fff4290</code> 将输入复制到 <code>0x1fffc343</code>；约 10 ms 后，由 <code>0x1fff6774</code> 完成口令、校验与命令分发。灯效任务入口为 <code>0x1fff7c60</code>。这些是研究描述，不是厂家的函数名，也不是跨版本稳定地址。</p></div></details>
-      <details name="development"><summary>SDK 与资料</summary><div class="ms-viewer-body ms-prose"><p>仓库提供自行实现的控制 SDK、离线字节测试与 Ghidra 工程重建脚本。开发入口是 <code>docs/SDK.md</code>、<code>docs/FUNCTIONS.md</code> 、<code>docs/NATIVE-EFFECTS.md</code> 和 <code>re/README.md</code>。<a href="assets/hardware/board-back.webp">主控板背面照片</a>可辅助查看走线与焊点。</p><p>厂家固件、第三方工具及厂家 SDK 不随仓库分发。遵守<a href="LICENSE.txt">社区源码许可</a>：允许免费使用、二次开发与分享，禁止销售、付费托管和付费捆绑。不要向 OTA 服务 <code>5833ff01</code> 写入。</p></div></details>
+  <section class="ms-section ms-wrap" aria-labelledby="github-title">
+    <div class="project-callout">
+      <h2 class="ms-h2" id="github-title">源码与研究记录</h2>
+      <a class="ms-action" href="https://github.com/CloudyMoonShape/wuwa-lightstick" target="_blank" rel="noopener noreferrer" aria-label="在 GitHub 查看共鸣项目"><svg class="github-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>前往 GitHub<span aria-hidden="true">↗</span></a>
     </div>
   </section>
 </main>
-<footer class="ms-site-footer ms-wrap">
-  <div class="ms-warnstrip" data-status="candidate"><span class="ms-hazard" aria-hidden="true">//////</span><p>Do not write to OTA service <code>5833ff01</code>.</p></div>
-  <div class="ms-footer"><span>共鸣 · 原理</span><span><a class="ms-link" href="LICENSE.txt">社区源码许可</a> · 2026-10-24</span></div>
+<footer class="ms-site-footer ms-wrap principles-footer">
+  <div class="ms-warnstrip footer-warning"><span class="ms-hazard" aria-hidden="true">//////</span><p class="web-small" lang="en">Photosensitive? Keep flashing effects off.</p></div>
+  <div class="ms-footer community-footer">
+    <p class="footer-project web-small">共鸣 · 非官方社区项目</p>
+    <nav class="footer-links web-small" aria-label="项目文档"><a class="ms-link" href="principles.html" aria-current="page">原理与开发</a><span aria-hidden="true">·</span><a class="ms-link" href="LICENSE.txt">源码许可</a><span aria-hidden="true">·</span><a class="ms-link" href="https://github.com/CloudyMoonShape/wuwa-lightstick" target="_blank" rel="noopener noreferrer">GitHub</a></nav>
+    <p class="footer-disclaimer web-small">与游戏、主办方及硬件厂家无关</p>
+    <span class="footer-brand web-small" lang="en" aria-label="MoonShade"><span aria-hidden="true">▚</span> MOONSHADE <span aria-hidden="true">▞</span></span>
+  </div>
 </footer>
-<script>
-const channels = ['r', 'g', 'b'];
-const hex = value => value.toString(16).padStart(2, '0').toUpperCase();
-const presets = [...document.querySelectorAll('[data-rgb]')];
-function update() {
-  const rgb = channels.map(id => Number(document.getElementById(id).value));
-  const [r, g, b] = rgb;
-  channels.forEach((id, i) => document.getElementById(id + 'v').textContent = rgb[i]);
-  const body = [1, 0, g, r, b];
-  const total = body.reduce((sum, value) => sum + value, 0);
-  const checksum = (-total) & 255;
-  const labels = ['命令', '保留', 'G', 'R', 'B', '校验'];
-  document.getElementById('bytes').replaceChildren(...[...body, checksum].map((value, i) => {
-    const cell = document.createElement('div');
-    cell.className = 'byte';
-    const strong = document.createElement('strong');
-    strong.className = 'ms-readout ms-readout--sm';
-    strong.textContent = hex(value);
-    const small = document.createElement('small');
-    small.className = 'ms-label';
-    small.textContent = labels[i];
-    cell.append(strong, small);
-    return cell;
-  }));
-  document.getElementById('formula').textContent = `校验 = (−${total}) mod 256 = ${checksum} (0x${hex(checksum)})`;
-  document.getElementById('sum').textContent = `完整帧相加 = ${total + checksum}；除以 256 的余数 = 0。`;
-  document.getElementById('lamp').style.setProperty('--drive-color', `rgb(${r}, ${g}, ${b})`);
-  const channel = r === g && g === b ? (r ? '独立白光通道' : '全部灯光关闭') : 'RGB 通道';
-  const channelOutput = document.getElementById('channel');
-  if (channelOutput.textContent !== channel) channelOutput.textContent = channel;
-  presets.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.rgb === rgb.join(','))));
-}
-channels.forEach(id => document.getElementById(id).addEventListener('input', update));
-presets.forEach(button => button.addEventListener('click', () => {
-  button.dataset.rgb.split(',').forEach((value, i) => document.getElementById(channels[i]).value = value);
-  update();
-}));
-update();
-// Native details stays usable without JavaScript; wide layouts show all three photos.
-const hardwareFold = document.getElementById('hardware-more');
-const widePhotos = matchMedia('(min-width: 768px)');
-let mobilePhotosOpen = hardwareFold.open;
-hardwareFold.addEventListener('toggle', () => {
-  if (!widePhotos.matches) mobilePhotosOpen = hardwareFold.open;
-});
-function syncHardwarePhotos() {
-  hardwareFold.classList.toggle('is-auto', widePhotos.matches);
-  hardwareFold.open = widePhotos.matches || mobilePhotosOpen;
-}
-widePhotos.addEventListener('change', syncHardwarePhotos);
-syncHardwarePhotos();
-</script>
 </body>
 </html>
