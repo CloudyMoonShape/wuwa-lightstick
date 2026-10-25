@@ -32,22 +32,20 @@ The repository does not contain a documented statement of authorship and redistr
 
 ## Wuthering Waves artwork
 
-The background comes from the [official Wuthering Waves site](https://wutheringwaves.kurogames.com/en/). The recorded [source image](https://wutheringwaves.kurogames.com/website-preface/assets/main-bg-c08dcefb.webp) is 1920 × 1080 pixels and 479,860 bytes. The recorded site bundle was `index-415d4999.js`, with the source asset name `desktop/main-bg.webp`. These upstream paths can change.
+The current background is the “To the New World” concert key visual supplied by the maintainer. The [source image](https://pbs.twimg.com/media/HGGg_HmboAAq81-?format=jpg&name=4096x4096) is 3072 × 1728 pixels. The same concert artwork appears in the [official concert announcement](https://wutheringwaves.kurogames.com/jp/main/news/detail/4929).
 
-Copyright remains with Kuro Games and the respective rights holders. Publication on the official site is not an open license. The repository does not claim official endorsement or a redistribution grant. Attribution alone does not resolve permission to publish these copies.
+Copyright remains with Kuro Games and the respective rights holders. Publication is not an open license. The software license does not relicense this artwork or imply endorsement.
 
-Processing was limited to resize, crop, compression, and metadata removal. The desktop copy is 1440 × 810. The mobile crop uses source coordinates `x=660, y=0, width=500, height=1080`. CSS overlays preserve text contrast.
+Copies are resized, compressed, and stripped of metadata. Desktop uses 1440 × 810; mobile uses 960 × 540 with CSS positioning. Both retain the original image composition. CSS overlays preserve text contrast.
 
 | File in `web/assets/artwork/` | Bytes |
 |---|---:|
-| `wuwa-key-visual-2bf16e89.avif` | 48,834 |
-| `wuwa-key-visual-0cc8a4a2.webp` | 89,284 |
-| `wuwa-key-visual-mobile-c930edae.avif` | 25,527 |
-| `wuwa-key-visual-mobile-64336493.webp` | 47,428 |
+| `wuwa-concert-desktop-5c336cf1.webp` | 122,402 |
+| `wuwa-concert-mobile-f3b1a20c.webp` | 59,952 |
 
-A viewport loads one supported format from the same origin. It does not request the image from Kuro Games. Filenames use the first eight characters of the content SHA-256. Rename replaced assets to keep long-lived caching safe.
+The browser loads one same-origin image at low priority. It makes no request to X or Kuro Games. Content hashes prevent stale cached backgrounds.
 
-Repository screenshots also show this artwork. Review their publication rights together with the source assets.
+Earlier repository screenshots may show the previous game key visual from the [official site](https://wutheringwaves.kurogames.com/en/). Its rights remain with the original rights holders.
 
 ## Social icons
 

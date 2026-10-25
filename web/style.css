@@ -5,6 +5,7 @@
 @media(prefers-color-scheme:light) { :root:not([data-theme]) .wuwa-controller { --wuwa-gold:#765a23; --wuwa-art-opacity:.16; } }
 .resonance-field { position:fixed; inset:0; z-index:-1; pointer-events:none; opacity:var(--wuwa-art-opacity); mask-image:linear-gradient(90deg,transparent,black 65%); }
 .resonance-field img { display:block; width:100%; height:100%; object-fit:cover; object-position:center top; }
+@media(max-width:767px) { .resonance-field img { object-position:72% top; } }
 .resonance-field::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg,var(--web-bg),transparent 40%,var(--web-bg)); }
 p,h1,h2 { margin:0; }
 button,input,select { font:inherit; }
