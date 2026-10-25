@@ -1,6 +1,6 @@
-// Ghidra postScript：自动分析没认出来的函数（OSAL 任务表、thunk 间接调用的目标）在指定地址建函数并反编译，
-// 顺带把它直接调用、但还不是函数的应用代码也建出来一起导出，往下追 DEPTH 层。
-// 参数：输出路径，DEPTH，后面跟若干个十六进制地址
+// Ghidra postScript: create and decompile functions missed by automatic analysis
+// (OSAL task entries and indirect thunk targets). Follow called functions to DEPTH.
+// Arguments: output path, DEPTH, then hexadecimal addresses.
 //@category PHY62xx
 
 import ghidra.app.decompiler.DecompInterface;
@@ -38,7 +38,7 @@ public class DecompAt extends GhidraScript {
                     f = createFunction(a, null);
                 }
                 if (f == null) {
-                    w.printf("// ===== %s: 建函数失败 =====%n", a);
+                    w.printf("// ===== %s: cannot create function =====%n", a);
                     continue;
                 }
                 DecompileResults r = d.decompileFunction(f, 60, monitor);

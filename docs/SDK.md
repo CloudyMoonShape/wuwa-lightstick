@@ -1,126 +1,156 @@
-# 开发 SDK
+# JavaScript SDK
 
-这是本项目独立编写的**主机侧 JavaScript SDK**，在浏览器中通过 Web Bluetooth 控制自己的棒子。不是芯片厂商的固件 SDK，不包含厂家代码、固件、反编译输出或串口工具。原厂 SDK 获取与逆向环境重建见 [逆向说明](../re/README.md)。
+[简体中文](zh-CN/SDK.md)
 
-## 开始使用
+Use this host-side SDK to control your lightstick through Web Bluetooth. It is independent project code. It is not the chip manufacturer's firmware SDK. Manufacturer code, firmware, decompiled output, and third-party serial tools are not included. See [firmware analysis](../re/README.md) for the separate research workflow.
 
-从仓库根目录启动静态服务 `python3 -m http.server 8765`，用支持 Web Bluetooth 的浏览器打开 `http://localhost:8765/sdk/examples/color.html`。部署到 HTTPS 后也可使用；连接必须由点击等用户操作触发，用户在系统选择框里自行选择设备。网页 SDK 不需要安装依赖。
+## Start
+
+1. From the repository root, run `python3 -m http.server 8765`.
+2. Open `http://localhost:8765/sdk/examples/color.html` in a browser with Web Bluetooth support.
+3. Select **Connect**. Choose your lightstick in the browser's device dialog.
+
+The example needs no package installation. A remote host must use HTTPS. A user action, such as a button click, must start the connection.
 
 ```js
+// This import path assumes a module at the repository root.
 import { LightstickClient, colorFrame } from './web/sdk.js';
 const stick = new LightstickClient({
   onState(state, detail) { console.log(state, detail); },
-  onNotification(bytes) { console.log('设备回包', bytes); }
+  onNotification(bytes) { console.log('Device reply', bytes); }
 });
-// 在按钮点击处理函数中执行，并捕获异常：
+// Run in a button handler. Catch connection and write errors.
 await stick.connect();
-await stick.setColor([255, 0, 0]); // 参数是 RGB，SDK 转为线上的 GRB
-await stick.setColor([0, 0, 0]);   // 熄灯
-stick.disconnect();              // 断开不等于熄灯；已实测颜色会保持
+await stick.setColor([255, 0, 0]); // RGB input; GRB on the wire.
+await stick.setColor([0, 0, 0]);   // Turn the light off.
+stick.disconnect();              // Disconnect does not turn the light off.
 console.log(colorFrame([12, 34, 56])); // 01 00 22 0c 38 99
 ```
 
-Node 可导入 `sdk/index.mjs` 使用纯字节函数；Node 默认没有浏览器蓝牙 API。运行 `node --test tests/sdk.test.mjs` 执行模拟传输测试，测试不会连接真实设备。
+Node can import `sdk/index.mjs` for frame functions. Node does not provide the browser Bluetooth API by default. Run `node --test tests/sdk.test.mjs` for simulated transport tests. These tests do not connect to hardware.
 
-## 浏览器兼容性
+## Browser support
 
-网页按安全上下文与 `navigator.bluetooth.requestDevice` 是否存在判断连接能力，不按设备型号拒绝访问。目前电脑 Chrome / Edge 与 Android Chrome 提供所需接口。iPhone / iPad 的常规 Safari、Chrome 未提供原生 Web Bluetooth；HTTPS、添加到主屏幕或把网站改成 PWA 都不能自行补上系统没有开放的蓝牙接口。
+The controller checks for a secure context and `navigator.bluetooth.requestDevice`. It does not reject a device by its model name.
 
-按产品要求，本站不引导用户下载其他浏览器、App 或扩展。缺少接口时禁用连接并明确显示屏幕预览，调色和灯效预览仍然可用。没有把第三方桥接方案宣传成已验证的 iPhone 支持，也没有改动蓝牙协议来绕过平台权限。
+Chrome on Windows, macOS, ChromeOS, and Android provides the required interface. Edge on Windows and macOS also supports the controller path. Linux Chrome support remains experimental; do not assume it works without configuration. Standard Safari and Chrome on iPhone and iPad do not provide native Web Bluetooth. HTTPS, a home-screen shortcut, or a PWA cannot add this interface.
 
-依据：[Chrome 官方蓝牙说明](https://support.google.com/chrome/answer/6362090?hl=zh-Hans)、[Web Bluetooth 实现状态](https://github.com/whatwg/bluetooth/blob/main/implementation-status.md)。
+If the interface is absent, the page disables connection and keeps screen previews available. It does not ask users to install another browser, app, or extension. An extension with a native Bluetooth bridge is a separate installation, not native browser support.
 
-### 从网页到灯棒
+See [Chrome Bluetooth help](https://support.google.com/chrome/answer/6362090?hl=en) and the [Web Bluetooth implementation status](https://github.com/whatwg/bluetooth/blob/main/implementation-status.md).
 
 ```mermaid
 flowchart LR
-  P[Cloudflare Pages] -->|下载控制台| W[浏览器里的调色与灯效]
-  W -->|Web Bluetooth| B[本机蓝牙]
-  B -->|BLE GATT · 六字节颜色帧| S[应援棒]
+  P[Cloudflare Pages] -->|Page download| W[Browser controller]
+  W -->|Web Bluetooth| B[Local Bluetooth adapter]
+  B -->|BLE GATT commands| S[Lightstick]
 ```
 
-用户点击连接并选择设备后，SDK 连接服务、订阅通知、完成口令回显，再持续写入颜色帧。颜色指令不经过 Cloudflare；加载完页面后，网站网络延迟不会叠加到每次调色上。
+The SDK connects to the service, subscribes to notifications, and checks the handshake echo. Control commands then travel directly from the browser to the lightstick. They do not pass through Cloudflare.
 
-手机能连接蓝牙耳机，并不代表网页也能控制 BLE 设备。前者由系统提供功能，后者需要浏览器向 JavaScript 开放 Web Bluetooth。iPhone 的当前限制在这一接口层，修改颜色协议、网页混色算法或 HTTPS 配置都不能补齐它。实现状态文档提到的 Safari 扩展通过原生进程桥接 CoreBluetooth，仍需要用户安装扩展，不属于 Safari 原生支持，也不符合本站免安装的要求。
+System support for Bluetooth headphones does not give a web page access to BLE devices. An iPhone relay through another nearby computer could provide an alternative path. This project does not implement that relay.
 
-若将来增加免安装的 iPhone 遥控，需要另一台附近、已支持网页蓝牙的设备承担连接，再通过网络接收 iPhone 指令。这是需要另行实现与验证的中继功能，当前版本没有提供。
+## API
 
-## 接口与语义
-
-| 接口 | 说明 |
+| API | Behavior |
 |---|---|
-| `frame(body)` | 纯函数，追加负和校验；不发送任何内容。输入必须为非空、0–255 的整数序列。 |
-| `colorFrame([r,g,b])` | 纯函数，返回 `01 00 G R B checksum` 的 `Uint8Array`。严格校验三个颜色值。 |
-| `validChecksum(bytes)` | 检查非空字节序列总和 mod 256 是否为 0；不是语义校验或身份验证。 |
-| `new LightstickClient(options)` | 可选 `onState`、`onNotification` 和 `onWrite(bytes, elapsedMs)` 回调。回调应保持简短，不抛异常。 |
-| `connect()` | 弹设备选择器、连接 FA00、订阅 FA01、向 FA02 写口令、在 4000 ms 内收到完全一致的口令回显，再等待 1200 ms 蓝灯动画；返回设备。并发连接调用会拒绝。 |
-| `setColor([r,g,b])` | 返回 Promise；真正完成浏览器写入返回 `true`；被更新颜色替换的待发帧返回 `false`。断开或写入失败则拒绝。 |
-| `nativeEffectFrame(kind, options)` | 纯函数，严格生成 `breathe`、`fade`、`blink`、`rgb-step`、`rgb-breathe` 帧。参数见下。 |
-| `continuousColorFrame(rgb)` | 非中性色 / 全零用 `0e`；等值非零白色保留 `01`，防止意外满亮白光。 |
-| `setNativeEffect(kind, options)` | 启动内置效果；等待匹配 FA01 回复及写入完成才返回 true；超时断开。 |
-| `stopNativeEffect()` | 发送 `0d` 零色并等待匹配回复；停止效果并熄灯。 |
-| `setContinuousColor(rgb)` | 连续直出颜色；调用前先 `await stopNativeEffect()` 建立直接输出模式。 |
-| `disconnect()` | 取消尚未发送的颜色、移除监听、关闭 GATT。连接中的异步步骤也会检查取消状态。 |
-| `ready`, `state`, `device` | 连接就绪布尔值、阶段字符串、当前设备（未连接时为 null）。 |
+| `frame(body)` | Return bytes with a negative-sum checksum. Send nothing. Require a nonempty sequence of integers from 0 to 255. |
+| `colorFrame([r,g,b])` | Return `01 00 G R B checksum` as a `Uint8Array`. Validate all three input values. |
+| `validChecksum(bytes)` | Return whether a nonempty byte sequence sums to 0 modulo 256. This does not validate command meaning or identity. |
+| `new LightstickClient(options)` | Accept optional `onState`, `onNotification`, and `onWrite(bytes, elapsedMs)` callbacks. Keep callbacks short. Do not throw from them. |
+| `connect()` | Open the device dialog. Connect to FA00 and subscribe to FA01. Write the handshake to FA02. Require an exact echo within 4000 ms, then wait 1200 ms for the blue animation. Return the device. Reject concurrent connection calls. |
+| `setColor([r,g,b])` | Return a Promise. Resolve to `true` when the browser write completes. Resolve to `false` if a newer pending command replaces this one. Reject on disconnect or write failure. |
+| `nativeEffectFrame(kind, options)` | Build a validated frame for `breathe`, `fade`, `blink`, `rgb-step`, `rgb-breathe`, `palette-cycle`, or `rgb-burst`. Send nothing. |
+| `continuousColorFrame(rgb)` | Use `0e` for unequal channels or all-zero input. Use `01` for equal, nonzero channels to avoid full white output. |
+| `setNativeEffect(kind, options)` | Start a native effect. Resolve to `true` only after both the write and matching FA01 reply. Disconnect on reply timeout. |
+| `stopNativeEffect()` | Send a zero-color `0d` frame. Wait for its matching reply. Stop the effect and turn the light off. |
+| `setContinuousColor(rgb)` | Send continuous direct color. First call and await `stopNativeEffect()` to establish direct-output mode. |
+| `disconnect()` | Cancel pending commands, remove listeners, and close GATT. Connection steps also check for cancellation. |
+| `ready`, `state`, `device` | Read connection readiness, the state name, and the current device. `device` is `null` when disconnected. |
 
-状态为 `selecting → connecting → authenticating → ready`；失败进入 `error`，断开进入 `disconnected`。`ready` 表示口令写操作完成、FA01 完整回显与口令逐字节一致，且经过 1200 ms 动画等待；缺少或错误回显会超时并断开。回显是设备协议握手，不是加密身份认证；`setColor` 的成功表示浏览器完成写操作，不证明灯光真实呈现。FA01 回包单独传给调用者，不能用 GATT 写耗时声称测得完整声光延迟。
+Connection states are `selecting → connecting → authenticating → ready`. Failure changes the state to `error`. Disconnection changes it to `disconnected`.
 
-发送器始终只有一个写操作在途，待发区只有最新一帧，避免动画积压。优先用无响应写，不支持时用有响应写。默认目标上限为 **60 次写入 / 秒**，`minGapMs` 为相邻写入开始之间的最小间隔（默认 `1000 / 60` 毫秒）；当前写入耗时计入此间隔，只等待剩余时间。传输本身比一帧慢时立即处理最新待发颜色，不额外叠加固定延迟，也不并发补发过期帧。实际速度仍受浏览器调度、蓝牙链路与设备处理能力限制。
+`ready` requires a completed handshake write, an exact FA01 echo, and the animation wait. A missing or incorrect echo causes a timeout and disconnection. The echo is a protocol handshake, not cryptographic authentication.
 
-网页在输出数值变化时才发帧，常亮、呼吸极值附近或低亮度时的次数可能低于上限。网页的 `FrameSender` 现在独立于屏幕刷新采样，并可通过 `?rate=90` / `?rate=120` 试验更高发送率；该实例设置 `minGapMs: 0`，由外层统一限速，公开 SDK 默认不变。具体时序和固件约 10 ms 延后处理的边界见 [高发送率试验](OUTPUT-TIMING.md)。
+A successful color write proves that the browser completed the write. It does not prove the optical output. FA01 replies are separate observations. Do not report GATT write duration as measured light or audio latency.
 
-连接详情统计实际完成的控制写入和有效控制回包；不是光学刷新率或完整延迟。内置灯效稳定后通常为 0 次写入/秒。新命令经过静态追踪与模拟传输测试，仍需真实硬件回归；此前实测结论来自原控制台和命令行工具。
+## Send timing
 
-## 内置灯效 SDK（试验）
+Only one write can be in progress. The pending slot holds only the latest command. This prevents old animation frames from accumulating.
+
+The SDK prefers a write without response. It falls back to a write with response. The default target limit is 60 writes per second. `minGapMs` sets the minimum interval between write starts. Its default is `1000 / 60` ms. Write duration counts toward this interval.
+
+If a write takes longer than the interval, the SDK sends the latest pending command when it can. It does not add another fixed delay or send old frames in parallel. Browser scheduling, the Bluetooth link, and firmware processing can reduce the actual rate.
+
+The controller sends only changed values. Its `FrameSender` samples independently of screen refresh. The `?rate=90` and `?rate=120` options select experimental target rates. That client uses `minGapMs: 0`; the outer sender controls timing. The public SDK default remains unchanged. See [output timing](OUTPUT-TIMING.md).
+
+Connection details count completed control writes and valid control replies. They do not measure optical refresh rate. A stable native effect usually needs no repeated writes. The owner confirmed that native single-color breathing looks smooth. Other native commands still need individual hardware tests.
+
+## Native effects
 
 ```js
-// 以下放在用户点击连接后的异步处理函数内，捕获异常。
-await stick.setNativeEffect('breathe', {rgb: [255, 32, 32]});
-// 内部计时器持续呼吸，不要循环重发启动命令。
-await stick.setColor([255, 16, 16]); // 更新基础色，保留呼吸阶段
-await stick.stopNativeEffect();     // 明确退出并熄灯
-await stick.setContinuousColor([80, 0, 0]); // 此后可连续发送新颜色
+// Run after connection in an async handler. Catch errors and check return values.
+const started = await stick.setNativeEffect('breathe', {rgb: [255, 32, 32]});
+if (!started) throw new Error('A newer command replaced the effect request');
+// The firmware continues the effect. Do not resend its start command in a loop.
+await stick.setColor([255, 16, 16]); // Change the base color; retain the phase.
+const stopped = await stick.stopNativeEffect();
+if (!stopped) throw new Error('A newer command replaced the stop request');
+await stick.setContinuousColor([80, 0, 0]);
 ```
 
-`breathe` 接收原始 `rgb`；`blink` 接收 `rgb` 和 `intervalMs`；`rgb-step` 仅接收 `intervalMs`；`fade` / `rgb-breathe` / `palette-cycle` / `rgb-burst` 不接收可调参数。`palette-cycle` 为 15 色轮播（`08 00 f8`），`rgb-burst` 为三色连闪（`07 00 f9`）；使用连闪前由应用征得用户开启闪光。毫秒间隔为整数 1–65534。SDK 不自动应用网页观感混色。最小交互示例见 [native.html](../sdk/examples/native.html)。
+| Effect | Options |
+|---|---|
+| `breathe` | `rgb` |
+| `blink` | `rgb`, `intervalMs` |
+| `rgb-step` | `intervalMs` |
+| `fade`, `rgb-breathe`, `palette-cycle`, `rgb-burst` | None |
 
-启动与退出默认等待 1500 ms 匹配回复；可用 `replyTimeoutMs` 配置。所有调用仍共用一个在途写入和一个最新待发项；被后续调用覆盖的待发命令返回 false。开发者应串行 await 模式切换，检查返回值，然后才发送颜色；网页由 `DevicePlayback` 统一处理。回包可能早于浏览器写操作完成，SDK 会同时等待两者。
+Intervals must be integers from 1 to 65534 ms. `palette-cycle` uses 15 firmware colors (`08 00 f8`). `rgb-burst` uses repeated RGB flashes (`07 00 f9`). Require the user to enable flashing before starting this effect.
 
-`01` 在 `02` / `04` 中只改基础色，不能当作退出命令；`03` 启动渐变，也不是复位。内置呼吸速度固定，实体按键呼吸另走内部模式 7，不能承诺两者完全一致。完整证据与白光特例见 [内置能力](NATIVE-EFFECTS.md)。
+The SDK does not apply the controller's color mapping. See the [native-effect example](../sdk/examples/native.html).
 
-## 已知固件行为与证据等级
+Start and stop commands wait up to 1500 ms for a matching reply by default. Set `replyTimeoutMs` to change this limit. They share the single write slot with color commands. A pending command replaced by a newer one resolves to `false`.
 
-| 项目 | 已知含义 | 证据/边界 |
+Await mode changes in sequence. Check each result before sending a color. The controller uses `DevicePlayback` for this task. A reply can arrive before the browser write completes; the SDK waits for both.
+
+In modes `02` and `04`, command `01` changes only the base color. It does not exit the mode. Command `03` starts a fade; it is not a reset. Native breathing has a fixed speed. The physical button uses a separate internal mode 7. Their behavior is not assumed to be identical. See [native effects](NATIVE-EFFECTS.md).
+
+## Firmware evidence
+
+| Item | Meaning | Evidence and limits |
 |---|---|---|
-| `FA00 / FA01 / FA02` | 控制服务 / 读与通知 / 写入口 | 原工具已有设备实测记录。 |
-| `JFKJ-20250421` | FA02 明文握手口令；停止约 8 秒断开计时器 | 固件逆向和原工具实测；不是用户账号密钥。 |
-| `0x01` | 六字节设色帧 `01 xx G R B checksum`，xx 当前取 0 | GRB、红绿及熄灯由原工具实测。 |
-| `R=G=B≠0` | 固件改用白光通道 | 既有逆向与白平衡测试记录；等值 RGB 不应当作 RGB 三通道独立混色。 |
-| `0xa1` 回包首字节 | 灯效模式 2/4 的设色回包可能以此开头 | 既有记录；不是另一个公开发色命令。 |
-| `0x02–0x08` | 已接入的内置灯效入口 | 静态布局与 SDK 模拟验证；`02` 主观顺滑度获用户实物确认，其余未逐项验收。 |
-| `0x09–0x0c` | 组合 / 七色轮播 / 白光及红蓝图案 | 未开放设备调用封装。 |
-| `0x0d` / `0x0e` | 强制停止后直出 / 连续设色 | 已追踪；等值非零 RGB 在这两个分支会开满 W。 |
+| `FA00 / FA01 / FA02` | Control service / read and notify / write | Historical device tests with the original tools. |
+| `JFKJ-20250421` | Plaintext handshake; stops the approximately 8-second disconnect timer | Static analysis and device tests. This is not a user account secret. |
+| `0x01` | Six-byte color command: `01 xx G R B checksum`; use `xx=0` | GRB order, red, green, and off were tested on the sample. |
+| `R=G=B≠0` | Select the white channel | Static analysis and earlier white-balance observations. Equal values do not independently drive three RGB channels. |
+| Reply prefix `0xa1` | Possible reply to a color update in modes 2 and 4 | Historical records. It is not another documented color command. |
+| `0x02–0x08` | Implemented native effects | Static analysis and simulated tests. The owner confirmed the smooth appearance of `02`; others need individual device tests. |
+| `0x09–0x0c` | Combined, seven-color, white, and red/blue patterns | No SDK device-call wrappers. |
+| `0x0d / 0x0e` | Stop and direct output / continuous color | Static analysis. Equal, nonzero RGB selects full white in these branches. |
 
-## 固件函数地图（特定备份，不是通用 ABI）
+## Firmware addresses
 
-以下名称是本项目按观察行为起的描述性名称；地址来自既有逆向笔记，仅对那份固件布局有意义。它们不是可直接从 JavaScript 调用的公开函数，也没有足够证据提供 C 函数原型。
+These are descriptive names from the research notes, not manufacturer symbols. Addresses apply only to the reference firmware. They are not JavaScript-callable functions or a stable ABI. C prototypes are not sufficiently established.
 
-| 地址 | 描述性名称 | 行为与继续研究的入口 |
+| Address | Name | Behavior |
 |---|---|---|
-| `0x1fff4290` | FA02 写回调 | 将输入拷到 `0x1fffc343`，约 10 ms 后处理；追踪长度校验。 |
-| `0x1fff6774` | GATT 命令分发 | 比对口令、检查负和校验、按首字节分发；继续标注 `02–0c` 分支参数。 |
-| `0x1fff2fd4` | 原始射频任务事件处理 | OSAL 任务 10；独立于普通 GATT 控制。 |
-| `0x1fff73c0` | 原始射频收包 | 过滤 AdvA，把载荷交给解析器。 |
-| `0x1fff6b14` | 现场广播载荷解析 | XOR 解码、求和与分组/类型分发；仅逆向，未实测。 |
-| `0x1fff7c60` | 灯效任务 | OSAL 任务 11；后续可追踪颜色如何作用于通道。 |
-| `0x1fffc1cc` | 射频配置结构（数据，不是函数） | `+0x20` 格式/白化/CRC，`+0x24` CRC 初值，`+0x28` Access Address，`+0x40` 频率。 |
+| `0x1fff4290` | FA02 write callback | Copy input to `0x1fffc343`; process it about 10 ms later. Input-length checks need more analysis. |
+| `0x1fff6774` | GATT dispatcher | Compare the handshake, check the checksum, and dispatch by command byte. |
+| `0x1fff2fd4` | Raw RF task handler | OSAL task 10; separate from normal GATT control. |
+| `0x1fff73c0` | Raw RF receive handler | Filter AdvA and pass the payload to the parser. |
+| `0x1fff6b14` | Venue payload parser | Apply XOR decoding, check the sum, and dispatch by group and type. No RF test. |
+| `0x1fff7c60` | Light-effect task | OSAL task 11; controls the output path. |
+| `0x1fffc1cc` | RF configuration data | `+0x20`: format, whitening, CRC; `+0x24`: CRC initial value; `+0x28`: Access Address; `+0x40`: frequency. |
 
-复现方法见 [Ghidra 重建](../re/README.md)。贡献新发现时记录硬件版本、自己的固件哈希、函数地址、输入/响应原始字节、可复现步骤与实测现象；分别标注推断和实测，不能把反编译器猜测的函数签名当成事实。
+See [Ghidra setup](../re/README.md) and the [function reference](FUNCTIONS.md). Report the board, firmware hash, address, input bytes, reply bytes, steps, and visible result with each new finding. Keep static inference separate from device observations. A decompiler's guessed signature is not a verified prototype.
 
-现场广播字节生成保留在 `scripts/venue_packet.py`，与 SDK 的 GRB GATT 帧不是同一种协议；广播是 RGB。该脚本不发射。不要在演出/活动现场发包；类型 6 会把他人分组写入 flash。SDK 只封装已追踪布局的 GATT 命令，不提供广播发射、任意命令设备调用或 OTA 入口，也不向 `5833ff01` 写入。
+`scripts/venue_packet.py` generates venue protocol bytes, not RF signals. Venue color bytes use RGB; GATT uses GRB. Do not transmit venue packets at an event. Type 6 can persistently change other devices' groups. The SDK does not expose venue transmission, arbitrary device commands, or OTA writes to `5833ff01`.
 
-## 与网页色轮的关系
+## Color and brightness
 
-SDK `setColor` 接收原始RGB驱动值。网页先通过 `web/color.js` 的 `renderColor` 做观感混色，再调用SDK；请勿对已转换值重复应用映射。网页唯一混色标准、黄色微调和样机验收范围见 [混色说明](COLOR-MIXING.md)。
+`setColor` takes raw RGB drive values. The controller applies `renderColor` from `web/color.js` before calling the SDK. Do not apply that mapping twice. See [color mixing](COLOR-MIXING.md).
 
-网页手动亮度与呼吸由 `web/dimming.js` 生成整体亮度系数：滑块平滑后经过温和二次曲线，呼吸单独生成连续包络，再交给 `renderColor` 最后取整。SDK 不自动应用这些曲线，开发者传入 `[128,0,0]` 仍发送原始 128。详细换算和 8 位暗部限制见 [调光说明](DIMMING.md)。
+`web/dimming.js` produces brightness factors for the slider and browser-generated breathing. The slider uses smoothing and a mild quadratic curve. Breathing uses a continuous envelope. `renderColor` rounds the final channel values.
+
+The SDK does not apply these curves. `[128,0,0]` still sends raw red value 128. See [dimming](DIMMING.md) for the 8-bit limits at low output.

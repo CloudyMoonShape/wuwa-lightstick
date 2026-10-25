@@ -1,34 +1,71 @@
-# Cloudflare Pages 部署
+# Deploy
 
-正式入口：https://wuwa.south-wall.com/
+[Documentation](README.md) · [简体中文](zh-CN/DEPLOYMENT.md)
 
-Pages 项目仍为 `wuwa-lightstick`。先在项目中关联自定义域名 `wuwa.south-wall.com`，再添加同名 CNAME 指向 `wuwa-lightstick.pages.dev`。当前采用仅 DNS 解析，页面和 HTTPS 由 Pages 提供。等待域名验证与证书状态均为 active，再检查正式入口。详见 [Cloudflare 自定义域名说明](https://developers.cloudflare.com/pages/configuration/custom-domains/)。
+Build the site before you serve or upload it. The build inserts the shared header and footer. It also puts the controller code, styles, and font subset in one HTML file.
 
-原 `pages.dev` 地址保留为备用。新域名是新的浏览器来源：首次连接需要重新选择并授权应援棒，旧域名保存的个人调节不会自动迁移。
+## Local preview
 
-使用 Direct Upload；发布后回读正式入口及资源，逐项与本地构建比较。当前视觉版本的检查记录见 [展示审查](DESIGN-AUDIT.md)。
+Use Node.js 24 and Python 3. From the repository root, run:
 
-首页把样式、字体子集、品牌图标和应用/SDK 代码内联为一个 HTML，不请求第三方字体、图片或脚本，不含第三方分析 SDK；浏览器只需拿到首页即可通过本机蓝牙操作。鸣潮官网主视觉作为同源背景低优先级加载、异步解码；桌面 AVIF 为 48,834 字节，手机竖版为 25,527 字节，对应 WebP 后备为 89,284 / 47,428 字节。通过 picture 按视口和格式选择，只下载一张；图片慢或失败时不影响控制功能。图片文件名包含内容哈希，并通过响应头缓存一年；替换图片必须同步更新哈希文件名和构建白名单。到访计数在页面初始化后独立请求同源接口，超时或失败会隐藏，不阻塞遥控器。源文件仍模块化，便于开发。三个灯效入口版首页 132,165 字节原始体积、40,273 字节 gzip 估算，比内置能力试验版 gzip 增加 809 字节，不增加控制台脚本请求；这不是中国运营商延迟测量。
-
-仅公开 `dist/` 中列入白名单的网页资源：控制台、原理页、SDK、混色、调光、输出调度与播放模式模块、404、许可、站点响应头与 Functions 路由；另包含 `assets/hardware/` 四张已清理元数据的 WebP、`assets/artwork/` 桌面/手机各两种背景格式、`assets/concert/` 两张演出 WebP 和字体 OFL 许可。硬件照片在原理页按需加载，不进入控制台 HTML。Wrangler 另将根目录 `functions/` 编译到服务端；`_routes.json` 仅让 `/api/visitors` 进入函数，其余页面仍静态直出。不要上传仓库根目录、固件、vendor、虚拟环境或凭据。
-
-```bash
+```sh
 npm test
 npm run build
-npx wrangler@4.152.0 pages project create wuwa-lightstick --production-branch main
-npx wrangler@4.152.0 pages deploy dist --project-name wuwa-lightstick --branch main
+python3 -m http.server 8765 -d dist
 ```
 
-首次创建项目后，后续只执行 deploy。通过环境变量提供自己的 `CLOUDFLARE_API_TOKEN` 和 `CLOUDFLARE_ACCOUNT_ID`，不要把值写入版本控制。日常发布需要所选账号的 Pages 权限；首次创建或迁移计数数据库另需 D1 写入权限。数据库凭据不进入网页，运行时通过 `VISITORS_DB` 绑定访问专用库。计数初始化与生产、预览隔离见 [到访计数](VISITORS.md)。
+Open [localhost:8765](http://localhost:8765). A static preview does not need Cloudflare credentials. The visitor counter does not register visits on localhost.
 
-`wrangler.jsonc` 为部署配置来源：生产环境绑定计数专用库，预览环境没有生产库权限。Fork 后请填写自己的数据库 ID 和正式域名名单。控制台本地静态预览不需要云端凭据。
+## Cloudflare Pages
 
-说明页新增 `assets/concert/` 两张演出 WebP，构建时按文件名白名单复制，合计 149,226 字节。它们只在说明页加载，不增加控制台请求；`assets/concert/README.md` 不进入部署产物。照片内边框和边缘遮罩使用 CSS，不生成额外图片。
+The current site uses Direct Upload. Set `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in your shell. Use your own account and a token with the required Pages permissions. Do not commit their values.
 
-使用 Direct Upload，现阶段不启用 CI 或 Git 集成。Cloudflare 表明 Direct Upload 项目无法直接切换到 Git 集成；未来需要该功能时另建项目。
+For a new project, run:
 
-控制与音频分析全部在浏览器运行，无控制后端、无音频上传。唯一动态接口用于匿名到访计数，不接收蓝牙或音频数据；Cloudflare 仍会处理普通 HTTP 访问数据。Web Bluetooth 需要 HTTPS 或 localhost 及兼容浏览器，访客自己授权选中的设备。
+```sh
+npx wrangler@4.152.0 pages project create YOUR_PROJECT --production-branch main
+```
 
-上线检查：确认部署成功、正式域名资源返回 200、浏览器页面/原理页可交互、控制台无错误、仅白名单资源被上传。软件检查不代替新版本实物验收。
+After each build, run:
 
-资料：https://developers.cloudflare.com/pages/get-started/direct-upload/
+```sh
+npx wrangler@4.152.0 pages deploy dist --project-name YOUR_PROJECT --branch main
+```
+
+Upload `dist/`, not the repository root. Wrangler compiles the root `functions/` directory separately. The build copies only the selected public assets. It excludes firmware, local environments, downloaded tools, and credentials.
+
+The build prints the current HTML size and a gzip estimate. Use that output for the current revision. Do not treat a previous size measurement as the current payload or as a load-time guarantee.
+
+## Optional visitor counter
+
+The controller works without the counter. To enable it, create your own D1 database and apply the migration. Bind it as `VISITORS_DB` in the Pages production environment. Keep the production database out of preview environments.
+
+Use [wrangler.example.jsonc](../wrangler.example.jsonc) as a starting point for your own deployment. Replace the example values before use. Do not reuse the project's production database binding.
+
+Update the production database configuration and both origin lists in `web/visitors.js` and `functions/api/visitors.js`. See [Visitor counter](VISITORS.md). D1 setup needs database permissions in addition to Pages deployment permissions.
+
+Only `/api/visitors` enters the function. The other paths remain static. Counter failure must not block the controller.
+
+## Domain and assets
+
+Add a custom domain to the Pages project before you configure its DNS record. Wait for domain verification and the certificate to become active. Then open the domain in a browser. See [Cloudflare custom domains](https://developers.cloudflare.com/pages/configuration/custom-domains/).
+
+A new domain is a new browser origin. Users must select their Bluetooth device again. Saved settings do not move between origins.
+
+The background is a separate, low-priority, same-origin request. It does not block the controls. Hardware and concert photos load on the principles page. Before you redistribute these files, review [Third-party materials](../THIRD_PARTY.md).
+
+Artwork filenames contain a content hash and use long-lived caching. If you replace an image, update its filename, HTML references, and build allowlist together.
+
+## Check a release
+
+1. Run the tests and build.
+2. Inspect `dist/` for unintended files.
+3. Deploy the build.
+4. Check the production home page, principles page, license, and referenced assets.
+5. Compare their content with the local build.
+6. Check the browser console, desktop layout, and narrow layout.
+7. Test the changed controls on a real lightstick when the change affects device behavior.
+
+A successful upload does not prove that the deployed site or hardware works. See [Verification](VERIFICATION.md).
+
+[Cloudflare Direct Upload](https://developers.cloudflare.com/pages/get-started/direct-upload/) documents the deployment method. A Direct Upload project cannot switch directly to Git integration; use a new project if you need that workflow.

@@ -1,41 +1,41 @@
-# 硬件实拍
+# Hardware
 
-[文档](README.md) · [控制协议](PROTOCOL.md) · [开发 SDK](SDK.md)
+[中文](zh-CN/HARDWARE.md) · [Protocol](PROTOCOL.md) · [SDK](SDK.md)
 
-四张照片均由用户提供，记录本项目研究样机。网页副本保留整图与拍摄方向，仅缩放、转码并清除 EXIF / GPS 等元数据，没有生成或补绘细节。
+These photographs show the research sample. The copies retain the full frame and orientation. They were resized and converted, and EXIF/GPS metadata was removed. No device details were generated or repainted.
 
-| HE-590L5 灯板 | HE-750G24 主板正面 |
+| HE-590L5 LED board | HE-750G24 controller board |
 |---|---|
-| [![HE-590L5 灯板，标有 B、W、R 和正极，中央为复合 LED 封装](../web/assets/hardware/led-module.webp)](../web/assets/hardware/led-module.webp) | [![HE-750G24 主板正面，可见 ST17H66B、按键、16.000 MHz 晶振及 P10P9 接口](../web/assets/hardware/board-front.webp)](../web/assets/hardware/board-front.webp) |
+| [![LED board with B, W, R, and positive markings around a composite LED package](../web/assets/hardware/led-module.webp)](../web/assets/hardware/led-module.webp) | [![Controller board with ST17H66B, button, 16.000 MHz crystal, and P10P9 port](../web/assets/hardware/board-front.webp)](../web/assets/hardware/board-front.webp) |
 
-| 主板背面 | 拆机全貌 |
+| Controller rear | Assembly |
 |---|---|
-| [![主板背面，可见走线、过孔、灯板连接位置和负极标记](../web/assets/hardware/board-back.webp)](../web/assets/hardware/board-back.webp) | [![拆开的应援棒，左侧为内部主板和电池仓，右侧为外壳，顶部可见透明光学件](../web/assets/hardware/assembly.webp)](../web/assets/hardware/assembly.webp) |
+| [![Board rear with traces, vias, LED connections, and negative marking](../web/assets/hardware/board-back.webp)](../web/assets/hardware/board-back.webp) | [![Disassembled lightstick with controller, battery holder, shell, and optical parts](../web/assets/hardware/assembly.webp)](../web/assets/hardware/assembly.webp) |
 
-## 辨认样机
+## Identify the sample
 
-| 位置 | 照片直接可见 | 结合研究记录理解 |
+| Part | Visible evidence | Limit |
 |---|---|---|
-| 灯板 | `HE-590L5`，`B`、`W`、`R`、`+` 等标记；封装内有黄色荧光层区域和多个芯片区域 | 与现有 RGBW 四通道研究相符；焊点与遮挡处不能仅凭照片补出完整线路 |
-| 主板正面 | `HE-750G24`，U1 上的 `ST17H66B`，标注 `16.000 MHz` 的晶振、按键和 `P10P9` 四孔接口 | 与已研究主板对应；固件版本必须另外从设备读取，不能由外观确定 |
-| 主板背面 | 走线、过孔、安装孔与电源触点 | 可用于对照正面定位；不能据此宣称线路已经测通或确定每路 GPIO 对应 |
-| 装配 | 灯板与透明光学件的位置、主板安装方式、外壳与电池仓 | 用于辨认结构关系，不是完整拆装教程 |
+| LED board | `HE-590L5`; `B`, `W`, `R`, and `+`; a phosphor region and multiple die regions. | Consistent with the RGBW research record. The photograph does not establish every connection. |
+| Controller front | `HE-750G24`; `ST17H66B` on U1; `16.000 MHz`; button; four-hole `P10P9` port. | Matches the studied board. Read the firmware version from the device. Appearance cannot establish it. |
+| Controller rear | Traces, vias, mounting holes, and power contacts. | Useful for locating parts. No continuity test or full GPIO map is established by the image. |
+| Assembly | LED and optical-part positions, board mounting, shell, and battery holder. | Shows the arrangement. It is not a complete disassembly guide. |
 
-照片是外观证据。供电、电气连接和信号语义应分别核对测量与协议记录；[协议说明](PROTOCOL.md) 和 [函数目录](FUNCTIONS.md) 保留历史实测、静态逆向及未确认项。
+Photographs establish appearance. Check electrical connections and signal meanings separately. [Protocol](PROTOCOL.md) and [Functions](FUNCTIONS.md) distinguish hardware observations from static analysis.
 
-## RGBW 与混色
+## RGBW behavior
 
-这颗灯珠包含红、绿、蓝和独立白光通道。`W` 标记与荧光层区域能帮助理解实物结构；下面的控制规则来自既有固件分析和设备记录，而不是从照片推测：
+The LED package has red, green, blue, and separate white channels. The W marking and phosphor region help identify the structure. The following rules come from firmware analysis and device records, not from the photographs:
 
-- GATT 设色帧只有三个颜色字节。`R = G = B > 0` 时，固件改用白光通道；三个值都为零时熄灯。
-- 因而“发送等值 RGB”在这块棒子上不代表三个彩色通道一起混白。网页对白色、灰色使用该行为，对其他颜色避免四舍五入后意外变成等值。
-- 目前未确认通过现有接口同时、独立控制 RGB 和 W 的方法。SDK 不提供未经验证的四通道接口。
+- A GATT color frame contains three color bytes. For `R = G = B > 0`, the firmware selects W. All-zero RGB turns the light off.
+- Equal RGB values therefore do not mean that the three colored channels mix white. The browser uses this behavior for white and gray. It prevents rounding from selecting W for other colors.
+- Independent, simultaneous control of RGB and W through this interface has not been established. The SDK does not expose an unverified four-channel function.
 
-白光与 RGB 混色是不同的出光路径。照片无法测得通道亮度、光谱或色准，也不能证明偏色来自固件。网页的经验映射和适用边界见 [观感混色](COLOR-MIXING.md)。
+White and mixed RGB use different output paths. A photograph cannot measure channel brightness, spectrum, or color accuracy. It also cannot prove that a color error comes from firmware. See [Color mixing](COLOR-MIXING.md).
 
-## 继续开发
+## Continue the research
 
-1. 对照主板、灯板丝印与布局，再读取固件版本。当前记录面向 `HE-750G24` / `HE-590L5`、固件 `V4.1.8`；外观相同不保证协议兼容。
-2. 从 [SDK 示例](SDK.md#开始使用) 连接自己的设备，记录设色输入、回包与可见结果。SDK 接受原始 RGB，网页的观感映射是另一步。
-3. 需要追踪内部行为时，从 [函数与证据](FUNCTIONS.md) 找到入口，再按 [逆向环境](../re/README.md) 使用自己的固件重建分析。
-4. 只有需要固件研究时才考虑串口。四孔的位置可由照片辨认，接线与互斥供电要求仍按 [备份说明](PROTOCOL.md#备份固件) 核对；本轮没有进行电路通断或接线复验。
+1. Compare board markings and layout. Read the firmware version. Current records describe `HE-750G24`, `HE-590L5`, and firmware `V4.1.8`. Similar appearance does not guarantee protocol compatibility.
+2. Connect to your device with an [SDK example](SDK.md). Record input bytes, replies, and visible output. The SDK accepts raw RGB; the browser map is a separate stage.
+3. Use the [function map](FUNCTIONS.md) to locate internal behavior. Follow [reverse-engineering setup](../re/README.md) with your own firmware.
+4. Use the serial port only if firmware research requires it. Follow the mutually exclusive power options in [Protocol](PROTOCOL.md). The photographs do not verify wiring or electrical continuity.

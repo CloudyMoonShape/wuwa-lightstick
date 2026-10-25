@@ -1,132 +1,179 @@
-# 硬件与协议
+# Hardware and protocol
 
-[文档](README.md) · [硬件实拍](HARDWARE.md) · [开发 SDK](SDK.md) · [函数与证据](FUNCTIONS.md)
+[简体中文](zh-CN/PROTOCOL.md) · [Hardware photos](HARDWARE.md) · [SDK](SDK.md) · [Function reference](FUNCTIONS.md)
 
-这里保留研究样机的硬件、控制协议、备份方法与历史记录。实物观察和静态逆向分别标明；命令均在仓库根目录执行。仅使用网页无需拆机或准备逆向环境。
+These records describe one research sample. Device observations and static analysis have different evidence limits. Run commands from the repository root. Browser control does not require disassembly or a firmware backup.
 
-## 硬件
+## Hardware
 
-| 部分 | 内容 |
+| Part | Sample |
 |---|---|
-| 主板 | 丝印 `HE-750G24`，主控 ST17H66B（伦茨，PHY62x2 系 BLE SoC），16 MHz 晶振，板载天线 |
-| 灯板 | 丝印 `HE-590L5`，一颗 RGBW 共阳灯珠，Q1–Q4 四个三极管低边开关 |
-| 供电 | 3×AAA（4.5 V），U2 稳压给主控 |
-| 烧录口 | 左下 4 孔，丝印 `P10P9`：`−` / `+` / `P10`（芯片 RX）/ `P9`（芯片 TX） |
+| Main board | `HE-750G24`; ST17H66B controller, identified with the PHY62x2 BLE family; 16 MHz crystal; PCB antenna |
+| LED board | `HE-590L5`; one common-anode RGBW package; four low-side transistor switches, Q1–Q4 |
+| Power | Three AAA cells, 4.5 V nominal; U2 supplies the controller |
+| Serial pads | Four holes marked `P10P9`: `−`, `+`, `P10` (chip RX), `P9` (chip TX) |
 
-## 已知结论（2026-10-19 蓝牙实测）
+## GATT connection
 
-- 只要装着电池，蓝牙就一直开着，广播名 `JFKJ-FBFB`，可连接；"关机"只是关灯。
-- GATT：`180A`（只有固件版本 `V4.1.8`）、`FA00`{`FA01` read/notify，`FA02` write}、PhyPlus OTA `5833ff01`{`ff02` write，`ff03` notify}。
-- 不管什么状态，连上约 8 秒就被棒子踢掉（status 19）；往 `FA02` 写颜色候选全部无效。`FA02` 的描述是 SDK 模板串 `CharReadonly`。
-- 演唱会现场按键会被锁、离场后恢复手控，所以现场控制走的是无连接广播，不是 GATT。
-- **不要往 OTA 服务写任何东西**：没有备份时可能变砖。
+The sample advertises as `JFKJ-FBFB` while batteries are installed. The off state turns off the light but leaves Bluetooth available.
 
-2026-10-22 固件逆向后，上面「FA02 写颜色无效」和「8 秒踢人」都有了解释：FA02 要先写口令（见下）。
+| Service | Characteristics |
+|---|---|
+| `180A` | Firmware version `V4.1.8` |
+| `FA00` | `FA01`: read/notify; `FA02`: write |
+| PhyPlus OTA `5833ff01` | `ff02`: write; `ff03`: notify |
 
-## GATT 控制协议（固件逆向，2026-10-22）
+Do not write to the OTA service. An unverified write can make the device unusable.
 
-- 连上后 8 秒内往 `FA02` 写 ASCII `JFKJ-20250421`（固件里的明文串）。固件比对通过就停掉踢人计时器，并从 `FA01` 原样通知回来。通过时棒子闪 3 次蓝灯（约 0.9 秒，2026-10-22 实测确认）；动画期间会关掉 RGB 通道，所以命令要等它放完再发。
-- 之后每次写 `FA02` 是一帧：`命令, 参数…, 校验`，校验字节让整帧逐字节相加为 0（mod 256）。校验不对的帧直接丢。棒子每处理一帧从 `FA01` 回一帧。
-- 命令 `0x01`：`01 xx G R B 校验` 设颜色（注意是 G R B，2026-10-22 实测发 `ff 00 00` 亮绿）。2026-10-22 实测红、绿都对，断开连接后颜色保持。棒子在灯效模式 2/4 时回包首字节是 `0xa1`，颜色存成灯效色而不是直接点亮，实测效果一样。第 2 字节固件不用。R=G=B 且不为 0 时改点白光通道，全 0 = 灭。
-- 2026-10-24 已静态追踪 `02` 单色呼吸、`03` 三色渐变、`04` 单色闪烁、`05` 三色跳变、`06` 三色呼吸，以及 `0d` / `0e` 直接输出。参数、回复与边界见 [内置能力](NATIVE-EFFECTS.md)。这些新指令尚未完成实物验收；`03` 会启动渐变，不能作为复位。
+Initial tests on 2026-10-19 disconnected after about 8 seconds with status 19. Candidate color writes had no effect. The `FA02` description was the SDK template string `CharReadonly`. Analysis on 2026-10-22 identified the missing handshake:
 
-首页分为原生灯效、延伸灯效与音乐律动三个同级入口。普通首页默认原生常亮，`?engine=native` 预选内置呼吸；延伸与音乐由浏览器逐帧计算颜色。原生使用已追踪布局的内置命令，单色效果只在基础色或亮度变化时更新；固定三色预设不持续发色。试验会话切回网页时使用带白光保护的连续设色路径；完整状态机与命令表见 [内置能力](NATIVE-EFFECTS.md)。
+1. Write ASCII `JFKJ-20250421` to `FA02` within 8 seconds of connection.
+2. Subscribe to `FA01` and require an exact echo. The firmware then stops its disconnect timer.
+3. Wait for the three blue flashes to finish before sending colors. The observed animation lasted about 0.9 seconds. The SDK waits 1.2 seconds; the Python tool waits 1.5 seconds.
 
-「音乐律动」区：音源可选本地音乐文件、共享 Chrome 标签页声音（比如网页版音乐播放器）或麦克风。网页自己做频谱分析和节拍检测（低频谱通量 + 自适应门限 + 静音门），有 6 种律动模式。延迟的处理办法是把音乐播放推迟「同步」毫秒，帮助调整声音和灯光同步；「估算同步」根据浏览器写入耗时估算这个值，不是光学延迟测量，需按观感微调。麦克风收的是已经放出来的声音，推迟不了，所以延迟最大。
+The handshake is plaintext. It is not cryptographic authentication.
+
+## GATT frames
+
+Write one frame per `FA02` operation:
+
+```text
+command, parameters..., checksum
+checksum = -sum(command and parameters) mod 256
+```
+
+The complete byte sum must be 0 modulo 256. Firmware drops frames with an invalid checksum. The notification path returns a reply on `FA01` after command processing. A reply is not an optical measurement.
+
+Command `01` has six bytes:
+
+```text
+01 00 G R B checksum
+```
+
+The second byte is unused in the analyzed branch; the SDK sets it to zero. The wire order is **GRB**, although the SDK accepts RGB. Red and green output, and color retention after disconnect, were observed on 2026-10-22.
+
+Equal, nonzero RGB selects the white channel. All-zero RGB turns the light off. In modes 2 and 4, a color write updates the effect's base color and can return prefix `a1`. It does not stop the effect.
+
+The owner confirmed smooth single-color native breathing (`02`) on the sample. Other native commands have static-analysis and simulated-test evidence, but still need individual hardware tests. Command `03` starts a three-color fade; it is not a reset. See [native effects](NATIVE-EFFECTS.md) for command layouts, replies, and mode changes.
+
+## Controller behavior
+
+The controller provides native effects, browser-generated effects, and music response as three peer controls. The default is steady native output. `?engine=native` selects native breathing.
+
+Native single-color effects need updates only when their base color or brightness changes. Fixed firmware palettes do not receive continuous color writes. Browser effects and music response calculate colors on the host. Mode changes use the stop command and a continuous-output path with white-channel protection.
+
+Music input can come from a local file, shared Chrome tab audio, or a microphone. The browser analyzes the spectrum and detects beats with low-frequency spectral flux, an adaptive threshold, and a silence gate. Six music modes are implemented.
+
+The synchronization control delays audio playback. Its estimate uses browser write duration, not measured optical latency. Adjust it by observation. A microphone hears sound that has already played; the controller cannot delay that original sound.
+
+To run the controller locally:
 
 ```bash
-python3 -m http.server 8765 -d web    # 然后 Chrome 打开 http://localhost:8765
+npm run build
+python3 -m http.server 8765 -d dist
 ```
 
-`scripts/stick_ble.py` 实现了口令 + 设颜色，`color R G B` 按常规顺序写，脚本内部换成 G R B。
+Open `http://localhost:8765` in a compatible browser. The build inserts the shared header and footer.
 
-## 现场广播协议（固件逆向，2026-10-22，未实测）
+`scripts/stick_ble.py` provides the handshake and color commands. `color R G B` takes RGB input and converts it to GRB.
 
-**不要在演出或活动现场发送这些包。** 它们可能控制周围其他人的棒子；类型 6 会把分组号写入他人设备的 flash `0x3c000`，掉电不会恢复。本仓库脚本仅生成字节，不包含射频发送器。
+## Venue broadcast research
 
-固件里有一个独立的任务绕开 BLE 协议栈、直接操纵射频，开机 1 秒后起一直在收。空口参数：
+The following parameters come from static analysis on 2026-10-22. They have **not** been verified with an RF transmitter or receiver.
 
-| 项 | 值 |
+Do not transmit these packets at an event. They can affect nearby lightsticks. Type 6 can write a group number to another device's flash. Power cycling does not undo that write. The repository only provides byte construction, not an RF transmitter.
+
+The analyzed firmware has a raw RF task separate from the BLE stack. It starts reception about one second after power-on.
+
+| Parameter | Static finding |
 |---|---|
-| 调制 | BLE Coded PHY，S=8（125 kbps 长距离模式） |
-| 频率 | 2478 MHz（不是三个广播信道之一，所以普通扫描看不到） |
-| Access Address | `0x8E89BED6`（就是 BLE 广播用的那个） |
-| CRC | BLE CRC24，初值 `0x555555` |
-| 白化种子寄存器 | `0x38`（不符合 SDK 按信道算种子的公式，实际 LFSR 初值要实测确认） |
-| 包结构 | 2 字节头（第 2 字节 = 后面总长）+ 6 字节 AdvA + 载荷；AdvA 为 `11:11:11:11:11:11` 的包被丢弃 |
+| Modulation | BLE Coded PHY, S=8; 125 kbps |
+| Frequency | 2478 MHz; not one of the three BLE advertising channels |
+| Access Address | `0x8E89BED6` |
+| CRC | BLE CRC24; initial value `0x555555` |
+| Whitening seed register | `0x38`; does not match the SDK's channel-derived formula. The actual LFSR initial state needs an RF test. |
+| Packet | Two-byte header, six-byte AdvA, payload. Header byte 2 gives the following length. AdvA `11:11:11:11:11:11` is rejected. |
 
-载荷 `P[0..n-1]`：`P[n-1]` 是密钥字节，`P[1..n-2]` 全部和 `表[P[n-1] & 0x3f]` 异或（表是固件里 64 字节常量，在 `scripts/venue_packet.py`）；解出来后 `P[n-2]` 要等于 `P[0..n-3]` 之和。`P[0]` 高 4 位是类型：
+For payload `P[0..n-1]`, the last byte selects an XOR table entry. Decode `P[1..n-2]` with `table[P[n-1] & 0x3f]`. The 64-byte table is in `scripts/venue_packet.py`. After decoding, `P[n-2]` must equal the byte sum of `P[0..n-3]` modulo 256. The upper four bits of `P[0]` select the type.
 
-| 类型 | 作用 |
+| Type | Meaning |
 |---|---|
-| 1 | 每组 3 字节 RGB，第 g 组在 `P[3g-1..3g+1]` |
-| 2 | 20 位分组掩码（`P[2]` 低 4 位、`P[3]`、`P[4]`，第 g 组看第 g-1 位）+ `P[5]` 低 4 位灯效号 |
-| 3 | 亮度 |
-| 4 | 第 g 组的预设色号在 `P[g]` |
-| 6 | 把 `P[5]`（1–20）写进 flash `0x3c000` 当本棒分组号——会改写 flash，别随手发 |
+| 1 | Three RGB bytes per group. Group `g` uses `P[3g-1..3g+1]`. |
+| 2 | A 20-bit group mask: lower four bits of `P[2]`, then `P[3]` and `P[4]`. Group `g` uses bit `g-1`. The lower four bits of `P[5]` select the effect. |
+| 3 | Brightness |
+| 4 | Group `g` uses preset color number `P[g]`. |
+| 6 | Write `P[5]`, from 1 to 20, to flash `0x3c000` as the device group. This is persistent. |
 
-- 本棒分组号存在 flash `0x3c000`，备份里是 `2`。
-- 每收到一个有效包就重置一个 30 分钟计时器并锁住按键，所以「离场约半小时后恢复手控」。
-- 手机、Mac 都发不了这种包（自定义频率、Coded PHY、自定义白化），要用能直接操纵射频的板子，比如 nRF52840。`scripts/venue_packet.py` 只负责拼出要发的字节。
+The reference backup stores group 2 at flash `0x3c000`. The receive path resets a 30-minute timer and locks the physical button after a valid packet. This is consistent with the observed button lock at a concert and later recovery. That observation alone does not verify the RF parameters.
 
-## 目录
+Normal phone and desktop Bluetooth APIs do not expose the required raw radio controls. A separate radio implementation is required. The packet-generation script does not provide one.
 
-```
-scripts/phy_read.py   只读备份整片 flash（读两遍比对 sha256）
-scripts/stick_ble.py  GATT 口令 + 设颜色
-scripts/venue_packet.py  拼现场广播包
-web/index.html        网页控制台（Web Bluetooth）
-re/ghidra/            Ghidra 无界面分析脚本，用法见 re/README.md
-vendor/               （不入 git）pvvx 的 rdwr_phy62x2.py
-backup/               （不入 git）原厂固件 dump
-.venv/                （不入 git）pyserial + bleak
-```
+## Research files
 
-## 准备环境
+| Path | Purpose |
+|---|---|
+| `scripts/phy_read.py` | Read flash twice and compare hashes |
+| `scripts/stick_ble.py` | GATT handshake and color control |
+| `scripts/venue_packet.py` | Construct venue packet bytes; no transmission |
+| `re/ghidra/` | Headless analysis scripts |
+| `vendor/` | Local third-party tools; excluded from Git |
+| `backup/` | Local firmware reads; excluded from Git |
+| `.venv/` | Local Python environment; excluded from Git |
+
+## Prepare the serial tools
 
 ```bash
 python3.12 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
-mkdir -p vendor && curl -sSfL -o vendor/rdwr_phy62x2.py \
+mkdir -p vendor
+curl -sSfL -o vendor/rdwr_phy62x2.py \
   https://raw.githubusercontent.com/pvvx/THB2/1454c2748f1fd5cff9f852173f25dc687aa292ba/rdwr_phy62x2.py
 shasum -a 256 vendor/rdwr_phy62x2.py
-# 应为 1d23bc1cfa1cb82908626d4777923c2cca6a5d0230769f6e8a8681cee83395f5
 ```
 
-## 备份固件
+Expected SHA-256: `1d23bc1cfa1cb82908626d4777923c2cca6a5d0230769f6e8a8681cee83395f5`.
 
-仅进行网页控制不需要拆机或串口。以下只面向自行备份固件的开发者。
+## Back up firmware
 
-原始 README 记录的是 USB 串口 3.3 V 供电；后续交接记录要求电池供电加三根信号线。两种方式必须互斥，原资料未解释切换原因，本轮未做接线复验。确认板子、电源及串口均为适用电平后，只选一种：
+This procedure is for developers who read their own device. The browser controller does not need it.
 
-- **电池供电**：只接 `− → GND`、`P10 → TX`、`P9 → RX`，串口的 `3V` 与 `+5V` 都不接。需要重新上电时断开、再接回电池。
-- **USB 串口 3.3 V 供电**：先取下所有电池，再按下表连接；确认模块供电能力及输出为 3.3 V。
+Historical notes contain two power arrangements: USB serial power at 3.3 V, and battery power with three signal wires. The reason for the change was not recorded. Neither arrangement was retested during this documentation audit. Check voltage levels and board connections before use. Select only one power source.
 
-**电池和 3V 不可同时接；+5V 永远不接板子。断电后再调整接线。**
+- **Battery power:** connect `− → GND`, `P10 → TX`, and `P9 → RX`. Leave serial `3V` and `+5V` disconnected. Disconnect and reconnect the batteries when a power cycle is required.
+- **USB serial power:** remove all batteries first. Confirm a 3.3 V supply and sufficient current capacity. Use the connections below.
 
+Do not connect batteries and serial `3V` at the same time. Never connect `+5V` to the board. Disconnect power before changing wires.
 
-| 板子 | 串口模块 |
+| Board | USB serial adapter |
 |---|---|
-| `+` | `3V` |
+| `+` | `3V`, only in USB-powered mode |
 | `−` | `GND` |
 | `P10` | `TX` |
 | `P9` | `RX` |
-| — | `+5V` 不接 |
+| — | Leave `+5V` disconnected. |
+
+Replace the serial device path with your adapter's path:
 
 ```bash
 mkdir -p backup
 .venv/bin/python -I scripts/phy_read.py /dev/cu.usbserial-0001
 ```
 
-脚本提示后按所选方式重新上电：电池模式重新接入电池，USB 供电模式再插上 3V。芯片启动握手窗口约 10 秒，脚本会持续尝试最多 10 分钟。没反应先断电，再核对或对调 P9 / P10；脚本内的“拔插 3V”提示仅适用于 USB 供电模式。
+When prompted, power-cycle the device using the selected supply. The boot handshake window is about 10 seconds. The script retries for up to 10 minutes. If it does not connect, remove power and check the P9/P10 connections. Reconnect serial `3V` only in USB-powered mode. In battery-powered mode, reconnect the batteries.
 
-### 历史样机备份记录（2026-10-21，不随仓库分发）
+### Reference backup record
 
-- 芯片应答 `Revision 001260c4 6222M005`：ST17H66B 就是 PHY6222；flash 256 KB，状态寄存器 `0x00`（原厂没开写保护），唯一 ID `7991130c0579e019`。
-- 整片读了两遍，只有偏移 `0x30100` 这一个字不同。用 `--peek` 低速复读 50 遍：这个字每次读到的值都在变（`ffffe67d` / `ffffe67f` / `ffff667d` …），而周围的字 50 遍全部稳定。原记录据此推测该 flash 单元处于临界状态，可能曾在写入期间掉电；这属于解释性推断，未通过芯片级测试排除所有其他原因。备份已经不可能比芯片本身更准确，以 `read1` 为准。
-- `read1` sha256 `8be1f64cd4b084e213e353f449ced36b8dd835e3dbcf7e6e1628f48db281182c`
-- `read2` sha256 `8a2391932a7b370f77b912cd671e9393ff0a16658c62054735d8d160d51d769f`
+The 2026-10-21 sample returned `Revision 001260c4 6222M005`, consistent with the PHY6222 identification. Flash capacity was 256 KB. The status register was `0x00`, with no factory write protection reported.
 
-`phy_read.py --peek ADDR SIZE N` 会把指定区间读 N 遍，统计每个字读到的各种值，用来核对两遍备份之间的差异。
+Two full reads differed at one word, offset `0x30100`. Fifty slow repeated reads with `--peek` produced changing values there, including `ffffe67d`, `ffffe67f`, and `ffff667d`. Nearby words remained stable.
 
-`phy_read.py` 去掉了上游连接时默认做的 `FlashUnlock`（会把 flash 状态寄存器写成 0），对 flash 只读。如果连上时提示芯片处于 FCT 模式，**不要**按上游提示去执行 `ea`（全片擦除）。
+The original notes suggested an unstable flash cell, possibly after interrupted programming. This is an inference, not a chip-level diagnosis. The analysis uses `read1` as its reference. The anomaly does not prove that all other backup bytes are correct.
+
+| Read | SHA-256 |
+|---|---|
+| `read1` | `8be1f64cd4b084e213e353f449ced36b8dd835e3dbcf7e6e1628f48db281182c` |
+| `read2` | `8a2391932a7b370f77b912cd671e9393ff0a16658c62054735d8d160d51d769f` |
+
+The backups are not distributed. `phy_read.py --peek ADDR SIZE N` reads a region repeatedly and reports the observed values for each word.
+
+`phy_read.py` removes the upstream `FlashUnlock` step, which would write zero to the flash status register. Here, *read-only* means no flash write; serial and peripheral registers are still initialized. If the device reports FCT mode, do not run the upstream `ea` command. That command erases the whole flash.

@@ -1,32 +1,33 @@
-# 国内访问速度
+# Network measurements
 
-2026-10-24 20:16:23–20:16:49 UTC（北京时间 10 月 25 日 04:16）从中国大陆一条联通 IPv6 线路实测。正式首页 HTML 完整接收的中位时间为 **0.713 秒**，10 次均成功。这个结果仅代表当时这条线路。
+[Documentation](README.md) · [简体中文](zh-CN/PERFORMANCE.md)
 
-## 测量结果
+These are historical measurements from 2026-10-24, 20:16:23–20:16:49 UTC. One China Unicom IPv6 connection in mainland China received the production HTML in a median of **0.713 seconds**. This result describes that connection and time only. It is not a measurement of the current revision.
 
-| 目标 | 成功 | 首字节中位 | 完整接收中位 | 完整接收范围 |
+| Target | Successful requests | Median first byte | Median complete response | Complete response range |
 |---|---:|---:|---:|---:|
 | `wuwa.south-wall.com/` | 10/10 | 0.686 s | 0.713 s | 0.675–0.765 s |
 | `wuwa-lightstick.pages.dev/` | 10/10 | 0.675 s | 0.699 s | 0.651–0.759 s |
-| 主域名 `/api/visitors` GET | 10/10 | 0.830 s | 0.830 s | 0.801–0.925 s |
+| Production `/api/visitors` GET | 10/10 | 0.830 s | 0.830 s | 0.801–0.925 s |
 
-主域名的 TCP 建连中位耗时约 206 ms，TLS 握手额外约 217 ms；收到首字节后，下载正文中位约 27 ms。Cloudflare 返回 `loc=CN`、`colo=LAX`、`warp=off`，即国内出口连接到洛杉矶边缘节点。结合这些数据，当前等待主要发生在跨境连接与响应阶段，继续压缩几 KB 对这条线路的改善空间较小。
+The production connection took a median of approximately 206 ms for TCP and another 217 ms for TLS. The body took approximately 27 ms after the first byte. Cloudflare reported `loc=CN`, `colo=LAX`, and `warp=off`. These observations suggest that connection and response latency dominated that run.
 
-当前首页解压后 103,214 字节，复核时 gzip 正文为 31,472 字节（约 31.5 KB）。控制程序、样式和字体都在这一个 HTML 内；用户主动打开说明页面后才会加载说明和照片。计数接口在页面初始化后独立执行，最多等 6 秒，失败则隐藏计数，不阻塞蓝牙控制。
+The measured revision contained 103,214 uncompressed HTML bytes. Follow-up gzip responses contained 31,472 bytes. One earlier sample contained 30,648 bytes; its body was not saved, so the cause is unknown. The sample remains in the data. Four later reads, across both domains and their two IPv6 addresses, matched the local build hash.
 
-30 次性能采样中，主域名第 2 次 gzip 字节数为 30,648，其余首页均为 31,472；当时未保存正文，不能确定差异原因。随后对两域名的两个 IPv6 地址分别回读，4 次均得到 103,214 字节，SHA-256 均与当前构建一致且含计数模块。原始差异保留在数据里，没有筛除该样本。
+## Method and limits
 
-## 方法与范围
+- curl 8.5.0 opened a new connection for each request. It used HTTP/1.1, gzip, certificate validation, no retries, and an eight-second timeout.
+- The three targets alternated, with ten requests per target.
+- IPv6 was forced. Explicit client proxies were disabled. The route was checked before the test.
+- DNS caches were warm. Median DNS time was approximately 0.7 ms. System, upstream DNS, and CDN caches were not cleared.
+- Counter requests used GET. They did not register test visitors. Each request opened a new connection, unlike a browser that can reuse a connection.
+- The test did not cover other carriers, IPv4, other locations, or peak hours. It did not measure browser rendering, first contentful paint, largest contentful paint, or time to interaction.
 
-- 在国内设备执行 curl 8.5.0，每个样本启动新进程、新建连接；HTTP/1.1，启用 gzip，验证 HTTPS 证书，不重试，单次上限 8 秒。三种目标交替请求，各 10 次。
-- 强制 IPv6 直连并禁用客户端显式代理。该办公室 IPv4 对海外网站会经美国代理，实测出口为 US，因此没有把它计入国内直连结果。
-- DNS 缓存已热，本轮解析中位约 0.7 ms；没有清理系统、上游 DNS 或 CDN 缓存。这不是首次 DNS 冷启动测试，也不是浏览器 FCP / LCP 或按钮可交互时间。
-- 计数仅执行 GET，不创建匿名身份、不增加生产计数。真实浏览器通常可复用首页连接；表中接口数据包含一次独立连接，且不代表 POST 写入耗时。
-- 仅覆盖这一条联通 IPv6 线路、单一时段；未测电信、移动、普通 IPv4、晚高峰和其他城市。现有另一节点无可用外网路径，不作为网站失败样本。不能据此声称全国都能在一秒内打开。
+See the [raw data](benchmarks/2026-10-24-cn-unicom-ipv6.json). It excludes client public addresses, browser identities, and credentials.
 
-原始请求记录与后续内容核对见 [JSON 数据](benchmarks/2026-10-24-cn-unicom-ipv6.json)。数据不包含客户端公网地址、浏览器身份或凭据。
+## Repeat the check
 
-在具备国内原生 IPv6 的设备上可重复检查：
+Use a device with a verified direct mainland China IPv6 route:
 
 ```sh
 curl -6 --noproxy '*' --compressed -sS -o /dev/null \
@@ -35,4 +36,4 @@ curl -6 --noproxy '*' --compressed -sS -o /dev/null \
   https://wuwa.south-wall.com/
 ```
 
-测速工具接收完 HTML 后不会运行 JavaScript，因此这个命令不会增加访客计数。应先确认运行设备确实从国内直出，再解释结果。
+curl does not execute JavaScript, so this command does not register a visitor. Record the revision, route, carrier, time, and response sizes with new results. Use `npm run build` for the current local payload size.

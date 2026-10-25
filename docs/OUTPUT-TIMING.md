@@ -1,49 +1,57 @@
-# 高发送率试验
+# Output timing
 
-[打开 120 档](https://wuwa.south-wall.com/?engine=web&rate=120) · [打开 90 档](https://wuwa.south-wall.com/?engine=web&rate=90)
+[中文](zh-CN/OUTPUT-TIMING.md) · [90 writes/s target](https://wuwa.south-wall.com/?engine=web&rate=90) · [120 writes/s target](https://wuwa.south-wall.com/?engine=web&rate=120)
 
-延伸灯效和音乐律动的逐帧输出默认上限为 60 次/秒。试验链接进入延伸灯效，选择「调速呼吸」后比较；链接只改变发送上限，颜色、亮度曲线与呼吸周期沿用当前版本。原生呼吸由灯棒内部运行，不受此上限影响。展开「连接详情」可在 60 / 90 / 120 间切换，无需重新连接蓝牙；所选档位保存在当前网址，刷新保留。推荐用相同颜色、亮度和 3× 速度依次比较，观察真实灯光，以及写入和设色回包次数。
+Extended effects and music default to a target limit of 60 writes per second. The links above select the extended engine with a higher limit. They do not change the color map, brightness curve, or breathing period. Native breathing runs inside the lightstick and does not use this frame limit.
 
-## 从屏幕刷新中独立
+Open connection details to select 60, 90, or 120 without reconnecting. The URL retains the selection. To compare settings, use the same color, brightness, and 3× browser breathing speed. Observe the light and the write/reply counts.
+
+## Scheduling
 
 ```mermaid
 flowchart LR
-    Controls[颜色 / 亮度 / 速度] --> Scene[共享灯效时间与调光状态]
-    Screen[屏幕刷新] --> Scene
-    Scene --> Preview[预览与界面]
-    Timer[60 / 90 / 120 发送上限] --> Fresh[上次写完后采样当前灯效]
-    Scene --> Fresh
-    Fresh --> Mix[原有观感混色与 8 位取整]
-    Mix --> Changed{RGB 有变化?}
-    Changed -->|是| SDK[SDK 串行写入 FA02]
-    Changed -->|否| Timer
-    SDK --> Timer
-    Device[FA01 设色回包] --> Counter[独立计数]
+  Controls[Color, brightness, speed] --> Scene[Shared effect time and dimming state]
+  Screen[Screen refresh] --> Scene
+  Scene --> Preview[Screen preview]
+  Timer[Write-rate target] --> Fresh[Sample after the previous write completes]
+  Scene --> Fresh
+  Fresh --> Mix[Color map and eight-bit rounding]
+  Mix --> Changed{RGB changed?}
+  Changed -->|Yes| SDK[Serial FA02 write]
+  Changed -->|No| Timer
+  SDK --> Timer
+  Device[FA01 control reply] --> Counter[Separate counter]
 ```
 
-原网页把输出绑在 `requestAnimationFrame` 上，60 Hz 屏幕每秒最多产生约 60 个新采样。现在 `web/output.js` 的 `FrameSender` 单独安排采样与写入；屏幕预览仍随屏幕刷新。普通呼吸等无内部状态的灯效，每次真正有机会发报时重新计算当前时刻的颜色。音乐分析和有内部状态的音乐灯效只随界面更新，避免多计节拍或加快色相漂移。
+The earlier sender used `requestAnimationFrame`. A 60 Hz screen could produce at most about 60 new samples per second. `FrameSender` in `web/output.js` now schedules output separately. Screen preview still follows screen refresh.
 
-调度器保持一个写操作在途，不排队补发旧采样。一次写入超过目标间隔时，写完就取当前帧；相同 RGB 不重复发送。页面隐藏、断线或停止灯效时取消输出，恢复后重新取当前帧。旧连接迟到的完成或失败不会覆盖新一轮发送状态。
+Stateless effects calculate the current color when a write is possible. Audio analysis and stateful music effects update with the interface. This avoids counting a beat twice or accelerating hue drift.
 
-网页专用 SDK 实例传入 `minGapMs: 0`，由 `FrameSender` 统一限速，避免两个等待器叠加。公开 `LightstickClient` 的默认最小间隔仍是 `1000 / 60` ms；开发者不能只把 SDK 间隔设为零就认为链路能无限提速。
+Only one write can be in progress. The sender does not queue old samples. If a write takes longer than the target interval, the next write uses the current frame immediately. Equal RGB values are not sent again. Hiding the page, disconnecting, or stopping the effect cancels output. A resumed sender samples the current state. Late results from an old connection cannot replace the new sender state.
 
-## 读数与实际限制
+The browser-specific SDK client uses `minGapMs: 0`. `FrameSender` supplies the delay, so two limiters do not add their waits. The public `LightstickClient` still defaults to `1000 / 60` ms. A zero SDK delay does not imply unlimited link speed.
 
-| 显示 | 意义 |
+## Counters and limits
+
+| Reading | Meaning |
 |---|---|
-| 发送上限 | 网页逐帧发送的软件目标；60 / 90 / 120 不是实测灯光刷新率，也不调节内置灯效速度 |
-| 写入次数 | 浏览器成功完成设色写操作的次数，按实际经过时间换算 |
-| 指令回包 | FA01 中 `a1–a6`、`ad`、`ae` 对应已知长度、零参数位和有效校验的控制回复次数 |
-| 写入耗时 | 浏览器写操作 Promise 的耗时滑动平均，不是完整声光延迟 |
+| Rate limit | Software target for browser-generated frames. It is not measured light refresh or native-effect speed. |
+| Writes | Completed browser color/control writes, divided by elapsed time. |
+| Replies | FA01 replies `a1–a8`, `ad`, and `ae` with a known length, required zero parameter byte, and valid checksum. |
+| Write time | Moving average of the browser write Promise duration. It is not complete audio-to-light latency. |
 
-等待时间向上取整为整数毫秒。理想的 2 ms 写入下，三个档位的相邻开始间隔分别约为 17 / 12 / 9 ms，即约 59 / 83 / 111 次采样每秒。相同 RGB 去重、浏览器调度和链路延迟会进一步降低实际写入次数；35 ms 才完成一次写入的链路不能靠调高上限突破约 29 次/秒。
+Waits round up to integer milliseconds. With an ideal 2 ms write, the three targets give approximately 17, 12, and 9 ms between write starts: about 59, 83, and 111 samples per second. Deduplication, browser scheduling, and link delay can reduce actual writes further. A link that needs 35 ms per write cannot exceed about 29 writes per second by raising the target.
 
-已分析固件的 FA02 回调先复制到单个缓冲区，约 10 ms 后处理。更密的指令可能在处理前覆盖中间状态；定时器的重启行为与实际吞吐还需实物验证，因此 120 档不一定比 90 档更顺，不能把 10 ms 直接当成已测得的 100 Hz 硬上限。回包没有逐帧序号，统计不能完美对应每次写入，也不代表 LED 的光学输出已经测量。若写入很多、回包偏少或观感更差，请在同一连接里切到 90 或 60 对照。
+Static analysis shows that the FA02 callback copies data to one buffer and schedules processing about 10 ms later. Faster writes may replace an intermediate state before processing. Timer restart behavior and actual throughput still need hardware tests. The 120 setting can therefore perform worse than 90. The 10 ms delay is not a measured 100 Hz hard limit.
 
-每通道仍为 8 位，增加采样只能细化时间上的间隔，不会增加 0–255 的物理档位。本页描述的提高发送率本身不改变混色或调光曲线；不加入时间抖动。后续新增 [内置能力试验](NATIVE-EFFECTS.md)，用内部计时取代逐帧发送的呼吸，并为试验会话提供 `0e` 连续设色；白光保持 `01`。当前首页提供原生、延伸、音乐三个入口；普通网址默认原生常亮，直接打开 `?engine=web` 且未切换入口时保留原输出路径作比较。
+Replies have no per-frame sequence number. Counts cannot identify every write/reply pair and do not measure optical output. If writes rise while replies fall, or the effect looks worse, compare 90 and 60 in the same connection.
 
-## 软件验证
+Each channel still has only 256 values. Faster sampling changes time resolution, not the number of brightness levels. No temporal dithering is added.
 
-虚拟时钟覆盖高于 60 Hz 的独立采样、慢链路不叠加等待、最新颜色采样、相同 RGB 去重、切档、停止/恢复、旧连接迟到失败与回包过滤。另通过真实 SDK 搭配模拟 GATT，检查单次写入、有效 GRB 字节与 60 Hz 界面下的高频输出。
+[Native effects](NATIVE-EFFECTS.md) avoid frame-by-frame breathing updates. Sessions that use the native or music section also use `0e` continuous color, with `01` retained for white. A session opened directly with `?engine=web` and not switched to another section retains the old output path for comparison.
 
-在 2 ms 写入、100% 纯红、3× 呼吸、60 Hz 界面的 4 秒模拟中，60 档发送 227 帧，120 档发送 406 帧；最大相邻 R 变化从 12 降至 6。此结果仅验证软件路径，尚未测量真实蓝牙吞吐与灯光；试验版由用户用灯棒比较。
+## Software checks
+
+Virtual-clock tests cover sampling above 60 Hz, slow writes, current-frame selection, duplicate colors, rate changes, stop/resume, late failures, and reply filtering. Tests with the real SDK and simulated GATT also check single-write serialization and GRB bytes.
+
+A four-second simulation used 2 ms writes, pure red at 100%, 3× breathing, and a 60 Hz interface. The 60 setting sent 227 frames; 120 sent 406. The maximum adjacent red-channel change fell from 12 to 6. This validates the software path only. It does not measure Bluetooth throughput or light output.

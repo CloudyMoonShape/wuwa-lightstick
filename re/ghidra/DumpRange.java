@@ -1,8 +1,8 @@
-// Ghidra postScript：反编译器恢复不了的地方（switch8 跳转表、没被识别成函数的 XIP 代码）直接看汇编。
-// 参数：输出路径，后面跟若干项：
-//   START-END  反汇编这一段并打印
-//   refs:ADDR  列出引用 ADDR 的指令和所在函数
-//   dis:ADDR   从 ADDR 起按控制流反汇编，不打印（给跳转表的各个分支用）
+// Ghidra postScript: inspect assembly for switch8 tables and unrecognized XIP functions.
+// Arguments: output path, then one or more entries:
+//   START-END  Disassemble and print this range.
+//   refs:ADDR  List instructions that reference ADDR and their containing functions.
+//   dis:ADDR   Disassemble control flow from ADDR without printing; use for jump-table branches.
 //@category PHY62xx
 
 import ghidra.app.script.GhidraScript;

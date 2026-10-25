@@ -1,6 +1,6 @@
-// Ghidra preScript：按 0x3000 应用分区表把 PHY6222 应用程序搭成运行时内存布局，
-// 并导入 ROM 符号表。导入的原始文件是整片 flash，基址 0x11000000。
-// 用法见 re/README.md。
+// Ghidra preScript: reconstruct the PHY6222 runtime layout from the table at 0x3000.
+// Import ROM symbols. Input is the full flash image at base address 0x11000000.
+// See re/README.md for usage.
 //@category PHY62xx
 
 import ghidra.app.script.GhidraScript;
@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 
 public class PhyAppLayout extends GhidraScript {
     static final long FLASH = 0x11000000L;
-    // 应用的 SRAM 段存放在 flash 0x11000 起，分区表里的偏移以此为基
+    // SRAM segments start at flash 0x11000. Partition offsets are relative to this base.
     static final long APP_STORE = 0x11000L;
 
     @Override
@@ -39,7 +39,7 @@ public class PhyAppLayout extends GhidraScript {
             long run = bb.getInt(off + 4) & 0xffffffffL;
             int size = bb.getInt(off + 8);
             if ((run & 0xffff0000L) != 0x1fff0000L) {
-                continue; // XIP 段本来就在 flash 映射里
+                continue; // XIP segments are already in the flash mapping.
             }
             byte[] seg = new byte[size];
             System.arraycopy(flash, (int) (APP_STORE + src), seg, 0, size);
@@ -51,7 +51,7 @@ public class PhyAppLayout extends GhidraScript {
             b.setExecute(true);
             b.setWrite(true);
             sramEnd = run + size;
-            println(String.format("SRAM 段 %08x <- flash %08x, %d 字节", run, APP_STORE + src, size));
+            println(String.format("SRAM segment %08x <- flash %08x, %d bytes", run, APP_STORE + src, size));
         }
         mem.createUninitializedBlock("sram_" + Long.toHexString(sramEnd), addr(sramEnd), 0x20000000L - sramEnd, false)
                 .setWrite(true);
@@ -81,9 +81,9 @@ public class PhyAppLayout extends GhidraScript {
                 count++;
             }
         }
-        println("ROM 符号 " + count + " 个");
+        println("ROM symbols: " + count + "");
 
-        // jump table：0x1fff0000 起 256 个函数指针，ROM 通过它回调应用
+        // Jump table: 256 function pointers at 0x1fff0000 for ROM-to-application callbacks.
         for (int i = 0; i < 256; i++) {
             long v = mem.getInt(addr(0x1fff0000L + i * 4)) & 0xffffffffL;
             if ((v & 1) == 1 && (v & 0xfff00000L) != 0) {

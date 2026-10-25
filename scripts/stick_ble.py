@@ -1,11 +1,12 @@
-"""通过 BLE GATT 控制应援棒（协议从固件逆向得出，见 README「GATT 控制协议」）。
+"""Control a lightstick through BLE GATT. See docs/PROTOCOL.md for evidence.
 
-连上后先往 FA02 写口令 JFKJ-20250421，棒子才会停掉 8 秒踢人计时器并接受命令；
-命令帧 = 命令字节 + 参数 + 校验字节（整帧逐字节相加为 0）。棒子每收到一帧都从 FA01 通知回一帧。
+First write JFKJ-20250421 to FA02. The firmware then stops its 8-second disconnect timer.
+A frame contains a command, parameters, and a checksum. Its byte sum is zero modulo 256.
+FA01 carries command replies. This CLI waits for startup but does not validate the echo.
 
-  .venv/bin/python -I scripts/stick_ble.py color 255 0 0      # 红
-  .venv/bin/python -I scripts/stick_ble.py color 0 0 0        # 灭
-  .venv/bin/python -I scripts/stick_ble.py raw 06 00          # 任意命令，校验字节自动补
+  .venv/bin/python -I scripts/stick_ble.py color 255 0 0      # Red
+  .venv/bin/python -I scripts/stick_ble.py color 0 0 0        # Off
+  .venv/bin/python -I scripts/stick_ble.py raw 06 00          # Raw command; append checksum automatically
 """
 import asyncio, sys
 
@@ -24,7 +25,8 @@ def frame(body):
 def parse(argv):
     if argv[0] == "color":
         r, g, b = (int(x) for x in argv[1:4])
-        # 固件的 GATT 帧按 G R B 排（现场广播是 R G B）；第 2 字节固件不用，原样回显；R=G=B 时改点白光通道
+        # GATT uses GRB; venue packets use RGB. Byte 2 is unused and echoed.
+        # Equal nonzero RGB selects the white channel; all zero turns the light off.
         return frame([0x01, 0x00, g, r, b])
     if argv[0] == "raw":
         return frame([int(x, 16) for x in argv[1:]])
@@ -34,10 +36,11 @@ def parse(argv):
 async def main(cmd):
     dev = await BleakScanner.find_device_by_name(NAME, timeout=15)
     if dev is None:
-        sys.exit(f"没扫到 {NAME}：棒子装着电池就会广播，靠近点再试")
+        sys.exit(f"Cannot find {NAME}. Check the batteries, move closer, and try again.")
     async with BleakClient(dev) as c:
         await c.start_notify(FA01, lambda _, d: print("  <-", d.hex(" ")))
-        # 口令通过后棒子闪 3 次蓝灯（约 0.9 s），期间每次翻转都会关掉 RGB 通道，命令要等它放完
+        # The accepted handshake triggers three blue flashes, about 0.9 s.
+        # Wait until the startup animation ends before sending the command.
         for data, wait in ((PASSWORD, 1.5), (cmd, 2.0)):
             print("->", data.hex(" "))
             await c.write_gatt_char(FA02, data)

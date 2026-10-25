@@ -1,5 +1,5 @@
-// Ghidra postScript：把应用程序（SRAM + 0x1102xxxx XIP）里的函数全部反编译，写成一个 C 文件。
-// 参数：输出路径
+// Ghidra postScript: export application functions (SRAM and 0x1102xxxx XIP) to one C file.
+// Argument: output path.
 //@category PHY62xx
 
 import ghidra.app.decompiler.DecompInterface;
@@ -26,6 +26,6 @@ public class ExportDecomp extends GhidraScript {
                 n++;
             }
         }
-        println("反编译函数 " + n + " 个");
+        println("Decompiled functions: " + n + "");
     }
 }

@@ -1,33 +1,63 @@
-# 混色调查与实现 · 2026-10-24
+# Color mixing
 
-## 事实与边界
+[中文](zh-CN/COLOR-MIXING.md) · [Documentation](README.md)
 
-用户肉眼确认原始 RGB 三原色正常，认可粉红 255,32,32；报告网页橙黄偏绿。没有可用的线性色度测量，因此不能认定固件错误，也不能提供已标定的通道矩阵。此前 JPEG 裁图饱和，不能估算光通量比例。旧红色45%等浏览器增益可能进一步改变混色，现保留数值但默认不启用。
+The browser uses an empirical hue map. The sample operator accepted the result by eye. It is not a colorimetric calibration.
 
-## 成熟方案调查
+Raw red, green, and blue looked correct. Pink `[255,32,32]` was also accepted. Orange and yellow from the earlier browser palette looked green. The available JPEG images had clipped highlights, so they could not establish channel output ratios. These observations do not prove a firmware defect.
 
-- FastLED 使用不同于普通计算机 HSV spectrum 的 rainbow 色相映射：https://github.com/FastLED/FastLED/wiki/FastLED-HSV-Colors
-- WLED 分开提供颜色 gamma、亮度 gamma、RGBW 白通道策略：https://kno.wled.ge/features/settings/
-- Adafruit 讨论 LED gamma，示例2.8是经验值，不是所有设备的测量结论：https://learn.adafruit.com/led-tricks-gamma-correction/the-longer-fix
+## Color path
 
-采用其设计思路，不复制实现、不引入库或许可依赖。Gamma 改变中间值，但对255,255,0两个满值不改变比例，不能单独修复偏绿黄色。硬件不同，通用代码无法代替色度测量。
+```mermaid
+flowchart LR
+  Input[Swatch, wheel, or animation RGB] --> HSV[Extract hue and saturation]
+  HSV --> Map[Apply empirical hue map]
+  Map --> Gains[Apply optional channel correction]
+  Gains --> Peak[Restore input peak]
+  Peak --> Brightness[Apply overall brightness]
+  Brightness --> Quantize[Round and protect white channel]
+  Quantize --> SDK[Send GRB frame]
+```
 
-## 新流程
+`web/color.js` contains the pure functions. The SDK does not apply this map. It sends the raw RGB values supplied by the caller.
 
-色块/色轮/动画 RGB → 提取 HSV → 观感色相映射 → 可选手动通道修正 → 保持输入峰值 → 独立整体亮度 → 量化与白通道保护 → SDK GRB帧。
+| Hue | Full-saturation output |
+|---:|---|
+| 0° | `[255,0,0]` |
+| 30° | `[255,32,0]` |
+| 60° | `[255,96,0]` |
+| 120° | `[0,255,0]` |
+| 180° | `[0,255,255]` |
+| 240° | `[0,0,255]` |
+| 300° | `[255,0,255]` |
+| 360° | `[255,0,0]` |
 
-整体亮度现由 `web/dimming.js` 提供温和调光曲线和滑块平滑；呼吸使用独立连续亮度包络。两者只改变整体缩放，不对各通道分别做 Gamma，满亮度色板保持不变。换算、低亮度限制与待实物验证范围见 [调光说明](DIMMING.md)。
+The yellow green component can be set from 16 to 255. The default is 96. The orange green component is `min(32, yellowGreen / 2)`.
 
-- `web/color.js` 是可单测纯函数。SDK本身仍接受原始RGB，不偷偷更改开发者输入。
-- 观感模式的全饱和节点：H0红255,0,0；H30橙255,32,0；H60黄255,96,0；H120绿0,255,0；H180青0,255,255；H240蓝0,0,255；H300品红255,0,255；H360回红。
-- 黄色绿色分量可在16–255试调，默认96只是候选。相邻节点线性插值，再归一化峰值，保留低饱和度混白及原始明暗包络。橙节点绿色不高于黄色一半。
-- 保峰值不等于保感知亮度，不声称线性响应、恒定光通量、色准或跨批次通用。
-- 用户确认观感显著改善后，网页只保留观感混色，不再提供原始模式。SDK和命令行仍是原始协议接口，方便独立开发和诊断；它们不自动调用网页映射。
-- 白/灰主动使用W通道；非中性颜色若量化成相等的非零RGB，将最低输入通道减1，防止意外启用W。最低亮度可能存在8位量化色差，不能彻底消除。
-- 只对RGB输出发送颜色，不尝试同时独立驱动W。未做OTA或未知固件命令。
+The function interpolates between adjacent hue points, then normalizes the largest channel. It retains the input saturation and value. Optional channel gains apply only to non-neutral colors. After the gains, the function restores the input peak. Preserving the peak does not preserve perceived brightness or luminous flux.
 
-## 验证
+`web/dimming.js` supplies one overall brightness factor. It does not apply separate gamma curves to R, G, and B. See [Dimming](DIMMING.md).
 
-15个测试通过：既有11项SDK测试，新增已确认颜色保持、黄色调节、亮度独立/白通道保护、360度色相扫描边界及连续性。浏览器检查色轮点击、饱和度归零、黄色输出255,96,0、无控制台错误。用户已反馈新版观感“好非常多”，并选择作为唯一标准。这是样机主观验收，不是色度计校准。
+## White-channel handling
 
-单HTML打包约43KB，gzip估算16.3KB；色轮Canvas本地绘制，无新增外部请求。源码、测试及文档随本次色彩控制更新一起提交。
+The firmware selects W when `R = G = B > 0`. All-zero RGB switches the light off.
+
+The browser uses equal values for intended white and gray. If rounding makes a non-neutral color equal and nonzero, the map subtracts one unit from the channel with the lowest input value. This prevents an unintended switch to W. Small color shifts can still occur at low brightness because each channel has only 256 values.
+
+The map does not attempt simultaneous, independent RGBW control. The browser does not offer a raw-color mode. Use the SDK or CLI for raw protocol work.
+
+## Design references
+
+The implementation uses general LED color-space ideas. It does not copy code from these projects or add their libraries:
+
+- [FastLED HSV colors](https://github.com/FastLED/FastLED/wiki/FastLED-HSV-Colors): a rainbow hue map differs from a conventional HSV spectrum.
+- [WLED settings](https://kno.wled.ge/features/settings/): color gamma, brightness gamma, and white-channel policy are separate controls.
+- [Adafruit LED gamma](https://learn.adafruit.com/led-tricks-gamma-correction/the-longer-fix): an empirical gamma value is not a measurement of every device.
+
+A gamma curve alone cannot change the ratio of two channels that are both at their maximum. Thus it cannot correct `[255,255,0]` if that mix looks green. Different hardware still needs its own measurements.
+
+## Verification
+
+The color-map audit checked accepted colors, yellow adjustment, independent brightness, white-channel protection, and a full hue scan. Browser checks covered wheel input, zero saturation, the yellow output `[255,96,0]`, and console errors. The operator reported a large improvement on the sample.
+
+The historical audit passed 15 tests: 11 SDK tests and four color-map tests. Run the current suite for the current count. Canvas draws the wheel locally. Use `npm run build` to measure the current page size.

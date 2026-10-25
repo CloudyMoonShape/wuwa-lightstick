@@ -1,32 +1,35 @@
-"""按固件逆向出的现场广播格式拼包（射频参数和字段含义见 README「现场广播协议」）。
+"""Construct venue broadcast bytes from static firmware analysis. See docs/PROTOCOL.md.
 
-只负责拼出空口要发的字节；手机和 Mac 发不了这种包（Coded PHY、非广播信道、自定义白化），
-要靠能直接操纵射频的板子（如 nRF52840）发。
+This script does not transmit. Ordinary phone and desktop Bluetooth APIs do not
+expose the required raw radio controls. RF parameters have not been tested.
+Do not transmit these packets at an event or to devices that you do not own.
 
-  python3 -I scripts/venue_packet.py color 2 255 0 0     # 分组 2 变红
-  python3 -I scripts/venue_packet.py preset 2 3          # 分组 2 切到预设色 3
+  python3 -I scripts/venue_packet.py color 2 255 0 0     # Red for group 2
+  python3 -I scripts/venue_packet.py preset 2 3          # Preset 3 for group 2
 """
 import sys
 
-# 固件 0x1fff8834 处的 64 字节表：载荷最后一个字节的低 6 位选其中一个字节做异或
+# 64-byte table at firmware address 0x1fff8834. The final payload byte
+# selects an XOR entry with its lower six bits.
 XOR_TABLE = bytes.fromhex(
     "13316253c4f5a697b988dbea7d4c1f2e09c54f8a9e5bd114f93cb67367a228ed"
     "1257aef90b5ca5f21641b8ef1d4ab3e401a9fb525ff6a40dbe1745ece1481ab3")
-# 固件丢弃 AdvA 为 11:11:11:11:11:11 的包，其他地址都收
+# The analyzed filter rejects AdvA 11:11:11:11:11:11.
 ADV_A = bytes.fromhex("c0ffee000001")
 GROUPS = 20
 
 
 def payload(cmd, group, *args):
     if not 1 <= group <= GROUPS:
-        sys.exit(f"分组只能是 1..{GROUPS}")
+        sys.exit(f"Group must be from 1 to {GROUPS}.")
     if cmd == "color":
-        # 类型 1：每组 3 字节 RGB，第 g 组从偏移 3g-1 起；全 0 = 灭
+        # Type 1: three RGB bytes per group, starting at offset 3g-1.
+        # Zero values turn lights off; lower-group placeholders are not an ignore mask.
         body = bytearray(3 * group + 2)
         body[0] = 0x10
         body[3 * group - 1:3 * group + 2] = bytes(args)
     elif cmd == "preset":
-        # 类型 4：第 g 组的预设色号放在偏移 g
+        # Type 4: group g uses the preset number at offset g.
         body = bytearray(group + 1)
         body[0] = 0x40
         body[group] = args[0]
@@ -36,7 +39,8 @@ def payload(cmd, group, *args):
 
 
 def scramble(body, key=0x00):
-    """body 后面补校验字节（前面所有字节之和）和密钥字节，再把中间部分整体异或。"""
+    """Append the byte-sum checksum and key byte. XOR the middle bytes.
+    The key selects an obfuscation constant, not cryptographic encryption."""
     plain = body + bytes([sum(body) & 0xFF])
     x = XOR_TABLE[key & 0x3F]
     return plain[:1] + bytes(b ^ x for b in plain[1:]) + bytes([key])
@@ -44,7 +48,8 @@ def scramble(body, key=0x00):
 
 def pdu(body, key=0x00):
     data = scramble(body, key)
-    # 头 2 字节：第 1 字节固件不看，第 2 字节是 AdvA 加载荷的长度
+    # Two-byte header: byte 1 is unused by the analyzed branch;
+    # byte 2 gives the combined AdvA and payload length.
     return bytes([0x02, len(ADV_A) + len(data)]) + ADV_A + data
 
 

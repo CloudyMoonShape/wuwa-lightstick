@@ -1,9 +1,9 @@
-# 原厂固件 dump 只放本机:厂家二进制,体积大且来源不归我们
+# Keep manufacturer firmware dumps local.
 /backup/
-# 第三方工具许可证未声明(GitHub 显示 NOASSERTION),不随仓分发;取法见 README
+# Do not redistribute vendor tools with an unspecified license.
 /vendor/
 /.venv/
-# Ghidra 工程和反编译输出都由厂家固件派生，只放本机
+# Keep Ghidra projects and decompiled firmware local.
 /re/proj/
 /re/out/
 
@@ -14,3 +14,10 @@ __pycache__/
 /dist/
 /.wrangler/
 .DS_Store
+
+# Local deployment credentials and overrides
+.env
+.env.*
+.dev.vars
+.dev.vars.*
+*.local.jsonc

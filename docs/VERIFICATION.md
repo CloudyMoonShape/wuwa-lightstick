@@ -1,151 +1,65 @@
-# 本轮验证 · 2026-10-24
+# Verification
 
-## 已交付
+[Documentation](README.md) · [简体中文](zh-CN/VERIFICATION.md)
 
-- 正式网页：https://wuwa.south-wall.com/
-- 原理页：https://wuwa.south-wall.com/principles.html
-- Cloudflare Pages 项目：wuwa-lightstick，production branch main，Direct Upload。
-- 新工作目录独立于 Project-Wuling 原件，未改变原仓库。用户随后授权创建私有源码仓库 `CloudyMoonShape/wuwa-lightstick`，首个提交使用 GitHub noreply 作者邮箱。
+Evidence below was recorded on or before 2026-10-24. A software test, a simulated device, and a physical observation are different kinds of evidence. Do not substitute one for another.
 
-## 通过
+## Documentation release check — 2026-10-24
 
-- Python 3.12 新建 `.venv`，安装 `bleak==3.0.2`、`pyserial==3.5`。
-- `python -I scripts/venue_packet.py color 2 255 0 0` 输出 `02 10 c0 ff ee 00 00 01 10 13 13 13 13 ec 13 13 1c 00`。
-- Python 源码编译检查、前端 JavaScript 语法检查、HTML 本地资源路径检查。
-- SDK 11 个模拟测试：GRB 与校验、无效输入、口令先于设色、最新帧合并、写失败、断线重连、选择器取消、迟到连接、缺失/错误回显、提前回显与等待动画、认证期间断线。
-- 浏览器实际查看桌面与窄屏布局、点击无设备颜色/灯效预览、快速闪光默认阻止、原理页等值白计算（01 00 B4 B4 B4 E3；总和768）。所检查路径没有控制台 warning/error。
-- 首版正式域名 HTTP 200 且页面/资源回读一致；轻量版再验证首页、SDK、原理页与许可。
-- 线上重新打开并验证交互；站点 `_headers` 生效。
-- 轻量版首页内联 SDK、应用代码和样式，仅一次 HTML 请求即可使用；原始约 36 KB、gzip 估算约 13.8 KB。原理页与许可证点击后才加载。部署白名单仅 index.html、sdk.js、principles.html、LICENSE.txt、404.html 及配置 _headers。没有厂家固件、vendor、反编译输出、环境、API 凭据。
+The documentation audit passed 68 existing automated tests and the site build. The documentation checker passed 295 local links across 48 Markdown files and 24 translation pairs. Current desktop, mobile, and principles screenshots were captured from the live site. Python research scripts passed compilation after text-only edits. No hardware test was performed for this documentation update.
 
-## 尚未验证 / 待决定
+The build reported 167,707 bytes of controller HTML and a 46,298-byte gzip estimate. These are build measurements, not transfer timings. Public-release limitations remain in [Public release review](PUBLIC-RELEASE.md).
 
-- 新版 SDK/网页未连接真棒子；真实设备认证、回执时序、断线恢复及音乐视觉同步仍需硬件验收。
-- 本轮没有授权麦克风或标签页录音，也未测试本地音频文件播放路径；代码保留原版音频分析并调整界面与停止行为。
-- 现场广播、未知固件命令不作可用性承诺；没有 RF 发射、OTA 写入或厂家固件改动。
-- 用户已选定免费二次开发与分享、禁止销售/付费托管/付费捆绑，已提供定制社区源码许可 LICENSE；不是标准开源许可。
-- Direct Upload 项目未来不能原地改 Git 集成，需要新项目。
+## Physical observations
 
-## UX 参考
+| Area | Recorded result | Limit |
+|---|---|---|
+| GATT connection | The original tools completed the passphrase exchange and set colors on the sample. | This is not a complete regression test of every later SDK revision. |
+| RGB channels | The user reported normal red, green, and blue from direct commands. | No instrument measurements. |
+| Color mapping | The user accepted the revised pink and reported a large improvement with perceptual mixing. | One sample and visual judgment; not colorimetric calibration. |
+| Dimming | The user reported some improvement after the dimming change. | Rapid browser-driven breathing still showed steps. |
+| Native breathing (`02`) | The user reported much smoother breathing. | No optical curve, latency, or frame-rate measurement. Do not extend this result to other native modes. |
 
-以 Chrome 官方示例理解权限、选择设备和断开连接模式，没有复制第三方产品界面或商标素材。
+The research sample is described in [Hardware](HARDWARE.md). Firmware addresses and inferred behavior are in [Functions](FUNCTIONS.md) and [Native effects](NATIVE-EFFECTS.md).
 
-- https://googlechrome.github.io/samples/web-bluetooth/
-- https://googlechrome.github.io/samples/web-bluetooth/device-disconnect.html
-- https://developer.chrome.com/docs/capabilities/bluetooth
+## Software checks
 
-## 轻量版补充
+The last recorded effect-library test run passed 68 automated checks. That count is historical. Run `npm test` to check the revision you use.
 
-按用户反馈取消宣传首页，连接/关灯/颜色/亮度置于顶部，音乐与校准折叠。单文件打包后的模块语法检查通过，实际浏览器验证选红色、呼吸、关灯和无控制台错误。中国运营商真实首屏耗时未测量；不声称保证中国访问速度。
+The suite covers:
 
-## 色板、混色与色轮更新
+- Frame bytes, GRB order, checksums, and input limits.
+- Authentication order, exact echo matching, animation delay, cancellation, and disconnect paths.
+- One write in progress, replacement of pending colors, slow writes, and output scheduling.
+- Color mapping, white-channel protection, dimming curves, and breathing boundaries.
+- Native command replies, mode transitions, exit barriers, fixed presets, and late audio-source results.
+- Visitor identities, SQL uniqueness, transactions, request limits, origin checks, and failure handling.
 
-用户通过命令行确认三原色正常、认可粉红255,32,32，并在网页新版反馈观感显著改善，选择观感混色为唯一网页标准。保留原有未覆盖的硬件/音频验证限制。新增4项颜色测试，加既有11项SDK测试，共15项通过；检查纯色/粉红保持、黄色调节、峰值与亮度分离、白通道保护和色轮连续性。单HTML 42,626字节，gzip估算16,213字节。历史截图可能显示当时的原始RGB模式；当前页面不再提供该模式。
+Simulated writes and replies do not measure real Bluetooth throughput or optical latency. Tests of `node:sqlite` do not verify a production D1 binding.
 
+## Browser and deployment records
 
-## 展示审查与交互整理（2026-10-24）
+Earlier browser checks covered desktop and narrow layouts, light and dark themes, keyboard focus, color controls, effect categories, flashing opt-in, local audio playback, and simulated Bluetooth transitions.
 
-控制台与原理页已统一视觉；README 精简，完整协议与硬件记录移至 [PROTOCOL.md](PROTOCOL.md)。本轮浏览器布局、颜色输出、闪光开关、本地音源与重复播放检查见 [DESIGN-AUDIT.md](DESIGN-AUDIT.md)。源码保留相同的 15 项 SDK/混色测试并全部通过。首页约 52.8 KB，gzip 估算约 18.6 KB；无首屏外部资源。新截图为 `controller-desktop.png` 和 `controller-mobile.png`，早期截图仅为历史记录。
+Background failure and slow loading were tested without blocking the controls. Tests with the Bluetooth interface removed kept screen preview available. These were browser simulations, not physical iPhone tests.
 
-## MoonShade 与硬件照片追加轮（2026-10-24）
+The visitor counter was tested in an isolated local database. Thirty-two requests with the same ID incremented the total once. A production browser then registered once and reused its identity across refreshes and tabs. No test IDs were inserted into the production database.
 
-控制台、原理页、404 采用 MoonShade 网页样式。四张样机照片进入硬件文档，原理页使用其中三张；控制台不加载照片。首页约 98 KB、gzip 估算 30 KB，字体子集内联且单独保留 OFL 许可。上述旧版体积是历史记录。
+Published pages and selected assets were read back and compared with build output during earlier releases. Header alignment and copy were checked again after later visual changes. These records do not certify every browser or every future deployment.
 
-四宽度、双主题、灰阶、焦点和展开状态检查及明确保留的功能性色彩例外见 [展示审查](DESIGN-AUDIT.md#moonshade-追加轮)。浏览器确认此前接受的颜色输出；此次没有重新请求麦克风、连接真实灯棒、写入 OTA 或发送射频广播。
+One mainland China IPv6 measurement is documented in [Network measurements](PERFORMANCE.md). It is a historical network test, not a nationwide speed guarantee.
 
-## MoonShade 字标与域名更新（2026-10-24）
+## Still to verify
 
-三个页面嵌入原版字符画字标，并核对生成路径与设计系统原件一致。四宽度、双主题视觉检查通过；404 字标焦点框收缩到内容宽度后复验通过。15 项 SDK / 混色测试保持通过。构建首页 100,585 字节，gzip 估算 30,523 字节，仍为单 HTML。
+- Complete real-device regression for the current SDK: connect, disconnect, reconnect, mode changes, and failure recovery.
+- Each native mode other than the reported single-color breathing observation.
+- Optical brightness curves, color accuracy, and end-to-end music synchronization.
+- Sustained real Bluetooth write rates and firmware processing limits.
+- Other hardware batches and firmware versions.
+- Venue RF reception and the inferred broadcast settings.
 
-新增主域名 `wuwa.south-wall.com`，Pages 项目关联该域名，DNS CNAME 指向 `wuwa-lightstick.pages.dev`。仓库仍为 private；域名配置与发布检查方法见 [部署说明](DEPLOYMENT.md)。此轮不涉及实物蓝牙操作。
+No OTA write, firmware modification, or venue RF transmission was performed as part of these web and documentation checks.
 
-## 发包节奏修正（2026-10-24）
+## Record a new result
 
-旧发送器在每次蓝牙写入结束后再等 25 ms，实际间隔会叠加传输耗时。改为相邻写入开始间隔至少 `1000 / 60` ms；写入较慢时不再追加等待，保持单次写入在途和仅保留最新待发帧。连接详情也改为按实际经过时间计算帧率。混色与呼吸曲线保持原样。
-
-18 项 SDK / 混色测试通过，包括新增的快链路节奏、慢链路不叠加延迟、等待期间合并与断线取消。虚拟时钟下，5 ms 写入的 60 个间隔耗时 1020 ms；35 ms 写入的 4 个间隔耗时 140 ms，均没有并发写入。它们验证软件调度，不代表实物达到 60 帧 / 秒；新版呼吸观感仍需实物对比。
-
-此次构建首页 101,088 字节，gzip 估算 30,696 字节。新域名已在本机正常解析，标准 HTTPS 请求返回 200，并在浏览器实际打开成功；此前的 NXDOMAIN 为旧的否定缓存。
-
-## 到访计数（2026-10-24）
-
-按用户选择统计成功登记的匿名浏览器身份数，从零开始；同一来源下重复刷新不累加。页面和 API 的边界见 [到访计数](VISITORS.md)。计数模块不读取蓝牙信息，不影响遥控器初始化，失败时隐藏。
-
-33 项测试全部通过，包含 15 项计数接口、SQL 去重与事务、浏览器身份复用、来源限制、超时与失效隐藏检查。另用 Wrangler 4.152.0 的本地 Cloudflare 运行时与 D1 验证：初始为 0，32 个相同 ID 的并发登记只增加到 1；再对 10 个不同 ID 各登记两次，最终为 11。这些请求只进入本地隔离库，没有填充正式统计。
-
-首页 103,214 字节，gzip 估算 31,533 字节，比发包修正版增加 837 字节压缩体积。计数脚本随 HTML 内联，页面初始化后仅请求一次同源接口；静态路径通过 `_routes.json` 排除在 Functions 之外。页脚的四宽度、双主题检查见 [展示审查](DESIGN-AUDIT.md#到访计数追加轮)。
-
-现有 Pages 发布凭据缺少 D1 权限。用户随后授权创建一枚 30 分钟有效的临时 D1 凭据；已建立独立数据库并应用迁移，查询确认总数为 0、身份表为空、去重触发器存在。`wrangler.jsonc` 仅为生产环境绑定该库，预览环境没有绑定正式库。
-
-正式部署 `ca1ec031` 已上线，主域名与备用域名的 GET 接口均返回 200。真实浏览器首次到访显示 1，刷新及同一浏览器的新标签页仍为 1；没有向生产库填入测试身份。正式首页、SDK 和原理页回读与构建产物一致，浏览器无 warning/error。临时凭据已立即撤销并回读确认失效，本地临时密钥文件已删除；原长期发布凭据未增加 D1 权限，撤销后计数服务仍正常。
-
-## 国内访问实测（2026-10-24 UTC）
-
-从中国大陆一条联通 IPv6 线路直连，对正式首页、备用首页、计数 GET 接口分别发起 10 次独立连接，30 次全部成功。主域名首页完整接收中位 0.713 秒，范围 0.675–0.765 秒；计数 GET 中位 0.830 秒。后续在两个域名的两个 IPv6 地址分别核对首页，4 次内容哈希均与当前构建一致。
-
-测试未经过办公室的 IPv4 海外代理，但只覆盖一条联通 IPv6 线路；不是全国三网结论，也不是浏览器渲染指标。方法、原始数据、压缩体积差异及边界见 [访问速度](PERFORMANCE.md)。
-
-## 背景与社交入口更新（2026-10-24）
-
-黑金水波摄影与四个内联社交品牌图标已进入首页。33 项既有测试通过；四宽度、深浅主题的 18 张视觉检查记录见 [展示审查](DESIGN-AUDIT.md#水波摄影与社交图标)。README 桌面与手机截图同步更新，截图数字使用正式 GET 接口当时返回的 `4`，没有创建测试访客。
-
-本地构建浏览器验证通过五组场景：桌面图标/颜色/灯效及 AVIF→WebP 选择；模拟缺少蓝牙接口的 iPhone Safari、iPhone Chrome、iPad 桌面模式；320 px 下屏蔽背景请求。四个社交入口的地址与用户提供值一致，48 px 点击区域、辅助名称、焦点环与新窗口属性均保留。图片失败时仍能选红色；所有兼容性模拟中，缺少接口时连接按钮禁用、屏幕颜色与灯效可操作、无 App 安装链接、无脚本异常。
-
-这些 iOS 检查采用本地浏览器模拟设备标识与接口缺失，不是 iPhone 实机或真实蓝牙连接测试。此次不改变 SDK、混色算法与发包节奏，不请求麦克风，也不改变 Cloudflare 权限。
-
-
-## 官方壁纸与加载隔离（2026-10-24）
-
-替换为鸣潮官网主视觉，并将来源、文件大小、裁切范围和原作权利归属记录在 [第三方材料](../THIRD_PARTY.md)。README 桌面/手机截图同步更新；图中的到访数字 4 来自当时正式接口的只读 GET，没有插入测试身份。
-
-33 项既有 SDK、混色与计数测试通过。构建产物另经六组本地浏览器场景验证：桌面、手机、移除 AVIF 候选后的 WebP 后备、背景请求挂起、320 px 下图片请求失败，以及模拟缺少网页蓝牙接口。每组均可选纯红、播放呼吸、切回常亮、调到 50% 亮度并关灯，数值输出正确；缺少蓝牙接口时保持仅预览。背景挂起时无需等待即可操作，图片完成后连接按钮位置不变。每组只请求一张符合视口的背景，没有第三方请求或脚本异常；四个社交入口保留 48 px 点击区域和辅助名称。
-
-四宽度/双主题及灰阶、焦点的 18 张截图已检查，见 [展示审查](DESIGN-AUDIT.md#鸣潮官方壁纸)。这次没有修改蓝牙发送器与混色算法，没有进行实物蓝牙连接或 iPhone 实机测试。
-
-正式部署 `146fdb96` 已完成。主域名、备用域名、原理页及四份背景资源均返回 200，内容逐字节与本地构建一致；背景响应头确认一年缓存与 immutable 生效。正式浏览器已加载新 AVIF，显示真实到访计数 4，呼吸/常亮预览可切换，无 warning/error。GitHub 仓库仍为 private；推送基于重写后的 main，未恢复旧历史。
-
-## 2026-10-24 · 平滑调光候选
-
-手动亮度改为 0.1% 步进、80 ms 时间常数平滑以及 `0.4p+0.6p²` 整体调光曲线。呼吸去掉正弦上的二次缓动，在连续余弦上应用相同曲线；变色呼吸在暗部连续换色。原有混色模块与原始 SDK 字节接口未修改，满亮度色板保持一致；暗部保护和分辨率取舍见 [调光说明](DIMMING.md)。
-
-39 项 SDK、混色、调光和计数测试通过。新增检查覆盖调光单调性、已确认色板保持、低亮度白通道保护、不同采样率的滑块响应、呼吸边界和连续换色。本轮尚未连接实物；部署后由用户检查真实灯棒的滑块与呼吸观感。
-
-本地实际浏览器已验证 50% 纯红稳定输出 89,0,0、0.1% 滑块步进、单色/变色呼吸和关灯全零，无 warning/error。采样 100%→50% 的页面输出可见 255→237→219→205…→121→最终89 的过渡，未直接跳到目标值。打包后的两个内联模块语法检查通过；首页 gzip 估算增加 835 字节，没有新增脚本网络请求。
-
-生产部署 `11b7c960` 已成功，发布源码为 `401bd67`，工作区干净。正式主域名、备用域名、调光模块及原理页均返回 200，与本地构建逐字节一致。正式浏览器再次确认 0.1% 步进、50% 纯红 89,0,0 与呼吸运行，无 warning/error。仓库仍为 private，提交基于重写后的 main；实物调光观感等待用户验证。
-
-
-## 2026-10-24 · 高发送率试验
-
-新增 `?rate=90` / `?rate=120` 试验入口和连接详情里的 60 / 90 / 120 档。灯效输出采样从屏幕刷新分离，由单一调度器限制开始间隔；慢链路只取最新状态，不叠加固定等待。设色回包独立计数；公开 SDK 默认间隔、混色与调光模块逐字节保持不变。使用与固件处理边界见 [高发送率试验](OUTPUT-TIMING.md)。
-
-52 项测试通过，新增检查覆盖独立采样、合法浏览器计时器调用、慢写入、切档、去重、停止/恢复、旧连接迟到失败、回包过滤和真实 SDK 搭配模拟 GATT。2 ms 写入、60 Hz 界面、3× 纯红呼吸的 4 秒模拟：60 档 227 帧、120 档 406 帧，最大相邻 R 变化从 12 降到 6。这不是实物吞吐或光学测量。
-
-浏览器检查发现计时器作为实例方法调用会触发 `Illegal invocation`，已改为独立包装调用并补充回归测试。修正后，在浏览器真实计时器与模拟蓝牙端点下完成握手、发送、切档、停止和恢复；1.5 秒内 120 档 151 次写入/151 次回包，60 档 81/81，全程最大在途写入为 1。模拟端点只用于验证软件，不连接真实设备，临时检查页不进入发布白名单。
-
-实际控制台已核对 120 查询参数、60/90/120 切档、50% 纯红稳定输出 89,0,0、0.1% 亮度步进、3× 单色/变色呼吸和关灯全零，无 warning/error。首页 118,310 字节、gzip 估算 36,746 字节，比上一版增加 1,431 字节压缩体积，仍无额外脚本请求。实物观感和链路上限等待用户试验反馈。
-
-生产部署 `34d5c600` 已成功，源码为 `c6b25b3`，发布时工作区干净。正式主域名、备用域名的 120 档链接、输出调度模块和原理页均返回 200，逐字节匹配本地构建。正式浏览器确认查询参数选中 120 档、3× 呼吸可运行、连接详情包含写入/设色回包/写入耗时，无 warning/error。仓库仍为 private，提交沿用重写后的 main。
-
-## 2026-10-24 · 内置能力试验
-
-从参考备份的 GATT switch8 跳转表追踪到灯效任务、内部定时中断、按键预设与直接 PWM 输出。静态确认 `02–06` 的布局、`01` 在 `02/04` 中只改基础色的特殊行为、连续 `0e` 跳过清灯，以及 `0d/0e` 等值非零 RGB 会开满白光的差异。独立脚本 `re/inspect_native.py` 对参考哈希复核映射、跳转地址与 1300 ms 常量。没有分发厂家固件或反编译输出。
-
-新增「网页 / 灯棒 · 试验」，`?engine=native` 预选内置呼吸。普通首页保留原网页路径；试验会话使用确认回包的模式切换与退出屏障，连续设色保留白光调暗。固定三色预设不伪装成可任意调色调光；单色呼吸只在基础色或亮度变化时发送更新。页面预览明确标为示意。
-
-65 项自动检查通过，新增覆盖命令布局与边界、正确回包早于写入完成、错误 / 缺失回包、断线、快速切换、隐藏页面、白光保护、10 秒虚拟时间内不持续发呼吸包和明确退出。内置效果的静态推导和模拟链路均不能替代实物验收；尤其 `02` 与实体按键的内部模式 7 并不相同。
-
-浏览器在本机模拟 GATT 页面验证：连接后仅启动与基础色更新两条命令；随后稳定等待无新增写入。改粉色与 50% 亮度仍保持原生呼吸；三色渐变禁用色彩控件且仅发模式指令；切回网页先出现 `0d` 再 `0e`；关灯先退出再保持零。最大在途写入为 1，控制台无 warning/error。测试页不调用真实蓝牙，也不打包发布。
-
-生产部署 `efdaf3b2` 已完成，发布源码提交 `2356d18`。正式主域名、备用域名的内置试验入口、普通首页、SDK、播放模块和原理页均返回 200，并与构建产物逐字节一致。正式浏览器确认内置呼吸默认选中、固定三色预设停用色彩控件、返回呼吸后恢复，控制台无 warning/error，到访计数显示 6；计数接口用浏览器请求头 GET 返回 200。首页为 128,540 字节，gzip 估算 39,464 字节。GitHub 元数据确认仓库 private，推送沿用清理后的 main；原本地 clone 已安全快进。没有对真实灯棒发送本轮命令，等待用户实物反馈。
-
-
-## 2026-10-24 · 原生、延伸与音乐
-
-用户已在上一轮实物反馈中确认原生单色呼吸明显更顺滑；这是主观观感确认，不是光学曲线测量。此次将三个类别设为同级入口，原生新增 `07` 三色连闪和 `08` 十五色轮播，延伸保留可调速度与自制配色，音乐直接选择音源。固定原生效果只发启动命令，切换回逐帧模式先等待退出确认；音源请求晚返回时不会跨类别重新启动。
-
-68 项自动检查通过；新检查覆盖两条命令的字节与回包、固定模式不持续发包、退出屏障和串行写入。浏览器隔离模拟另通过 12 项交互检查，包含闪光授权、色彩控件恢复、调速呼吸、无音源黑场、迟到授权释放、音乐中改色保持玩法、关灯释放音源与清灯。控制台没有 warning/error。响应式、双主题、灰阶和焦点检查见 [展示审查](DESIGN-AUDIT.md#三个同级灯效入口--2026-10-24)。
-
-SDK、协议说明、函数目录、示例和原理页已同步。新增两种效果的证据仍为静态追踪及模拟验证，未向真实灯棒发送本轮命令；不把用户对 `02` 呼吸的反馈外推到其他模式。
-
-生产部署 `3136cc6d` 已完成，发布源码为 `de4055e`。正式主域名、备用域名、音乐与原生入口、SDK、输出与播放模块及原理页的 8 项回读均为 200，并与本地构建逐字节相同。正式浏览器确认默认原生常亮、轮播禁用固定参数、延伸恢复调速、音乐直接显示音源与五项玩法；控制台无 warning/error。首页 132,165 字节、gzip 估算 40,273 字节。GitHub 元数据确认仓库仍为 private；提交基于清理后的 main，没有恢复旧历史。新增效果的实际灯光仍等待用户试验。
+Record the commit, board, firmware version, browser, operating system, input bytes, response bytes, steps, date, and visible result. State whether the result came from a real device, a simulation, or static analysis. Attach the evidence needed to reproduce it. Do not include device identifiers or private data that the test does not need.

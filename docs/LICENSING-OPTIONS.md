@@ -1,31 +1,31 @@
-# 发布许可与防倒卖
+# License
 
-已按用户 2026-10-24 的选择采用 [Wuwa Lightstick Community License 1.0](../LICENSE)。允许免费使用、修改、分享及免费托管；禁止销售软件、收费访问/托管，以及作为付费商品或服务的一部分或赠品捆绑分发。改名、修改、象征性收费不能绕开限制。真正无权益交换的自愿捐赠允许。仅链接到可独立免费访问的官网不属于捆绑。
+[Documentation](README.md) · [简体中文](zh-CN/LICENSING-OPTIONS.md)
 
-这是项目定制的源码可用许可，不是 MIT、GPL、Commons Clause 或 OSI 批准的标准开源许可。英文 LICENSE 为正式条款；本页只是中文说明。未经过律师审查，不能保证在所有法域的适用性或平台投诉结果。源码仓库与网页均公开，可免费使用。
+The project uses the [Wuwa Lightstick Community License 1.0](../LICENSE). The English `LICENSE` file contains the operative terms. This page is a summary, not a replacement.
 
-## 目标与真实边界
+| Activity | Summary |
+|---|---|
+| Free use, modification, sharing, and public hosting | Permitted under the license conditions. |
+| Software sales, paid access, or paid hosting | Requires separate written permission. |
+| Distribution with a paid product, service, or membership | Requires separate written permission, including software offered as a bonus. |
+| Voluntary donation with no exclusive benefit | Permitted by the license. |
+| A link to an independently accessible free site | Not treated as bundling by the license. |
 
-静态网页的 JavaScript 必须交给访客浏览器，因此无法技术上彻底禁止复制。代码混淆、域名判断、隐藏口令都不能解决这个问题，也会妨碍社区开发。协议里的共享口令不是秘密。
+Retain the license and copyright notice. Identify substantial changes. Keep the same terms for the covered software in modified distributions. Renaming the software or charging a nominal delivery fee does not remove the restrictions.
 
-实用组合：免费官网醒目可查、作者与项目标识、清楚的授权边界、保留版本及发布时间证据。遇到搬运销售时，保存商品链接、页面截图、交付文件和与本项目代码的具体比对，再按平台流程提交事实清楚的投诉。不能保证平台处理结果。
+This is a **source-available license**, not an OSI-approved open-source license. A public GitHub repository does not change those terms. The current publication status and remaining checks are recorded in [Public release](PUBLIC-RELEASE.md).
 
-## 可选方向
+## Scope
 
-| 方案 | 允许什么 | 对倒卖的作用 | 代价 |
-|---|---|---|---|
-| MIT | 修改、分发、商业使用和销售 | 保留版权声明，不能仅因销售投诉许可违规 | 最利于复用，无法禁售 |
-| GPL / AGPL | 商业分发也允许；有相应源码义务 | 可约束封闭衍生分发，不能直接禁止收费 | 复用义务更重，仍可能合法售卖 |
-| 基础许可 + Commons Clause | 源码可查看、修改、免费分享；限制销售价值完全或主要来自本软件的产品/服务 | 针对原样或轻微换皮收费、相关付费托管 | 不是标准开源；有实质增值的商业产品不一定被禁止 |
-| PolyForm Noncommercial | 规定范围内的非商业使用、修改和分发 | 比只禁止原样倒卖更宽 | 正当商业合作、支持服务也可能受限 |
+The license covers the original code and documentation identified by the copyright holder. It does not grant rights in manufacturer firmware, third-party tools, SDKs, trademarks, or artwork. See [Third-party materials](../THIRD_PARTY.md).
 
-用户选择禁止销售、付费托管和付费捆绑；Commons Clause 对新增价值商业产品的处理不完全符合该要求，因此采用上述定制条款。源码可用许可只约束受版权保护的代码与文档，不垄断协议事实或独立重写的实现。
+It does not grant ownership of protocol facts. It does not prohibit an independent implementation that does not copy protected project material. The license also preserves rights that applicable law does not allow it to restrict.
 
-最终条款只能约束有权授权的原创部分，不能替厂家固件、商标、第三方工具或 SDK 授权。已依法授出的旧版本权利也不能通过后来改许可证简单收回。当前本地根目录未发现覆盖此模块的 LICENSE，但这不等于已经核验所有历史发布与第三方贡献权属。
+## Copies offered for sale
 
-## 原始资料（2026-10-24 查阅）
+The browser receives the site's JavaScript. A technical copy-prevention mechanism cannot make that source unavailable while the site still runs. Obfuscation or a domain check is not a substitute for clear license terms.
 
-- MIT：https://choosealicense.com/licenses/mit/
-- GNU 关于销售自由软件：https://www.gnu.org/philosophy/selling.en.html
-- Commons Clause 正文与边界：https://commonsclause.com/
-- PolyForm Noncommercial：https://polyformproject.org/licenses/noncommercial/1.0.0/
+If you report a suspected license violation, retain the listing URL, date, screenshots, delivered files, and specific code comparisons. State the facts and the relevant license terms. A platform may require additional evidence. The project does not promise an enforcement result.
+
+The custom license has not received a documented legal review. Its application depends on the facts and applicable law. The project cannot relicense third-party work or assume that earlier grants have been revoked.

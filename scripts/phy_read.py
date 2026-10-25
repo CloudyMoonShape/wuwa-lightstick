@@ -1,12 +1,14 @@
-"""只读备份 ST17H66B 整片 flash。
+"""Read the full ST17H66B flash without writing to flash.
 
-基于 pvvx 的 rdwr_phy62x2.py，但去掉了它连接时默认执行的 FlashUnlock
-（那一步会把 flash 状态寄存器写成 0x00，等于改了芯片上的写保护位）。
-本脚本对 flash 只发读命令：读状态寄存器、读唯一 ID、逐字读整片，连读两遍比对。
+Based on pvvx's rdwr_phy62x2.py, without its default FlashUnlock step.
+That step writes 0x00 to the flash status register and changes write protection.
+Read the status register, unique ID, and full flash twice; compare the hashes.
+Serial and peripheral registers are initialized. Only flash writes are omitted.
 
-用法：.venv/bin/python -I scripts/phy_read.py /dev/cu.usbserial-0001 [baud]
-      .venv/bin/python -I scripts/phy_read.py /dev/cu.usbserial-0001 115200 --peek 0x30100 0x40 20
-      （--peek：从 flash 偏移 ADDR 起读 SIZE 字节，重复 N 遍做多数表决，用来核对两遍备份的差异）
+Usage: .venv/bin/python -I scripts/phy_read.py /dev/cu.usbserial-0001 [baud]
+       .venv/bin/python -I scripts/phy_read.py /dev/cu.usbserial-0001 115200 --peek 0x30100 0x40 20
+       --peek reads SIZE bytes at flash offset ADDR, N times, and counts values.
+       Use these counts to investigate differences between two backups.
 """
 import hashlib, os, sys, time
 
@@ -28,8 +30,9 @@ WAIT = 600
 
 
 def connect_patient(phy, baud):
-    """上游 Connect 只给约 10 秒握手窗口；这里一直发握手串直到芯片应答，
-    期间随便拔插 3V、对调 TX/RX 都行。握手后的初始化照抄上游，只是不做 FlashUnlock。"""
+    """Retry the handshake for up to WAIT seconds; each boot window is about 10 s.
+    Disconnect all power before changing TX/RX wiring. See docs/PROTOCOL.md
+    for battery and USB power options. Initialize as upstream, without FlashUnlock."""
     p = phy._port
     p.timeout = 0.04
     t0 = last = time.time()
@@ -42,22 +45,22 @@ def connect_patient(phy, baud):
         junk += r
         if time.time() - last > 5:
             last = time.time()
-            note = f"，收到杂字节 {bytes(junk[-16:]).hex()}" if junk else ""
-            print(f"  …等待芯片应答 {time.time() - t0:.0f}s{note}", flush=True)
+            note = f"; unexpected bytes: {bytes(junk[-16:]).hex()}" if junk else ""
+            print(f"  Waiting for chip response: {time.time() - t0:.0f}s{note}", flush=True)
             junk.clear()
         if time.time() - t0 > WAIT:
-            sys.exit("10 分钟没应答，退出")
+            sys.exit("No response after 10 minutes. Exit.")
     print("Chip Reset Ok. Response:", r, flush=True)
     if r == b"fct>>:":
-        sys.exit("芯片处于 FCT 模式 —— 停下，不要执行任何擦除命令，把输出发给 Claude")
+        sys.exit("Chip is in FCT mode. Stop. Do not run an erase command. Keep this output for diagnosis.")
     p.baudrate = phy_mod.DEF_RUN_BAUD
     p.timeout = 0.2
     if not phy.ReadRevision():
-        sys.exit("读芯片版本失败")
+        sys.exit("Cannot read chip revision.")
     if not phy.tg7100:
         for reg in (0x4000F054, 0x4000F140, 0x4000F144):
             if not phy.write_reg(reg, 0):
-                sys.exit(f"初始化寄存器 {reg:#x} 失败")
+                sys.exit(f"Cannot initialize register {reg:#x}.")
     print(phy.chip, "- connected Ok", flush=True)
     phy.SetBaud(baud)
 
@@ -65,16 +68,16 @@ def connect_patient(phy, baud):
 phy = phy_mod.phyflasher(port, False)
 
 print("=" * 60)
-print("监听已开始，最长等 10 分钟。拔插 3V 给芯片重新上电，芯片一应答就自动开始读")
-print("没反应的话：拔 3V → 对调 P9/P10 → 再插 3V，不用重启脚本")
+print("Waiting for up to 10 minutes. Power-cycle the selected supply; reading starts after the chip responds.")
+print("If there is no response, disconnect all power before checking P9/P10. See docs/PROTOCOL.md for wiring and power options.")
 print("=" * 60, flush=True)
 connect_patient(phy, baud)
 
 st = phy.flash_read_status()
 uid = phy.flash_read_unique_id()
-print(f"Flash 状态寄存器: {st:#04x}" if st is not None else "Flash 状态寄存器: 读取失败")
-print("Flash 唯一 ID:", uid.hex() if uid else "读取失败")
-print(f"芯片: {phy.chip}  FlashID: {phy.flash_id:#x}  容量: {phy.flash_size // 1024} KB", flush=True)
+print(f"Flash status register: {st:#04x}" if st is not None else "Flash status register: read failed")
+print("Flash unique ID:", uid.hex() if uid else "read failed")
+print(f"Chip: {phy.chip}  FlashID: {phy.flash_id:#x}  Capacity: {phy.flash_size // 1024} KB", flush=True)
 
 if peek:
     import collections, struct
@@ -96,13 +99,13 @@ for n in (1, 2):
     t = time.time()
     with open(path, "wb") as f:
         if phy.ReadAllFlash(f) is None:
-            sys.exit(f"第 {n} 遍读取出错，文件不完整: {path}")
+            sys.exit(f"Read {n} failed. File is incomplete: {path}")
     data = open(path, "rb").read()
     digests.append(hashlib.sha256(data).hexdigest())
-    print(f"第 {n} 遍: {len(data)} 字节, {time.time() - t:.0f} 秒, sha256 {digests[-1]}", flush=True)
+    print(f"Read {n}: {len(data)} bytes, {time.time() - t:.0f} seconds, sha256 {digests[-1]}", flush=True)
 
 if digests[0] == digests[1]:
-    print("✅ 两遍完全一致，备份可信")
+    print("The two read hashes match. This does not independently verify every flash byte.")
 else:
-    print("⚠️ 两遍不一致，接触可能不稳，需要重读")
+    print("The read hashes differ. Check power and connections, then repeat the reads. The cause is not yet known.")
 phy._port.close()

@@ -1,19 +1,23 @@
-# 网页调光 · 2026-10-24
+# Dimming
 
-本轮针对手动亮度跳变与呼吸阶段感，供样机实测。观感混色节点、黄色修正、通道增益、白光保护和 SDK 原始协议均保持原样；100% 常亮输出与上一版一致。软件验证通过不代表实物平滑度已经验收。
+[中文](zh-CN/DIMMING.md) · [Documentation](README.md)
 
-## 从百分比到输出
+The browser smooths manual brightness changes and computes its own breathing envelope. Native breathing uses a separate firmware path. See [Native effects](NATIVE-EFFECTS.md).
 
-`web/dimming.js` 仅生成整体亮度系数。设滑块百分比除以 100 为 p，输出曲线为：
+The dimming stage scales all color channels together. It keeps the accepted color map, yellow adjustment, channel gains, and white-channel protection. At 100% steady brightness, the output is unchanged.
+
+## Brightness conversion
+
+`web/dimming.js` converts the slider position to an overall drive factor. Let `p` be the percentage divided by 100:
 
 ```text
-d(p) = 0.4p + 0.6p²，p ∈ [0, 1]
+d(p) = 0.4p + 0.6p², where 0 ≤ p ≤ 1
 ```
 
-这是保留线性暗部的温和二次曲线，不是测得的 Gamma 或光通量标定。与直接使用 p 相比，中间亮度更低；1% 满幅纯色仍可输出 1，100% 仍为 255。没有对 R/G/B 分别做 Gamma，避免改变已获实物认可的混色比例。网页百分比现在表示调光位置，不能作为占空比或实测光通量使用。
+This curve retains a linear component at low brightness. It is not a measured gamma curve or a luminous-flux calibration. The displayed percentage is a control position, not a measured duty cycle or light output.
 
-| 常亮设置 | 纯红输出 R（稳定后） |
-|---|---:|
+| Setting | Settled red output for full-scale pure red |
+|---:|---:|
 | 0% | 0 |
 | 1% | 1 |
 | 10% | 12 |
@@ -21,23 +25,31 @@ d(p) = 0.4p + 0.6p²，p ∈ [0, 1]
 | 50% | 89 |
 | 100% | 255 |
 
-滑块以 0.1% 步进更新目标；实际调光位置采用 80 ms 时间常数的一阶平滑，约 240 ms 完成变化量的 95%。计算使用实际经过时间，30/60/120 Hz 下响应一致；快速来回拖动从当前值继续，不回放旧位置。关灯按钮仍直接输出全零，不等待亮度平滑结束。
+The slider has a 0.1% step. A first-order filter smooths the position with an 80 ms time constant. It completes about 95% of a change in 240 ms. The filter uses elapsed time, so its response does not depend on a 30, 60, or 120 Hz screen rate. A new target starts from the current value. It does not replay old slider positions.
 
-## 网页呼吸
+The off button sends zero without waiting for the smoothing filter.
 
-1. 保留约 3.93 秒一轮的默认周期，速度滑块继续缩放时间。开始呼吸时从当前亮度上限起步。
-2. 用单一余弦生成连续相位，再应用上述温和亮度曲线；取消原来在正弦之上叠加的 smoothstep，减少极值附近过长停顿与中段过快变化。
-3. 正常亮度保留上限 4% 的暗部。低亮度时，暗部至少保留主通道约 2 个驱动单位，但绝不超过用户亮度上限，避免在 0/1 之间反复闪灭。上限已经不足 2 个单位时，呼吸会很浅或看不出变化，这是当前协议分辨率的取舍。
-4. “呼吸变色”在暗部附近用连续色相过渡跨越下一轮，不再每轮硬切 67°。正常单色呼吸只改变整体亮度，不改变所选色相。
+## Browser breathing
 
-只在最终 `renderColor` 输出时取整为 8 位值，继续执行非中性色的白通道保护。普通首页和公开 SDK 默认仍为 60 次写入/秒；网页另提供独立于屏幕刷新的 [90 / 120 高发送率试验](OUTPUT-TIMING.md)，保持本页调光曲线不变。没有加入需要稳定高刷新率的时间抖动，也没有改变固件。新增 [内置呼吸试验](NATIVE-EFFECTS.md) 走独立路径：网页只发送混色后的基础色与亮度上限，明暗周期交给固件，不重复叠加本节的网页包络。
+1. The default period is approximately 3.93 seconds. The speed control scales time. Breathing starts at the current brightness ceiling.
+2. A cosine produces a continuous cycle. The dimming curve above shapes that cycle. The earlier extra `smoothstep` stage was removed.
+3. At normal brightness, the floor is 4% of the ceiling. At low brightness, the floor retains approximately two drive units in the strongest channel, but never exceeds the ceiling.
+4. Color-changing breathing moves the hue continuously near each dark trough. It does not jump 67° at a cycle boundary. Single-color breathing keeps the selected hue.
 
-## 验证与边界
+If the ceiling is below two drive units, the effect can be shallow or invisible. This avoids repeated transitions between zero and one. It does not add physical output levels.
 
-测试覆盖调光单调性、满亮度色板不变、混色比例、白通道保护、不同帧率下的滑块响应、快速反向拖动、呼吸周期与上下界、变色跨周期连续性及关灯全零。
+Values are rounded to eight bits only at the final `renderColor` stage. The white-channel guard still applies. Browser output defaults to a target limit of 60 writes per second. [Output timing](OUTPUT-TIMING.md) describes the 90 and 120 settings. None of these settings add temporal dithering or change the firmware.
 
-在理想 60 Hz 时间采样、100% 纯红、默认速度的离线比较中，新一轮呼吸的最大相邻驱动变化为 4，旧曲线为 5。这个数值描述网页产生的指令，不代表蓝牙实际处理频率、灯珠发光测量或主观平滑度结论。
+Native breathing receives only the mapped base color and brightness ceiling. The firmware supplies the breathing cycle. The browser does not multiply its own breathing envelope into that path.
 
-8 位协议仍只有每通道 0–255。更多滑块小数位和更高计算精度不会增加灯棒的物理档位；低亮度下的单级跳变与通道取整色差仍可能可见。需要用户实物对比本版，才能决定是否继续调整暗部和呼吸曲线。
+## Verification
 
-背景资料：[Adafruit 的 Gamma 与量化讨论](https://learn.adafruit.com/led-tricks-gamma-correction?view=all)、[TI 的感知调光说明](https://www.ti.com/document-viewer/lit/html/SLAT163/GUID-0B9B8B31-DEC9-42E8-B9DE-ECF00C650F5E)。本轮曲线为独立实现，不引入第三方代码或库。
+Tests cover monotonic dimming, unchanged full-brightness colors, color ratios, white-channel protection, slider timing, rapid target reversal, breathing bounds, hue continuity, and zero output for the off control.
+
+An offline comparison used ideal 60 Hz sampling, pure red at 100%, and default speed. The largest adjacent drive step changed from 5 to 4. This measures generated commands, not Bluetooth throughput or optical output.
+
+The operator reported some improvement in browser dimming, but still saw steps during fast breathing. Native single-color breathing later received a positive smoothness report on the sample. Neither result is an instrument measurement or acceptance of every effect.
+
+Each channel remains limited to 0–255. Extra slider precision does not add device levels. Low-brightness steps and rounding-induced color shifts can remain visible.
+
+Background: [Adafruit gamma and quantization](https://learn.adafruit.com/led-tricks-gamma-correction?view=all), [TI perceived dimming](https://www.ti.com/document-viewer/lit/html/SLAT163/GUID-0B9B8B31-DEC9-42E8-B9DE-ECF00C650F5E). The curve is an independent implementation.

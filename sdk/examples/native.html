@@ -1,6 +1,6 @@
-<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SDK 内置呼吸试验</title>
-<h1>内置呼吸试验</h1><p>已分析命令布局，原生呼吸已有用户顺滑度反馈，新增轮播仍待实物验收。内置呼吸周期固定，按键呼吸走另一内部算法。</p>
-<button id="connect">连接自己的棒子</button><button id="breathe" disabled>红色呼吸</button><button id="pink" disabled>呼吸改为粉红</button><button id="cycle" disabled>15 色轮播</button><button id="off" disabled>退出并熄灯</button><button id="disconnect">断开</button><p id="status" role="status">未连接</p>
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SDK native effect example</title>
+<h1>Native effects</h1><p>Native breathing has user feedback from the research sample. The palette cycle still needs a device test. Native breathing has a fixed period. The physical button uses a different internal algorithm.</p>
+<button id="connect">Connect your lightstick</button><button id="breathe" disabled>Red breathing</button><button id="pink" disabled>Change to pink</button><button id="cycle" disabled>15-color cycle</button><button id="off" disabled>退出并Off</button><button id="disconnect">Disconnect</button><p id="status" role="status">Disconnected</p>
 <script type="module">
 import { LightstickClient } from '../index.mjs';
 const status=document.querySelector('#status');let busy=false,native=false;
@@ -9,9 +9,9 @@ function controls() { ids.forEach(id=>document.getElementById(id).disabled=!clie
 const client=new LightstickClient({onState(state){status.textContent=state;if(state!=='ready')native=false;controls();}});
 const run=async task=>{if(busy)return;busy=true;controls();try{await task();}catch(e){status.textContent=e.message;}finally{busy=false;controls();}};
 document.querySelector('#connect').onclick=()=>run(()=>client.connect());
-document.querySelector('#breathe').onclick=()=>run(async()=>{native=await client.setNativeEffect('breathe',{rgb:[255,0,0]});status.textContent=native?'内置呼吸指令已确认':'指令被覆盖';});
+document.querySelector('#breathe').onclick=()=>run(async()=>{native=await client.setNativeEffect('breathe',{rgb:[255,0,0]});status.textContent=native?'Breathing command acknowledged':'Command replaced';});
 document.querySelector('#pink').onclick=()=>run(()=>client.setColor([255,32,32]));
-document.querySelector('#cycle').onclick=()=>run(async()=>{if(await client.setNativeEffect('palette-cycle')){native=false;status.textContent='轮播指令已确认';}});
-document.querySelector('#off').onclick=()=>run(async()=>{if(await client.stopNativeEffect()){native=false;status.textContent='停止指令已确认';}});
+document.querySelector('#cycle').onclick=()=>run(async()=>{if(await client.setNativeEffect('palette-cycle')){native=false;status.textContent='Cycle command acknowledged';}});
+document.querySelector('#off').onclick=()=>run(async()=>{if(await client.stopNativeEffect()){native=false;status.textContent='Stop command acknowledged';}});
 document.querySelector('#disconnect').onclick=()=>client.disconnect();
 </script></html>

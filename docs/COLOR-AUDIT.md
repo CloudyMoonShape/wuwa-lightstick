@@ -1,15 +1,20 @@
-# 色板审查 · 2026-10-24
+# Color audit
 
-用户通过命令行肉眼确认原始红 255,0,0、绿 0,255,0、蓝 0,0,255 正常；认可粉红 255,32,32。并非仪器色度测量。
+[中文](zh-CN/COLOR-AUDIT.md) · [Documentation](README.md)
 
-旧快捷色红 ff2040、绿 3dff6e、蓝 2f6bff 为屏幕装饰混色，不是对应纯色。已修正纯色，粉红采用用户确认值。橙色 ff8000 被报告发绿，本轮降低绿色到 ff2000，仍待实物确认。
+This record describes the changes made on 2026-10-24. The current implementation is in [Color mixing](COLOR-MIXING.md).
 
-黄色 ffff00、青色 00ffff、品红 ff00ff 是明确的双通道参考值，未证明在样机上色相准确，标签明确待确认。白色 ffffff 触发固件独立白光通道。
+The sample operator checked raw red `[255,0,0]`, green `[0,255,0]`, and blue `[0,0,255]` by eye. All three looked correct. The operator also accepted pink `[255,32,32]`. These checks were not colorimeter measurements.
 
-静态主题、节拍换色共用快捷色表，移除旧的装饰混色；警灯蓝由 0,40,255 改为 0,0,255。连续 HSV 色环仍为算法混色，不声称已校准。亮度和白平衡仍会改变实际发送值，核对时应恢复所有增益为100%，亮度100%。没有自动清除用户本地设置。
+| Finding | Change | Evidence limit |
+|---|---|---|
+| The old red, green, and blue swatches used decorative screen colors: `ff2040`, `3dff6e`, and `2f6bff`. | Use pure RGB reference colors as swatch inputs. | The browser applies the current color mapping before transmission. |
+| Orange `ff8000` looked green. | Reduce green in the orange output to `ff2000`. | This was an empirical adjustment on one sample. |
+| Yellow looked green. | Use a hue map with yellow `[255,96,0]` by default. | The green value is adjustable. It is not a calibrated ratio. |
+| Equal nonzero RGB values select the firmware white channel. | Reserve equal RGB for intended white and gray. | The interface does not expose independent RGBW control. |
 
-验证：JavaScript 语法、单文件构建和11个SDK测试通过。新的橙色尚未硬件验收。该轮检查时尚未提交；本次统一整理入库。
+Static themes and beat-driven color changes use the same swatch table. The police-light blue changed from `[0,40,255]` to `[0,0,255]`.
 
-## 后续完成
+The early audit passed JavaScript syntax checks, the site build, and 11 SDK tests. Later color-map checks passed. The operator reported a large visual improvement and selected the empirical map as the only browser color mode. These are historical results, not the current test count.
 
-以上为此前色板排查记录。现已统一为观感混色，快捷色的屏幕RGB不再直接等于灯棒驱动值，实际输出在页面显示。用户确认显著改善并采用为唯一网页标准；实现、限制和15项测试见 [混色说明](COLOR-MIXING.md)。
+The SDK and CLI still accept raw RGB values. Use them to separate a protocol test from a browser color-map test. For a browser comparison, set brightness to 100% and disable manual channel correction. Existing local settings are not erased automatically.

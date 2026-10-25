@@ -1,151 +1,45 @@
-# 展示审查 · 2026-10-24
+# Design audit
 
-[控制台](https://wuwa.south-wall.com/) · [原理](https://wuwa.south-wall.com/principles) · [文档目录](README.md)
+[Documentation](README.md) · [简体中文](zh-CN/DESIGN-AUDIT.md)
 
-审查目标是让人愿意打开、连接和继续玩，同时保持一个轻量 HTML。以 Awwwards、Webby、FWA 为审美参照；自审不代表奖项认证或获奖预测。
+The controller puts connection and light control first. The principles page explains the device. The repository provides the implementation and evidence.
 
-评审依据采用 [Webby 官方标准](https://www.webbyawards.com/judging-criteria/) 的内容、结构导航、视觉、功能、交互与整体体验，以及 [Awwwards Mobile Excellence](https://www.awwwards.com/mobile-excellence-guidelines.pdf) 的可用性、性能与移动端要求。没有把增加装饰或动画数量作为品质指标。
+## Current layout
 
-## 前三轮修正
+- The header uses the RESONATOR wordmark above a compressed Tacet Mark. Overlapping pixels are cut out. Both pages use the same header and footer source.
+- The controller header aligns with the outer edges of its control panels. The principles header aligns with its text and image column.
+- The visitor count sits to the right of the logo on narrow screens.
+- Native effects, extended effects, and music have equal navigation priority.
+- Fixed native presets disable controls that do not apply. Fast flashing requires an explicit opt-in.
+- Social links use named, keyboard-accessible SVG icons. They open in a new tab.
+- The footer centers the MoonShade mark, document links, and creator credit. The flashing warning occupies its own row.
 
-| 轮次 | 发现 | 已完成的调整 |
-|---|---|---|
-| 信息与视觉 | 校准、诊断和核心遥控混在一层，说明文字密集；README 是长研究日志 | 色轮与灯效分区，连接与关灯置顶；精细参数按需展开；统一共鸣身份、墨黑、暖白与青色。README 改为试玩、真实界面、开发入口，原文完整迁入协议文档 |
-| 操作与响应式 | 手机选中色反馈不足，快速闪光与普通灯效混排 | 明确选中色、当前灯效和关灯状态；闪光独立展开并保留开关；320px、390px 与 1280px 布局检查 |
-| 独立复查 | 禁用速度仍像可操作；光条过小；停音后仍分析音频；红/粉红难辨 | 禁用行弱化，光带扩大；当前颜色显示名称；停止音源后断开、暂停处理并清空频谱，隐藏失效播放器；同文件可重新选择；原理页手机标题保持完整短句断行 |
+Keep instructions near the action that needs them. Remove labels that repeat the heading or control name. Use layout and spacing to show groups.
 
-## 前三轮验证
+## Visual system
 
-- SDK 与混色的 15 项既有测试全部通过；本轮没有改变混色算法与蓝牙传输协议。
-- 浏览器点击验证：黄色 `255,96,0`、橙色 `255,32,0`、半亮纯红 `128,0,0`、关灯 `0,0,0`；色轮拖动、精细滑块、选色与效果状态一致。
-- 闪光默认被拦截；允许后可启动，撤销允许回到呼吸。
-- 本地静音 WAV 验证文件选择、播放器显示、停止隐藏与同文件再次播放；没有请求麦克风或实际连接灯棒。
-- 原理页蓝色帧 `01 00 00 00 FF 00`、等值白帧 `01 00 B4 B4 B4 E3` 和白光通道提示正确。
-- 桌面 1280px、手机 390px、窄屏 320px 检查无横向溢出。色轮保留原生滑块替代路径，按钮和展开项具备键盘焦点样式；保留减少动态效果的系统偏好。
-- 首页约 52.8 KB，gzip 估算约 18.6 KB。CSS、脚本、图标与色轮全部包含在同一 HTML 中，首屏不依赖外部字体、图片或脚本。该体积不是中国网络延迟测量。
-- 检查页面未见控制台错误；文档相对链接与构建资源检查通过。
+The site uses a bundled MoonShade style snapshot: neutral colors, fixed spacing, clear type roles, and terminal-style marks. Control colors carry information. The game artwork and gold visitor count are project-specific additions.
 
-本轮浏览器检查不等于实体手机、光学延迟或蓝牙硬件回归，也未进行正式屏幕阅读器全流程认证。实物颜色反馈延续此前记录，见[验证记录](VERIFICATION.md)。
+The official wallpaper is a compressed, same-origin background. It loads at low priority and cannot intercept input. Solid control panels preserve legibility. Font subsets and icons are embedded; the controller has no third-party font or script request.
 
-## MoonShade 追加轮
+The website remains Chinese. English is the repository's primary documentation language, with a separate Chinese translation. Screenshots show the actual interface rather than an invented English UI.
 
-控制台、原理页和 404 共用 MoonShade 的深浅配色、字阶、间距、铭牌和阶梯切角。保留共鸣的产品名称；移除发光、装饰刻度、圆角面板与重复说明。连接、选色和灯效仍是首页主操作，校准和诊断按需展开。观感混色与蓝牙协议没有改变。
+## Images
 
-原理页从「颜色 → 六字节 → 实物」展开：驱动值可交互计算 GRB 帧，硬件照片随后对上主板和灯珠。手机先展示装配全貌，主板和灯珠按需展开；背面照片保存在[硬件文档](HARDWARE.md)。四张图共 418,522 字节，均保留完整取景、清除 EXIF / GPS 等元数据，未修改原始照片。
-
-### 自检与修正
-
-- 检查 375 / 768 / 1440 / 2560 px × 深 / 浅两套主题，另检查整页、1440 灰阶、Tab 焦点和主要展开状态。控制台与原理页共 54 张截图逐张检查；404 另行检查。
-- 检查中修复浅色主题的白色色块边界；不支持蓝牙时，在顶部明确显示兼容浏览器要求。404 返回按钮的切角会裁掉外扩焦点环，已取消此按钮的裁切，并在浏览器用 Tab 复验深浅两套主题。
-- 脚本在已检查状态中未报告横向溢出、文字对比度不足、非系统字体、字阶漂移、半透明叠色、模糊投影、圆角或位移动画。1440 px 下控制台 31 个、原理页 18 个默认可聚焦元素均有焦点环。
-- 默认 375 px 页高相对于 1440 px：控制台 1.45 倍，原理页 1.29 倍。宽屏主要内容保持 1200 px 居中。
-- 原理页手机默认折叠中的两张延迟加载图片会被脚本列为尚未加载；手机长截图也曾漏拍屏外灯珠照片。真实浏览器展开并滚到照片后已确认整图和图注完整可见，这是截图覆盖边界，不据此声称图片坏链。
-- 浏览器检查纯红、绿、蓝、橙、粉红、白，以及半亮红与关灯。输出仍为此前确认的数值，例如黄色 `255,96,0`、橙色 `255,32,0`、粉红 `255,32,32`、半亮纯红 `128,0,0`。
-- 首页约 98 KB 原始体积、30 KB gzip 估算。字体嵌入 HTML，未增加首屏请求；未测量中国网络真实延迟。字体子集更名并附带 OFL 许可。
-
-### 保留项与设计系统边界
-
-| 项目 | 依据与处理 |
+| File | Purpose |
 |---|---|
-| RGB 色轮、色板、灯光预览 | 用户明确要求通过真实颜色操纵灯棒；这些是控制数据。作为偏离保留，不把系统外 RGB 值算作零告警，也不把彩色照片改成灰阶 |
-| 灯效与频谱更新 | 用户要求预览灯效及音乐律动。保留功能性运动，移除装饰动画；继续支持减少动态效果偏好 |
-| 中文产品标题 | 中文使用系统无衬线；原理页拉丁标题与数字读数采用系统字体角色。不使用 MoonShade 字标替代共鸣 |
-| 桌面折叠细项 | 用户要求避免多余说明。校准、音频细项与开发资料在桌面也默认折叠；硬件照片遵循宽屏展开、手机折叠 |
-| `2px` 焦点环、`3px` 外扩 | 网页规范 §11 原文为「`:focus-visible` 2px `web-focus` 实线、外扩 3px」，保留这两个明确尺寸 |
-| 不使用的字体未加载 | 网页规范 §13.2：「没用到的是 `unloaded`，不算失败」。首页打包时直接移除未使用的 Expanded 字体 |
-| 桌面额外起笔 | 两栏卡片各有栏线；图列、顺序列表缩进、色名右对齐及页脚警示正文缩进各有明确作用，无悬空的小标题 |
+| [controller-desktop.png](screenshots/controller-desktop.png) | Current controller layout. |
+| [controller-mobile.png](screenshots/controller-mobile.png) | Narrow-screen hierarchy and controls. |
+| [principles-desktop.png](screenshots/principles-desktop.png) | Explanation page and hardware imagery. |
 
-候选警示语全部保留 `data-status="candidate"`：控制台「Photosensitive? Keep flashing effects off.」；原理页「Do not write to OTA service 5833ff01.」。二者是当前采用的措辞，尚未升级为设计系统定稿文案。使用了系统中仍标为建议的网页深浅配色、阶梯切角与页脚警示结构；不修改设计系统源文件。
+Screenshots demonstrate layout. They do not prove that a lightstick was connected or an effect was measured. Do not place a fabricated visitor count in a production screenshot.
 
-建议补入设计系统留表：① 控制类工具的功能性色彩、色轮与动态预览例外；② 简洁工具在宽屏仍折叠高级参数的变体；③ 硬件证据照片的原图比例、元数据清理和延迟加载检查方式；④ 切角行动链接应避免裁掉外扩焦点环。这些是记录建议，本轮没有擅自加入系统。
+## Review method
 
-这是本地浏览器和构建验证，不是奖项认定、真实手机性能测试或新一轮蓝牙硬件验收。
+Check desktop and narrow layouts after changes to shared page structure. Compare the logo, main content, and right-hand action edges. Check both light and dark themes when a color changes. Check keyboard focus and the disabled state when a control changes.
 
-## 字标与 south-wall 入口追加轮
+Use the built site for review. Serving `web/` directly bypasses the shared header and footer build step.
 
-控制台、原理页与 404 页加入 MoonShade 原版字符画字标。使用设计系统字符矩阵生成的单路径 SVG，紧凑尺寸为 142 × 33.6，跟随深浅主题的单色文字，不增加图片或字体请求。共鸣仍是产品名，连接和调色继续占据首屏。
+Earlier reviews covered 320, 375, 768, 1440, and 2560 px layouts across several revisions. They found and fixed overflow, focus, and layout issues. These historical checks do not establish that every later revision passed the same matrix. See [Verification](VERIFICATION.md) for evidence limits.
 
-三页共 54 张默认、整页、灰阶与焦点截图逐张检查，覆盖 375 / 768 / 1440 / 2560 px 与两套主题。复查修正了 404 字标链接焦点框占满整行的问题：现在焦点框贴合字标。控制台两主题各 32 个默认焦点停靠点均有焦点样式，无横向溢出；功能 RGB 色彩与折叠图片的既有例外仍保留。
-
-正式入口改为 `wuwa.south-wall.com`，文档、页面 canonical 与仓库入口同步更新。旧 `pages.dev` 地址保留。首页为 100,585 字节，gzip 估算 30,523 字节；本轮没有修改混色或蓝牙协议，15 项既有测试全部通过。README 桌面和手机截图均已更新。
-
-## 当前界面
-
-[桌面控制台](screenshots/controller-desktop.png) · [手机控制台](screenshots/controller-mobile.png)
-
-仓库展示采用真实界面截图，无徽章墙或虚构获奖标识。GitHub About 提供一句用途与控制台链接。
-
-## 到访计数追加轮
-
-页脚在项目署名下增加一行「N 位共鸣者到访」，使用现有字体、次要文字色和间距。没有新增卡片、图标或说明段落。计数失败时整行隐藏。
-
-本地隔离排版样本用 `1,234` 验证较长数字，不向正式接口上报、不写入正式统计。检查 375 / 768 / 1440 / 2560 px × 深 / 浅主题，以及整页、灰阶和焦点，共 18 张截图逐张查看。没有横向溢出、文字对比度告警或控制台错误；32 个默认焦点停靠点均保留焦点环。375 px 页高为 1440 px 的 1.43 倍。既有功能性色彩和 2px / 3px 焦点尺寸例外保持不变。
-
-## 到访计数前移
-
-按用户反馈将计数从页脚移至页头、连接栏上方。桌面位于页头右侧；手机在品牌下方与「原理与开发」并排，打开页面即可看到。采用系统 `web-body` 字阶与 `web-ink` 文字色，提高可见性，没有新增说明、图标、卡片或请求。页脚不再重复显示，去重、超时与失败隐藏逻辑保持原样。
-
-隔离样本 `1,234` 再次覆盖 375 / 768 / 1440 / 2560 px × 深浅主题、整页、灰阶和焦点，18 张截图逐张检查。无横向溢出、文字对比度不足、字体回退或控制台错误。既有功能性色彩例外保持不变；单文件审计把内联设计系统 CSS 也列入字面 px 告警，新增页面样式仅引用现有 token，没有新增固定像素值。候选警示语和系统待定项沿用前轮，没有新增偏离。
-
-33 项既有测试通过。首页 103,452 字节，gzip 估算 31,539 字节，压缩后较上一版增加 6 字节；测试数字未进入发布产物或生产计数。
-
-## 金色波纹与到访读数
-
-到访人数改为 44 px 的系统 `ms-readout` 大读数，采用金色，下方只保留「位共鸣者到访」。页头加入用户提供的 bilibili、X、Instagram 与 GitHub 四个文字链接；在新标签页打开，避免离开正在使用蓝牙的控制台。链接无社交插件、图标库或第三方脚本，GitHub 入口使用用户指定的仓库地址。
-
-背景使用原创的低对比度金色等高波纹，单个路径通过内嵌 SVG 复用。深浅主题各有一套实色，静止、不拦截点击，并从辅助技术中隐藏；面板维持实色底以保证控制区清晰。用户明确要求鸣潮式金色纹理，因此金色和装饰底纹作为本页的 MoonShade 偏离记录，不冒充设计系统的设施纹样，也未改动系统源文件。此前功能 RGB 色彩、焦点环尺寸和未使用字体的例外继续保留，候选警示语与系统待定项没有变化。
-
-本地隔离样本以 `4` 检查 375 / 768 / 1440 / 2560 px × 深浅主题、整页、灰阶及焦点，共 18 张截图逐张查看。无横向溢出、文字对比度告警、字体回退或控制台错误；1440 px 下两套主题各 36 个默认焦点停靠点均有焦点环。375 px 页高为 1440 px 的 1.42 倍。隔离样本不向正式接口上报；发布页面仍从接口读取真实数字。
-
-另以 `1,234` 检查 320 / 375 / 1440 px 页头，无数字与品牌重叠或横向溢出。README 桌面与手机截图来自本地页面，其数字使用截图时正式接口只读返回的 `4`，不生成测试访客。
-
-合入同期上游的字体许可命名修订后，继续使用相同的字形与字号，CSS 字体名为 `Wuwa UI Readout`。375 / 1440 px 深浅主题均复查字体实际加载、44 px 读数与无横向溢出，并重新生成 README 截图。
-
-33 项既有测试通过。首页 106,611 字节，gzip 估算 32,306 字节，较上一轮已发布版本压缩后增加 767 字节；本轮未改动混色、灯效调度和蓝牙协议，也未重测实体灯棒或国内线路延迟。
-
-## 水波摄影与社交图标
-
-按用户的新反馈，首页替换为 emteekay 的《Waves》黑金水波摄影，来源与原许可记录在 [第三方材料](../THIRD_PARTY.md)。使用降低饱和度、淡化左上区域的静态底图，控制面板仍为实色，保持品牌、读数和连接按钮清晰。照片、透明度、遮罩和饱和度处理是用户指定背景带来的 MoonShade 局部例外；不改动设计系统源文件。
-
-bilibili、X、Instagram、GitHub 四个入口改用内联品牌 SVG，无常显文字标签。图标 20 px，点击区域 48 × 48 px，保留名称提示、读屏标签、键盘焦点和新标签页打开行为。没有加载图标库或社交插件。
-
-375 / 768 / 1440 / 2560 px × 深浅主题、整页、灰阶及焦点共 18 张截图逐张查看。没有横向溢出、坏图、字阶漂移、字体回退、控制台错误或脚本文字对比度告警；1440 px 的 36 个默认焦点停靠点均有焦点环。375 px 与 1440 px 页高比为 1.42。脚本将已按 OFL 要求改名的 `Wuwa UI Readout` 列为设计系统外字体，浏览器检查确认字体已加载；原有功能 RGB、金色读数、2 px / 3 px 焦点尺寸例外继续保留。候选警示语与系统待定项没有变化。
-
-页面取消所有第三方浏览器、App 或扩展的安装入口。不能使用网页蓝牙时明确显示屏幕预览，不把 iPhone 的系统限制包装成连接故障。
-
-首页 110,561 字节，gzip 估算 34,404 字节。背景另加载一个同源文件：AVIF 36,499 字节，WebP 后备 48,582 字节；低优先级请求与异步解码，控制脚本不等待图片。素材加载不会访问 Unsplash。上述体积不是新一轮中国线路速度测量。
-
-
-## 鸣潮官方壁纸
-
-按用户要求，将独立水波摄影换为库洛官网的角色群像主视觉。保留原作色彩，桌面显示横图，手机使用同一张图的竖向裁切。图片、遮罩与渐变属于用户明确指定的本页设计例外，未修改 MoonShade 系统文件。连接按钮与状态文字采用实色底，主控制面板保持不透明，背景不能接收点击。来源、裁切范围与版权归属见 [第三方材料](../THIRD_PARTY.md#鸣潮官方主视觉)。
-
-375 / 768 / 1440 / 2560 px 的深浅主题首屏、三宽度整页及 1440 px 灰阶/焦点图共 18 张均已检查。文字与控制面板无横向溢出、坏图或脚本异常；背景不造成版面跳动。字体名称、控制色、金色读数和焦点环沿用上一轮记录的例外；新增渐变只用于降低壁纸对文字的干扰。既有候选警示语仍为 `Photosensitive? Keep flashing effects off.`，未增加新的待定设计项。
-
-背景优先使用 AVIF：桌面 48,834 字节、手机 25,527 字节；手机 WebP 后备 47,428 字节。与约 480 KB 的官方原图相比，桌面压缩约 90%，手机约 95%。背景低优先级、异步解码，资源名含内容哈希并启用长期缓存。首页本体 111,022 字节，gzip 估算 34,480 字节。此轮没有重新测量中国运营商线路延迟。
-
-
-## 内置灯效试验增量检查 · 2026-10-24
-
-播放方式复用 MoonShade Viewer 的 `.ms-switch`，原生灯效用两列四格，沿用现有图标、字阶和间距。固定参数停用控件；屏幕示意与设备确认分别表述。无新增设计 token、候选设施或警示语。既有候选警示仍为 “Photosensitive? Keep flashing effects off.” 和原理页 “Do not write to OTA service 5833ff01.”。已有官方壁纸、RGB 控件和灯光预览属于此前用户授权的设计例外。
-
-通过受控浏览器中的本机 iframe 验证 375 / 768 / 1440 / 2560 × 深 / 浅：无横向溢出，使用中的字体 loaded；已逐张查看截图，另检查手机灯效区和 1440 灰阶选中状态。此轮使用浏览器工具检查，没有另起独立无头浏览器验收脚本。模拟蓝牙场景核对了参数禁用与恢复、模式切换、改色和关灯。
-
-
-## 三个同级灯效入口 · 2026-10-24
-
-「原生灯效」「延伸灯效」「音乐律动」采用同一行等宽选项，保留 MoonShade 的选中标记与键盘焦点。音乐直接展示音源、频谱和玩法，不再折叠。原生常用区为两列四格加一整行多色轮播；音乐五项为三加二排布。快速闪光仍在各自分类的折叠区，需主动允许。固定原生效果禁用不适用的调色与速度控件。
-
-增量检查覆盖 375 / 768 / 1440 / 2560 px × 深浅主题，另看 1440 px 灰阶、320 px 深色及键盘切换。逐张检查截图；没有横向溢出、字体回退或浏览器错误。320 px 下修正入口标记与文字挤行的问题，三项保持同排，最小触控高度 44 px。没有新增字体、设计 token 或常显解释标签；既有背景、功能 RGB 和警示语例外不变。
-
-浏览器中的隔离模拟链路通过 12 项流程检查，包括轮播与连闪的一次启动、退出原生模式、音乐入口、迟到的麦克风授权、改色保持音乐，以及关灯释放音源。首页 gzip 估算 40,273 字节，较上一版增加 809 字节，不增加控制脚本请求。这些是布局与软件检查，不是新效果的实物验收。
-
-README 桌面截图已更新为正式站的音乐入口，显示同级分类、音源按钮与五项音乐玩法；截图时未连接灯棒。
-
-## 说明页与社区页脚（2026-10-24）
-
-说明页改为面向普通用户的短句介绍，依次说明个人控制、内部硬件、网页蓝牙、演出场控与日常玩法，最后引导至 GitHub。保留鸣潮背景，加入两张用户提供的演出图、三张硬件实拍与两幅控制流程图。场控结论注明来自样机固件分析，尚未进行现场无线验证；原生灯效和延伸灯效的说明与最新首页一致。照片采用淡内边框和窄幅边缘遮罩，浅色模式减弱遮罩；硬件原图链接仍可打开。
-
-首页与说明页采用同一页脚：左侧为「共鸣 · 非官方社区项目」及独立声明，右侧为「原理与开发 · 源码许可 · GitHub」和 MoonShade 字样。保留分隔线上方的 `//////` 提示。手机布局分组换行，三个文档链接的点击高度为 44 px。
-
-本地合并版本检查了 375 / 1280 px 的首页与说明页，无横向溢出；主线程新增的原生灯效、延伸灯效和音乐入口均保留。68 项测试、构建和差异空白检查通过。首页 133,918 字节，gzip 估算 40,643 字节；两张演出图合计 149,226 字节，只在说明页加载。本条记录是本地验证，不表示已部署到 Pages。
+The award references were design goals, not certifications or award results.

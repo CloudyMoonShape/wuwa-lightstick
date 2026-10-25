@@ -1,12 +1,14 @@
-# 演出配图
+# Concert photos
 
-两张图片由用户在本次页面编辑中提供。文件只做 WebP 压缩和元数据清除，保留完整画面、原始尺寸及画面内标志。
+[简体中文](README.zh-CN.md)
 
-| 文件 | 画面 | 尺寸 |
+These files came from images supplied by the project owner. They were compressed to WebP and stripped of metadata. The full frame and existing marks were retained.
+
+| File | Subject | Dimensions |
 |---|---|---|
-| `audience-blue.webp` | 蓝色应援棒与舞台灯光 | 954 × 635 |
-| `audience-pink.webp` | 粉色应援棒与舞台表演 | 953 × 632 |
+| `audience-blue.webp` | Blue lightsticks and stage lighting | 954 × 635 |
+| `audience-pink.webp` | Pink lightsticks and a stage performance | 953 × 632 |
 
-图片用于说明演出中的灯光效果，不作为发射设备、无线协议或现场配置的证据。场控说明来自 [样机协议研究](../../../docs/PROTOCOL.md#现场广播协议固件逆向2026-10-22未实测)，目前尚未做现场无线验证。
+The photos show concert lighting. They do not prove a radio protocol or transmitter configuration. See [protocol research](../../../docs/PROTOCOL.md).
 
-未提供原始发布链接或单独的图片授权文件。项目代码许可证不替代图片原权利人的权利。
+No original publication URL or separate redistribution permission was supplied. The project code license does not grant rights to these photos. See the [release review](../../../docs/PUBLIC-RELEASE.md).
