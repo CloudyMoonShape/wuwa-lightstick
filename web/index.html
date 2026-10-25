@@ -22,7 +22,7 @@
 <section class="instrument" id="playground" aria-label="应援棒遥控器">
   <div class="connection ms-plate">
     <div class="connection-state"><span class="ms-status" id="connectionMark" data-state="unknown" aria-hidden="true"></span><p id="status" role="status" aria-live="polite" class="web-small">未连接，可先试玩</p></div>
-    <div class="connection-actions"><button id="connect" class="web-small primary ms-action">连接应援棒</button><button id="blackout" class="web-small power" aria-label="关灯" title="关灯"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v9M6.3 6.7a8 8 0 1 0 11.4 0"/></svg></button></div>
+    <div class="connection-actions"><button id="guideOpen" class="web-small guide-open" type="button" data-guide><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg>连接说明</button><button id="connect" class="web-small primary ms-action">连接应援棒</button><button id="blackout" class="web-small power" aria-label="关灯" title="关灯"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v9M6.3 6.7a8 8 0 1 0 11.4 0"/></svg></button></div>
   </div>
   <div class="controls ms-grid">
     <section class="color-panel ms-card" aria-labelledby="colorHeading">
@@ -54,7 +54,7 @@
     </section>
   </div>
 </section>
-<p class="web-small compat" id="compat">蓝牙连接支持电脑 Chrome / Edge、Android Chrome。</p>
+<p class="web-small compat" id="compat">蓝牙连接支持电脑 Chrome / Edge、Android Chrome。<button class="web-small quiet inline" type="button" data-guide>其他设备</button></p>
 <div class="utilities">
   <details id="calibration"><summary class="web-small">颜色微调</summary><div class="detail-body">
     <div class="row"><label for="yellowGreen" class="web-small">黄色中的绿</label><input type="range" id="yellowGreen" min="16" max="255" value="96"><output id="yellowValue" for="yellowGreen" class="web-data">96</output><button id="calY" class="web-small quiet">试黄色</button></div>
@@ -68,11 +68,60 @@
       <p class="web-small note">数值保存在此浏览器，默认不启用。白光使用独立灯珠，不受增益影响。</p>
     </div></details>
   </div></details>
-  <details id="help"><summary class="web-small">连接帮助</summary><div class="detail-body"><p class="web-small">装好电池，在蓝牙弹窗中选择 <code>JFKJ</code> 开头的设备。蓝灯闪完后即可操纵，网页灯效使用时请保持页面在前台。</p><p class="web-small">找不到设备时，请关闭其他已连接它的网页或程序，确认系统蓝牙与浏览器权限已开启，靠近棒子后重试。iPhone / iPad 的常规浏览器尚未开放网页蓝牙，只能屏幕预览；添加到主屏幕也不会改变这一点。</p><p class="web-small">断开连接后灯光可能保持；需要熄灭时点关灯，或使用棒子的实体开关。</p></div></details>
+  <details id="help"><summary class="web-small">连接帮助</summary><div class="detail-body"><p class="web-small">装好电池，在蓝牙弹窗中选择 <code>JFKJ</code> 开头的设备。蓝灯闪完后即可操纵，网页灯效使用时请保持页面在前台。</p><p class="web-small">找不到设备时，请关闭其他已连接它的网页或程序，确认系统蓝牙与浏览器权限已开启，靠近棒子后重试。iPhone / iPad、微信里打开，或手机浏览器连不上时，见<button class="web-small quiet inline" type="button" data-guide>连接说明</button>。</p><p class="web-small">断开连接后灯光可能保持；需要熄灭时点关灯，或使用棒子的实体开关。</p></div></details>
   <details class="diagnostics"><summary class="web-small">连接详情</summary><div class="detail-body"><div class="row"><label for="sendRate" class="web-small">发送上限</label><select id="sendRate" class="web-small"><option value="60">60 次/秒</option><option value="90">90 次/秒 · 试验</option><option value="120">120 次/秒 · 试验</option></select></div><p id="outputRgb" class="web-small"></p><p class="web-small note">写入 <span id="fps">–</span> 次/秒 · 指令回包 <span id="replyFps">–</span> 次/秒 · 写入耗时 <span id="rtt">–</span> ms</p><pre id="log" class="web-small"></pre></div></details>
 </div>
 <!-- site-footer -->
 </main>
+<dialog id="guide" class="guide" aria-labelledby="guideTitle">
+  <div class="guide-head"><h2 class="ms-h2" id="guideTitle">连接说明</h2><form method="dialog"><button class="web-small quiet" aria-label="关闭">关闭</button></form></div>
+  <p class="web-small note">遥控用的是浏览器提供的「网页蓝牙」，和手机能不能连蓝牙耳机无关。连不上时仍可在屏幕上试玩。</p>
+  <fieldset class="ms-switch guide-tabs"><legend class="ms-sr">选择你的设备</legend>
+    <label><input type="radio" name="guideTab" value="computer" checked>电脑</label>
+    <label><input type="radio" name="guideTab" value="android">安卓</label>
+    <label><input type="radio" name="guideTab" value="iphone">iPhone</label>
+    <label><input type="radio" name="guideTab" value="in-app">微信 / QQ</label>
+    <label><input type="radio" name="guideTab" value="harmony">鸿蒙</label>
+  </fieldset>
+  <div class="guide-panel web-body" data-tab="computer">
+    <p>Windows、Mac 用 <strong>Chrome</strong> 或 <strong>Edge</strong> 打开本站，点「连接应援棒」即可。</p>
+    <p class="web-small note">Mac 的 Safari、电脑版 Firefox 不能连接。</p>
+  </div>
+  <div class="guide-panel web-body" data-tab="android" hidden>
+    <p>用 <strong>Chrome</strong> 或 <strong>Edge</strong> 打开本站。首次连接时允许「附近的设备」或「位置」权限。</p>
+    <p class="web-small note">手机自带浏览器、UC、夸克、QQ 浏览器等大多不能连接；连不上时复制网址，换到 Chrome 或 Edge 打开。</p>
+    <div class="copy-row"><button class="web-small" type="button" data-copy="https://wuwa.south-wall.com/">复制网址</button></div>
+  </div>
+  <div class="guide-panel web-body" data-tab="iphone" hidden>
+    <p>iPhone / iPad 上所有浏览器都不能直接连接，需要先从 App Store 装一个免费 App，任选其一。App 界面是英文，下面写明了要点哪里。两个 App 都由第三方开发，与本站无关。</p>
+    <h3 class="ms-h3">方法一：Bluefy（最省事）</h3>
+    <ol class="steps">
+      <li>App Store 搜索 <strong>Bluefy</strong> 并安装，开发者是 PNN Soft。<a class="ms-link" href="https://apps.apple.com/cn/app/id1492822055" target="_blank" rel="noopener noreferrer">去 App Store</a></li>
+      <li>打开 Bluefy，在顶部地址栏粘贴本站网址。<button class="web-small" type="button" data-copy="https://wuwa.south-wall.com/">复制网址</button></li>
+      <li>点「连接应援棒」，系统询问蓝牙权限时点「好」，选 <code>JFKJ</code> 开头的设备。</li>
+    </ol>
+    <h3 class="ms-h3">方法二：beacio（继续用 Safari）</h3>
+    <ol class="steps">
+      <li>App Store 搜索 <strong>beacio</strong> 并安装，打开一次。<a class="ms-link" href="https://apps.apple.com/cn/app/id6761301368" target="_blank" rel="noopener noreferrer">去 App Store</a></li>
+      <li>回到 Safari 打开本站，点地址栏左侧「大小」图标（aA）→「管理扩展」→ 打开 beacio。</li>
+      <li>再点「大小」图标 → beacio → <strong>Enable on all websites</strong>，系统弹窗里选「始终允许…」→「在所有网站上」。</li>
+      <li>刷新页面，点「连接应援棒」。</li>
+    </ol>
+    <p class="web-small note">beacio 只对 Safari 有效。两个 App 尚未与本站逐项实测，一个卡顿时可试另一个；音乐律动的「标签页」音源在 iPhone 上不可用。</p>
+  </div>
+  <div class="guide-panel web-body" data-tab="in-app" hidden>
+    <p>微信、QQ 里打开的网页都不能连接，需要换到浏览器：</p>
+    <ol class="steps">
+      <li>点右上角 <strong>···</strong>。</li>
+      <li>iPhone 选「在 Safari 中打开」，再按「iPhone」页装 App；安卓选「在浏览器打开」。</li>
+      <li>安卓如果跳到的不是 Chrome / Edge，复制网址后换过去打开。<button class="web-small" type="button" data-copy="https://wuwa.south-wall.com/">复制网址</button></li>
+    </ol>
+  </div>
+  <div class="guide-panel web-body" data-tab="harmony" hidden>
+    <p>HarmonyOS 4 及更早的版本能安装安卓版 Chrome，用法同安卓。</p>
+    <p class="web-small note">HarmonyOS NEXT / 5 及以后的华为浏览器暂未确认能否连接，欢迎实测反馈。</p>
+  </div>
+</dialog>
 <script type="module" src="app.js"></script>
 <script type="module" src="visitors.js"></script>
 </body></html>

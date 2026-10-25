@@ -609,11 +609,40 @@ function stopAudio() {
 $("stopAudio").onclick = stopAudio;
 $("blackout").onclick = () => { stopAudio(); startEffect(effects.at(-1)); };
 $("flashConsent").onchange = () => { if (!$("flashConsent").checked && FLASH_EFFECTS.has(running?.name)) startEffect(engine === "native" ? nativeEffects[1] : engine === "music" ? musicEffects[0] : effects[1]); };
+// Connection guide: one tab per device family, opened on the visitor's own.
+const ua = navigator.userAgent;
+const guideDevice = /MicroMessenger|\bQQ\/|Weibo|DingTalk/i.test(ua) ? "in-app"
+  : /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1) ? "iphone"
+  : /OpenHarmony|HarmonyOS|ArkWeb/.test(ua) ? "harmony"
+  : /Android/.test(ua) ? "android" : "computer";
+function showGuideTab(tab) {
+  document.querySelector(`input[name=guideTab][value="${tab}"]`).checked = true;
+  document.querySelectorAll(".guide-panel").forEach(panel => { panel.hidden = panel.dataset.tab !== tab; });
+}
+document.querySelectorAll("input[name=guideTab]").forEach(input => input.addEventListener("change", () => showGuideTab(input.value)));
+document.addEventListener("click", async e => {
+  if (e.target.closest("[data-guide]")) { showGuideTab(guideDevice); $("guide").showModal(); return; }
+  const copy = e.target.closest("[data-copy]");
+  if (!copy) return;
+  const label = copy.textContent;
+  try { await navigator.clipboard.writeText(copy.dataset.copy); copy.textContent = "已复制"; }
+  catch { copy.textContent = copy.dataset.copy; }
+  setTimeout(() => { copy.textContent = label; }, 2500);
+});
+$("guide").addEventListener("click", e => { if (e.target === $("guide")) $("guide").close(); });
 if (!window.isSecureContext || typeof navigator.bluetooth?.requestDevice !== "function") {
   setStatus("屏幕预览 · 当前浏览器无法连接蓝牙");
-  $("compat").textContent = "可以在屏幕上调色、播放灯效；当前浏览器尚未开放网页蓝牙。";
-  $("connect").disabled = true;
-  $("connect").textContent = "仅预览";
+  // Name the visitor's situation so the guide reads as a next step, not a dead end.
+  const hint = {"in-app": "在微信 / QQ 里不能连接，请换到浏览器打开。", iphone: "iPhone / iPad 需要先装一个免费 App 才能连接。"}[guideDevice]
+    ?? "当前浏览器尚未开放网页蓝牙，可以在屏幕上调色、播放灯效。";
+  const more = document.createElement("button");
+  Object.assign(more, {type: "button", className: "web-small quiet inline", textContent: "查看连接方法"});
+  more.dataset.guide = "";
+  $("compat").replaceChildren(hint + " ", more);
+  $("connect").textContent = "怎么连接";
+  $("connect").classList.add("guide-open");
+  $("connect").onclick = () => { showGuideTab(guideDevice); $("guide").showModal(); };
+  $("guideOpen").hidden = true;
 }
 if (!navigator.mediaDevices?.getDisplayMedia) $("srcTab").disabled = true;
 if (!navigator.mediaDevices?.getUserMedia) $("srcMic").disabled = true;
