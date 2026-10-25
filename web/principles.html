@@ -72,6 +72,17 @@
   .footer-links { margin-top:var(--web-space-2); }
   .footer-links a { min-height:calc(var(--web-space-12) - var(--web-space-1)); }
 }
+
+.unified-footer { margin-top:var(--web-space-8); padding-top:var(--web-space-4); border-top:1px dashed var(--web-line); }
+.footer-top,.footer-bottom { display:flex; justify-content:space-between; align-items:center; gap:var(--web-space-3); }
+.footer-top { padding-bottom:var(--web-space-4); }
+.footer-caution { margin:0; color:var(--web-ink-2); }
+.footer-top nav { display:flex; gap:var(--web-space-4); white-space:nowrap; }
+.footer-bottom { padding-top:var(--web-space-4); border-top:1px solid var(--web-line); }
+.footer-logo { display:inline-flex; align-items:center; min-height:44px; }
+.footer-logo svg { width:112px; height:auto; }
+.footer-credit { white-space:nowrap; color:var(--web-ink-2); }
+@media(max-width:600px) { .footer-caution span { font-size:0; } .footer-caution span::after { content:"闪光敏感请勿开启"; font-size:11px; } .footer-caution { font-size:11px; } .footer-top nav { gap:8px; font-size:11px; } .footer-credit { font-size:11px; } .footer-logo svg { width:88px; } }
 </style>
 </head>
 <body class="ms-page wuwa-principles">
@@ -204,14 +215,9 @@
     </div>
   </section>
 </main>
-<footer class="ms-site-footer ms-wrap principles-footer">
-  <div class="ms-warnstrip footer-warning"><span class="ms-hazard" aria-hidden="true">//////</span><p class="web-small" lang="en">Photosensitive? Keep flashing effects off.</p></div>
-  <div class="ms-footer community-footer">
-    <p class="footer-project web-small">共鸣 · 非官方社区项目</p>
-    <nav class="footer-links web-small" aria-label="项目文档"><a class="ms-link" href="principles.html" aria-current="page">原理与开发</a><span aria-hidden="true">·</span><a class="ms-link" href="LICENSE.txt">源码许可</a><span aria-hidden="true">·</span><a class="ms-link" href="https://github.com/CloudyMoonShape/wuwa-lightstick" target="_blank" rel="noopener noreferrer">GitHub</a></nav>
-    <p class="footer-disclaimer web-small">与游戏、主办方及硬件厂家无关</p>
-    <span class="footer-brand web-small" lang="en" aria-label="MoonShade"><span aria-hidden="true">▚</span> MOONSHADE <span aria-hidden="true">▞</span></span>
-  </div>
+<footer class="ms-site-footer principles-footer unified-footer">
+<div class="footer-top"><p class="web-small footer-caution">////// <span lang="en">Photosensitive? Keep flashing effects off.</span></p><nav class="web-small" aria-label="项目文档"><a href="principles.html">原理与开发</a><a href="LICENSE.txt">源码许可</a><a href="https://github.com/CloudyMoonShape/wuwa-lightstick" target="_blank" rel="noopener noreferrer">GitHub</a></nav></div>
+<div class="footer-bottom"><a class="footer-logo" href="/" aria-label="MoonShade · 共鸣首页"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1420 336" width="142" height="33.6" aria-hidden="true" class="ms-wordmark" shape-rendering="crispEdges" focusable="false"><path fill="currentColor" d="M0 0h40v21h-40zM0 168h40v147h-40zM130 0h40v21h-40zM130 168h40v168h-40zM220 0h80v21h-80zM380 0h80v21h-80zM510 0h50v42h-50zM620 0h30v168h-30zM700 0h80v21h-80zM820 0h40v126h-40zM820 210h40v105h-40zM920 0h40v126h-40zM920 189h40v147h-40zM1030 0h40v42h-40zM1150 0h100v21h-100zM1150 315h100v21h-100zM1300 0h120v63h-120zM1300 273h120v42h-120zM0 21h50v21h-50zM120 21h50v42h-50zM210 21h100v21h-100zM210 294h100v21h-100zM370 21h100v21h-100zM370 294h100v21h-100zM690 21h100v21h-100zM690 147h100v21h-100zM690 294h100v21h-100zM1150 21h110v21h-110zM1150 294h110v21h-110zM0 42h60v42h-60zM200 42h120v21h-120zM200 273h120v21h-120zM360 42h120v21h-120zM360 273h120v21h-120zM510 42h60v21h-60zM680 42h120v21h-120zM680 273h120v21h-120zM1030 42h50v21h-50zM1150 42h120v21h-120zM1150 273h120v21h-120zM110 63h60v42h-60zM200 63h40v42h-40zM200 231h40v21h-40zM280 63h40v21h-40zM280 252h40v21h-40zM360 63h40v42h-40zM360 231h40v21h-40zM440 63h40v21h-40zM440 252h40v21h-40zM510 63h70v42h-70zM680 63h40v21h-40zM680 105h40v21h-40zM680 252h40v21h-40zM760 63h40v42h-40zM760 210h40v63h-40zM1020 63h60v21h-60zM1150 63h40v210h-40zM1230 63h50v21h-50zM1230 252h50v21h-50zM1300 63h40v63h-40zM1300 210h40v63h-40zM0 84h70v42h-70zM290 84h40v168h-40zM450 84h40v168h-40zM680 84h30v21h-30zM1020 84h70v21h-70zM1240 84h40v63h-40zM1240 189h40v63h-40zM100 105h70v21h-70zM200 105h30v21h-30zM200 210h30v21h-30zM360 105h30v21h-30zM360 210h30v21h-30zM510 105h80v21h-80zM1010 105h80v21h-80zM0 126h80v42h-80zM90 126h80v42h-80zM190 126h40v84h-40zM350 126h40v84h-40zM510 126h90v21h-90zM680 126h90v21h-90zM820 126h140v63h-140zM1010 126h40v21h-40zM1060 126h30v21h-30zM1300 126h110v84h-110zM510 147h40v168h-40zM560 147h40v21h-40zM1000 147h40v63h-40zM1060 147h40v42h-40zM1250 147h30v42h-30zM50 168h70v42h-70zM560 168h90v21h-90zM700 168h100v21h-100zM570 189h80v21h-80zM740 189h60v21h-60zM820 189h50v21h-50zM1070 189h40v21h-40zM60 210h50v42h-50zM580 210h70v42h-70zM990 210h120v42h-120zM670 231h40v21h-40zM70 252h30v21h-30zM200 252h50v21h-50zM360 252h50v21h-50zM590 252h60v21h-60zM980 252h140v21h-140zM600 273h50v21h-50zM980 273h40v42h-40zM1080 273h40v21h-40zM610 294h40v42h-40zM1090 294h40v42h-40zM10 315h30v21h-30zM230 315h70v21h-70zM390 315h70v21h-70zM520 315h30v21h-30zM700 315h70v21h-70zM830 315h30v21h-30zM970 315h40v21h-40zM1310 315h110v21h-110z"/></svg></a><a class="web-small footer-credit" href="https://x.com/CloudyMoonShape" target="_blank" rel="noopener noreferrer">Powered by @CloudyMoonShape</a></div>
 </footer>
 </body>
 </html>
