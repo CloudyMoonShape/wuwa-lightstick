@@ -1,5 +1,5 @@
 
-.site-head { margin-inline:calc(-1 * var(--ms-hang)); display:grid; grid-template-columns:minmax(0,1fr) auto; gap:var(--web-space-3) var(--web-space-6); padding-block:var(--web-space-6); align-items:start; }
+.site-head { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:var(--web-space-3) var(--web-space-6); padding-block:var(--web-space-6); align-items:start; }
 .site-identity { display:flex; align-items:start; gap:var(--web-space-6); }
 .site-identity .ms-brand { flex:none; padding:0; margin:0; }
 .site-identity svg { display:block; width:142px; height:auto; stroke:none; }
@@ -28,3 +28,6 @@
 .site-identity .resonator-brand svg { width:230px; height:auto; }
 .resonator-brand:focus-visible { outline:2px solid currentColor; outline-offset:6px; }
 @media(max-width:767px) { .site-identity { display:contents; } .resonator-brand { grid-column:1; grid-row:1; } .site-heading { grid-column:1/-1; grid-row:2; } .site-identity .resonator-brand svg { width:clamp(150px,50vw,201px); max-width:100%; } }
+
+/* Controller cards hang beyond the text column; documentation does not. */
+.wuwa-controller .site-head { margin-inline:calc(-1 * var(--ms-hang)); }
