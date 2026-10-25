@@ -32,6 +32,8 @@ Safari and Chrome on iPhone or iPad do not provide native Web Bluetooth. They su
 
 The research sample has board `HE-750G24` and firmware `V4.1.8`. Other hardware or firmware versions can behave differently. Flashing effects require a separate opt-in.
 
+Cannot connect, or keep losing the connection? The batteries may be depleted. Replace the full set with new batteries and try again. If it still fails, check Bluetooth permission and close other pages or apps connected to the lightstick.
+
 ## How it works
 
 ```mermaid

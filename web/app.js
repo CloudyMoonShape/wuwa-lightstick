@@ -26,7 +26,7 @@ const client = new LightstickClient({
   // FrameSender is the sole rate limiter for this controller. SDK defaults stay 60 Hz.
   minGapMs: 0,
   onState(state, detail) {
-    const labels = {selecting:"选择设备…", connecting:"连接中…", authenticating:"等待蓝灯闪完…", ready:t("已连接 {device}", {device: detail || ""}), disconnected:"已断开 · 屏幕预览", error:detail ? t("连接失败，请检查电池和浏览器蓝牙权限（{detail}）", {detail}) : "连接失败，请检查电池和浏览器蓝牙权限"};
+    const labels = {selecting:"选择设备…", connecting:"连接中…", authenticating:"等待蓝灯闪完…", ready:t("已连接 {device}", {device: detail || ""}), disconnected:"已断开 · 屏幕预览", error:detail ? t("连接失败：请先更换新电池后重试，并确认浏览器蓝牙权限（{detail}）", {detail}) : "连接失败：请先更换新电池后重试，并确认浏览器蓝牙权限"};
     setStatus(labels[state] || state, state === "ready" ? "ok" : state === "error" ? "err" : "");
     $("connect").disabled = ["selecting","connecting","authenticating"].includes(state);
     $("connect").textContent = state === "ready" ? t("断开连接") : t("连接应援棒");

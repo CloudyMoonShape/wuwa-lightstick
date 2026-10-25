@@ -19,10 +19,6 @@
     "en": "Disconnected · Preview",
     "ja": "切断済み · プレビュー"
   },
-  "连接失败，请检查电池和浏览器蓝牙权限": {
-    "en": "Connection failed. Check the batteries and Bluetooth permission.",
-    "ja": "接続できません。電池とブラウザーの Bluetooth 権限を確認してください。"
-  },
   "断开连接": {
     "en": "Disconnect",
     "ja": "切断"
@@ -459,10 +455,6 @@
     "en": "Select white {hex}",
     "ja": "白 {hex} を選択"
   },
-  "连接失败，请检查电池和浏览器蓝牙权限（{detail}）": {
-    "en": "Connection failed. Check the batteries and Bluetooth permission. ({detail})",
-    "ja": "接続できません。電池とブラウザーの Bluetooth 権限を確認してください。（{detail}）"
-  },
   "已复制": {
     "en": "Copied",
     "ja": "コピーしました"
@@ -486,5 +478,13 @@
   "怎么连接": {
     "en": "How to connect",
     "ja": "接続方法"
+  },
+  "连接失败：请先更换新电池后重试，并确认浏览器蓝牙权限": {
+    "en": "Connection failed. Try new batteries and check browser Bluetooth permission.",
+    "ja": "接続できません。電池を新品に交換して再試行し、ブラウザーのBluetooth権限を確認してください。"
+  },
+  "连接失败：请先更换新电池后重试，并确认浏览器蓝牙权限（{detail}）": {
+    "en": "Connection failed. Try new batteries and check browser Bluetooth permission. ({detail})",
+    "ja": "接続できません。電池を新品に交換して再試行し、ブラウザーのBluetooth権限を確認してください。（{detail}）"
   }
 }

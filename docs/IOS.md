@@ -6,6 +6,8 @@ Use Bluefy to connect this website to your lightstick. Safari and Chrome on iPho
 
 These user-supplied screenshots show a successful Bluefy connection. They do not verify every effect or music feature. Device names and identifiers were concealed in two illustrations. The screenshots use the English app interface.
 
+Cannot connect, or keep losing the connection? The batteries may be depleted. Replace the full set with new batteries and try again. If it still fails, check Bluetooth permission and close other pages or apps connected to the lightstick.
+
 ## 1. Install Bluefy
 
 Find **Bluefy – Web BLE Browser** in the App Store. Check that the developer is PNN Soft.

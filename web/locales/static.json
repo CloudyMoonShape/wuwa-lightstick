@@ -757,5 +757,9 @@
   "截图已确认 Bluefy 可以连接此灯棒；不代表所有灯效和音乐功能都已逐项验证。iPhone 不支持「标签页」音源。": {
     "en": "These screenshots confirm a Bluefy connection to this lightstick. They do not verify every effect or music feature. Tab audio is not available on iPhone.",
     "ja": "このスクリーンショットでは、Bluefyからこのペンライトへの接続を確認しています。すべてのエフェクトや音楽機能を検証したものではありません。iPhoneではタブ音声を利用できません。"
+  },
+  "连不上或频繁断开？电池可能已耗尽，请先更换一组新电池后重试。仍无法连接时，再检查蓝牙权限，并关闭其他已连接灯棒的网页或程序。": {
+    "en": "Cannot connect, or keep losing the connection? The batteries may be depleted. Replace the full set with new batteries and try again. If it still fails, check Bluetooth permission and close other pages or apps connected to the lightstick.",
+    "ja": "接続できない、または接続が頻繁に切れる場合は、電池切れの可能性があります。すべての電池を新品に交換してから再試行してください。それでも接続できない場合は、Bluetoothの権限を確認し、ペンライトに接続中の他のページやアプリを閉じてください。"
   }
 }
