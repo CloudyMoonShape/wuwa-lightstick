@@ -24,7 +24,7 @@ Choose a color. Play an effect. Make the light follow your music. No account or 
 3. Select your device, named `JFKJ-FBFB`.
 4. Wait for the three blue flashes. Then choose a color or effect.
 
-The website interface is in Chinese. Safari and Chrome on iPhone or iPad support screen previews only. They do not provide the required native Web Bluetooth interface. This project does not ask users to install another browser or app. See [browser support](docs/SDK.md).
+The website interface is in Chinese. Safari and Chrome on iPhone or iPad do not provide Web Bluetooth and support screen previews only. To connect from an iPhone, use a free Web Bluetooth browser app such as Bluefy, or the beacio Safari extension; the controller's “连接说明” dialog gives step-by-step Chinese instructions per device. See [browser support](docs/SDK.md).
 
 The research sample has board `HE-750G24` and firmware `V4.1.8`. Other hardware or firmware versions can behave differently. Flashing effects require a separate opt-in.
 

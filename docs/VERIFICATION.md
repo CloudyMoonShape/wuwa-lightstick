@@ -41,7 +41,7 @@ Simulated writes and replies do not measure real Bluetooth throughput or optical
 
 Earlier browser checks covered desktop and narrow layouts, light and dark themes, keyboard focus, color controls, effect categories, flashing opt-in, local audio playback, and simulated Bluetooth transitions.
 
-Background failure and slow loading were tested without blocking the controls. Tests with the Bluetooth interface removed kept screen preview available. These were browser simulations, not physical iPhone tests.
+Background failure and slow loading were tested without blocking the controls. Tests with the Bluetooth interface removed kept screen preview available. These were browser simulations, not physical iPhone tests. The connection guide dialog was checked at 375 px and desktop widths for opening, closing, tab switching, and URL copying. In Bluefy on an iPhone, the old SDK failed before the device chooser appeared; the fix (full 128-bit UUIDs and a `writeValue()` fallback) passes a simulated legacy-write endpoint and awaits a real iPhone retest.
 
 The visitor counter was tested in an isolated local database. Thirty-two requests with the same ID incremented the total once. A production browser then registered once and reused its identity across refreshes and tabs. No test IDs were inserted into the production database.
 

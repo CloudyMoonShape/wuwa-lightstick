@@ -24,7 +24,7 @@
 3. 选择自己的 `JFKJ-FBFB` 设备。
 4. 等待三次蓝灯闪烁结束，再选择颜色或灯效。
 
-网站界面为中文。iPhone 和 iPad 上的 Safari、Chrome 只支持屏幕预览，未提供所需的原生 Web Bluetooth 接口。本项目不要求用户安装其他浏览器或 App。见[浏览器支持](docs/zh-CN/SDK.md)。
+网站界面为中文。iPhone 和 iPad 上的 Safari、Chrome 没有 Web Bluetooth，只能屏幕预览；要在 iPhone 上连接，需先装免费的 Bluefy 浏览器或 beacio Safari 扩展。首页的「连接说明」弹窗按设备分页给出中文步骤。见[浏览器支持](docs/zh-CN/SDK.md)。
 
 研究样机采用 `HE-750G24` 主板和 `V4.1.8` 固件。其他硬件或固件版本可能有不同行为。闪光效果需要单独开启。
 

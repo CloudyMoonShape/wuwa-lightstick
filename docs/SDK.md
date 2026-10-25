@@ -35,7 +35,9 @@ The controller checks for a secure context and `navigator.bluetooth.requestDevic
 
 Chrome on Windows, macOS, ChromeOS, and Android provides the required interface. Edge on Windows and macOS also supports the controller path. Linux Chrome support remains experimental; do not assume it works without configuration. Standard Safari and Chrome on iPhone and iPad do not provide native Web Bluetooth. HTTPS, a home-screen shortcut, or a PWA cannot add this interface.
 
-If the interface is absent, the page disables connection and keeps screen previews available. It does not ask users to install another browser, app, or extension. An extension with a native Bluetooth bridge is a separate installation, not native browser support.
+If the interface is absent, the page keeps screen previews available and turns the connect button into “怎么连接”, which opens the connection guide on the visitor's device tab. On iPhone and iPad the guide points to two free App Store routes, the Bluefy browser and the beacio Safari extension; both bridge to iOS Bluetooth and are third-party installs, not native browser support. In WeChat or QQ the guide asks the visitor to reopen the page in a browser.
+
+iOS bridges hand UUIDs to the system Bluetooth stack, so the SDK exports `SERVICE`, `NOTIFY`, and `WRITE` as full 128-bit strings rather than 16-bit numbers. Writes fall back to the legacy `writeValue()` when `writeValueWithResponse()` or `writeValueWithoutResponse()` is missing.
 
 See [Chrome Bluetooth help](https://support.google.com/chrome/answer/6362090?hl=en) and the [Web Bluetooth implementation status](https://github.com/whatwg/bluetooth/blob/main/implementation-status.md).
 
