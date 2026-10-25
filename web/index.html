@@ -78,7 +78,7 @@
     </div></details>
   </div></details>
   <details id="help"><summary class="web-small">连接帮助</summary><div class="detail-body"><p class="web-small">装好电池，在蓝牙弹窗中选择 <code>JFKJ</code> 开头的设备。蓝灯闪完后即可操纵，使用时保持网页在前台。</p><p class="web-small">找不到设备时，请关闭其他已连接它的网页或程序，确认系统蓝牙与浏览器权限已开启，靠近棒子后重试。iPhone / iPad 的常规浏览器尚未开放网页蓝牙，只能屏幕预览；添加到主屏幕也不会改变这一点。</p><p class="web-small">断开连接后灯光可能保持；需要熄灭时点关灯，或使用棒子的实体开关。</p></div></details>
-  <details class="diagnostics"><summary class="web-small">连接详情</summary><div class="detail-body"><p id="outputRgb" class="web-small"></p><p class="web-small note">发送 <span id="fps">–</span> 帧 / 秒 · 单帧耗时 <span id="rtt">–</span> ms（含软件限速）</p><pre id="log" class="web-small"></pre></div></details>
+  <details class="diagnostics"><summary class="web-small">连接详情</summary><div class="detail-body"><div class="row"><label for="sendRate" class="web-small">发送上限</label><select id="sendRate" class="web-small"><option value="60">60 次/秒</option><option value="90">90 次/秒 · 试验</option><option value="120">120 次/秒 · 试验</option></select></div><p id="outputRgb" class="web-small"></p><p class="web-small note">写入 <span id="fps">–</span> 次/秒 · 设色回包 <span id="replyFps">–</span> 次/秒 · 写入耗时 <span id="rtt">–</span> ms</p><pre id="log" class="web-small"></pre></div></details>
 </div>
 <footer class="ms-site-footer">
 <div class="ms-warnstrip" data-status="candidate"><span class="ms-hazard" aria-hidden="true">//////</span><p class="web-small">Photosensitive? Keep flashing effects off.</p></div>

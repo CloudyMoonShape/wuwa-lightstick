@@ -1,6 +1,7 @@
 import { LightstickClient } from "./sdk.js";
 import { rgbToHsv, wheelRgb, renderColor } from "./color.js";
 import { brightnessDrive, BrightnessSmoother, breathBrightness, breathHue } from "./dimming.js";
+import { outputRate, isColorReply, EffectClock, FrameSender } from "./output.js";
 
 const $ = id => document.getElementById(id);
 const hex = b => [...b].map(x => x.toString(16).padStart(2, "0")).join(" ");
@@ -15,19 +16,27 @@ function log(line) {
 function setStatus(text, cls = "") { $("status").textContent = text; $("status").className = "web-small " + cls; $("connectionMark").dataset.state = cls === "ok" ? "on" : cls === "err" ? "off" : "unknown"; }
 
 // Transport and frame validation are shared with developer examples through sdk.js.
-let sentFrames = 0, rttMs = 0, statsSince = performance.now();
+let sentFrames = 0, replyFrames = 0, rttMs = 0, statsSince = performance.now();
 const client = new LightstickClient({
+  // FrameSender is the sole rate limiter for this controller. SDK defaults stay 60 Hz.
+  minGapMs: 0,
   onState(state, detail) {
     const labels = {selecting:"选择设备…", connecting:"连接中…", authenticating:"等待蓝灯闪完…", ready:"已连接 " + (detail || ""), disconnected:"已断开 · 屏幕预览", error:"连接失败，请检查电池和浏览器蓝牙权限"};
     setStatus(labels[state] || state, state === "ready" ? "ok" : state === "error" ? "err" : "");
     $("connect").disabled = ["selecting","connecting","authenticating"].includes(state);
     $("connect").textContent = state === "ready" ? "断开连接" : "连接应援棒";
     $("mode").textContent = state === "ready" ? "正在控制应援棒" : "屏幕预览";
-    lastFrame = null;
+    sender.invalidate();
+    sentFrames = 0; replyFrames = 0; statsSince = performance.now();
+    if (state === "ready" && !document.hidden && running) sender.start();
+    else sender.stop();
     if (state === "disconnected") { stopAudio(); startEffect(effects[0]); }
     log(state + (detail ? " " + detail : ""));
   },
-  onNotification(data) { if (!running) log("<- " + hex(data)); }
+  onNotification(data) {
+    if (client.ready && isColorReply(data)) replyFrames++;
+    if (!running) log("<- " + hex(data));
+  }
 });
 async function connect() {
   if (!window.isSecureContext || typeof navigator.bluetooth?.requestDevice !== "function") { setStatus("当前浏览器无法连接蓝牙，可以继续屏幕试玩", "err"); return; }
@@ -40,12 +49,13 @@ async function connect() {
 }
 function sendColor(rgb) {
   const started = performance.now();
-  client.setColor(rgb).then(sent => {
-    if (!sent) return;
+  return client.setColor(rgb).then(sent => {
+    if (!sent) return false;
     const elapsed = performance.now() - started;
     rttMs = rttMs ? rttMs * .9 + elapsed * .1 : elapsed;
     sentFrames++;
-  }).catch(error => { lastFrame = null; log("发送失败 " + error.message); });
+    return true;
+  });
 }
 
 // ---- 颜色工具 ----
@@ -337,8 +347,15 @@ function calibrate(hexColor) {
   startEffect(effects[0]);
 }
 
-let running = null, raf = 0, t0 = 0, simT = 0, lastFrame = null;
+let running = null, raf = 0, visualTime = performance.now(), musicRgb = [0,0,0];
+const effectClock = new EffectClock(visualTime);
 const brightnessSmoother = new BrightnessSmoother(+$("bright").value / 100);
+const sender = new FrameSender({
+  rate: outputRate(new URLSearchParams(location.search).get("rate")),
+  readFrame: now => sampleFrame(now).out,
+  sendFrame: sendColor,
+  onError: error => log("发送失败 " + error.message)
+});
 let lastPreview = "", lastOutput = "";
 const FLASH_EFFECTS = new Set(["闪烁", "频闪", "警灯", "爆闪", "彩虹跳变"]);
 
@@ -346,49 +363,60 @@ function startEffect(fx) {
   if (FLASH_EFFECTS.has(fx.name) && !$("flashConsent").checked) { $("flashing").open = true; $("flashNote").textContent = "先开启「允许快速闪光」，或选择呼吸、渐变。"; return; }
   $("flashNote").textContent = "";
   $("effectName").textContent = fx.name;
-  if (fx.breathing && running !== fx) simT = 0;
+  if (fx.breathing && running !== fx) effectClock.reset(performance.now());
+  if (fx !== running) { musicRgb = [0,0,0]; sender.invalidate(); }
   running = fx;
   document.querySelectorAll("[data-effect]").forEach(b => { b.classList.toggle("on", b.dataset.name === fx.name); b.setAttribute("aria-pressed", String(b.dataset.name === fx.name)); });
   $("blackout").setAttribute("aria-pressed", String(fx.name === "关灯"));
   $("speed").disabled = ["常亮", "关灯"].includes(fx.name) || !!fx.music;
-  if (!raf) { t0 = performance.now(); raf = requestAnimationFrame(tick); }
+  if (!raf) { visualTime = performance.now(); raf = requestAnimationFrame(tick); }
+  if (client.ready && !document.hidden) sender.start();
 }
 
 function stopEffect() {
   running = null;
   cancelAnimationFrame(raf); raf = 0;
+  sender.stop();
   document.querySelectorAll("[data-effect]").forEach(b => { b.classList.remove("on"); b.setAttribute("aria-pressed", "false"); });
 }
 
-function tick(now) {
-  raf = requestAnimationFrame(tick);
-  const elapsed = Math.max(0, (now - t0) / 1000); t0 = now;
-  const dt = Math.min(0.1, elapsed);
-  simT += dt * +$("speed").value / 100;
-  if (srcNode) { analyse(now, dt); drawMeter(); }
+function sampleFrame(now, visualDt) {
+  const {time, elapsed} = effectClock.advance(now, +$("speed").value / 100);
   const base = hexToRgb($("color").value);
   const level = brightnessSmoother.advance(+$("bright").value / 100, elapsed);
   const ceiling = brightnessDrive(level);
-  const rgb = running.fn(simT, base, dt).map(x => Math.max(0, Math.min(255, x)));
-  const k = running.breathing ? breathBrightness(simT, ceiling, Math.max(...rgb)) : ceiling;
+  // Audio analysis and stateful music effects still advance only with the UI.
+  // Extra Bluetooth samples must not count a beat twice or speed up hue drift.
+  if (running.music && visualDt !== undefined) musicRgb = running.fn(time, base, visualDt);
+  const rgb = (running.music ? musicRgb : running.fn(time, base, Math.min(.1,elapsed)))
+    .map(x => Math.max(0, Math.min(255, x)));
+  const k = running.breathing ? breathBrightness(time, ceiling, Math.max(...rgb)) : ceiling;
+  return {rgb, k, out:balance(rgb, k)};
+}
+
+function tick() {
+  raf = requestAnimationFrame(tick);
+  const now = performance.now(), dt = Math.min(.1, Math.max(0, now-visualTime)/1000);
+  visualTime = now;
+  if (srcNode) { analyse(now, dt); drawMeter(); }
+  const {rgb, k, out} = sampleFrame(now, dt);
   const preview = rgb.map(x=>Math.round(x*k)).join();
   if (preview !== lastPreview) {
     $("orb").style.background = `rgb(${preview})`;
     lastPreview = preview;
   }
-  const out = balance(rgb, k);
   const key = out.join();
   if (key !== lastOutput) {
     $("outputRgb").textContent = `输出 RGB ${out.join(", ")} · ${out[0]>0 && out.every(x=>x===out[0]) ? "白光通道" : "RGB 通道"}`;
     lastOutput = key;
   }
-  if (client.ready && key !== lastFrame) { lastFrame = key; sendColor(out); }
 }
 
 setInterval(() => {
   const now = performance.now(), elapsed = now - statsSince;
   $("fps").textContent = running && client.ready ? Math.round(sentFrames * 1000 / elapsed) : "–";
-  sentFrames = 0; statsSince = now;
+  $("replyFps").textContent = running && client.ready ? Math.round(replyFrames * 1000 / elapsed) : "–";
+  sentFrames = 0; replyFrames = 0; statsSince = now;
   $("rtt").textContent = rttMs ? rttMs.toFixed(0) : "–";
 }, 1000);
 
@@ -439,11 +467,23 @@ $("color").oninput = () => { syncWheel(); stopAudio(); startEffect(effects[0]); 
 $("bright").oninput = () => { $("brightv").textContent = $("bright").value + "%"; };
 $("speed").oninput = () => { $("speedv").textContent = (+$("speed").value / 100).toFixed(1) + "×"; };
 $("connect").onclick = connect;
-GAIN_IDS.forEach(id => { $(id).oninput = () => { showGains(); lastFrame = null; }; });
+GAIN_IDS.forEach(id => { $(id).oninput = () => { showGains(); sender.invalidate(); }; });
 $("calY").onclick = () => calibrate("#ffff00");
 $("calC").onclick = () => calibrate("#00ffff");
 $("calM").onclick = () => calibrate("#ff00ff");
-$("calReset").onclick = () => { GAIN_IDS.forEach(id => { $(id).value = 100; }); showGains(); lastFrame = null; };
+$("calReset").onclick = () => { GAIN_IDS.forEach(id => { $(id).value = 100; }); showGains(); sender.invalidate(); };
+$("sendRate").value = String(sender.rate);
+$("sendRate").onchange = () => {
+  sender.setRate($("sendRate").value);
+  sentFrames = 0; replyFrames = 0; statsSince = performance.now();
+  const url = new URL(location.href);
+  url.searchParams.set("rate", String(sender.rate));
+  history.replaceState(null, "", url);
+};
+document.addEventListener("visibilitychange", () => {
+  if (client.ready && running && !document.hidden) sender.start();
+  else sender.stop();
+});
 loadGains();
 startEffect(effects[0]);
 
@@ -509,8 +549,8 @@ wheel.onpointermove=e=>{if(wheel.hasPointerCapture(e.pointerId)) pointWheel(e)};
 wheel.onpointerup=e=>{if(wheel.hasPointerCapture(e.pointerId)) wheel.releasePointerCapture(e.pointerId)};
 $("wheelHue").oninput=()=>selectWheel(+$("wheelHue").value,+$("wheelSat").value/100);
 $("wheelSat").oninput=()=>selectWheel(+$("wheelHue").value,+$("wheelSat").value/100);
-$("yellowGreen").oninput=()=>{$("yellowValue").textContent=$("yellowGreen").value;lastFrame=null};
-$("useGains").onchange=()=>{lastFrame=null};
+$("yellowGreen").oninput=()=>{$("yellowValue").textContent=$("yellowGreen").value;sender.invalidate()};
+$("useGains").onchange=()=>{sender.invalidate()};
 function paintRange(input) {
   const min=+input.min || 0, max=+input.max || 100;
   input.style.setProperty("--fill", `${(+input.value-min)/(max-min)*100}%`);
