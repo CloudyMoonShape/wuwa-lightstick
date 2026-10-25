@@ -622,6 +622,7 @@ const guideDevice = /MicroMessenger|\bQQ\/|Weibo|DingTalk/i.test(ua) ? "in-app"
   : /OpenHarmony|HarmonyOS|ArkWeb/.test(ua) ? "harmony"
   : /Android/.test(ua) ? "android" : "computer";
 function showGuideTab(tab) {
+  if (tab === "iphone") document.querySelectorAll("[data-guide-src]").forEach(image => { if (!image.hasAttribute("src")) image.src = image.dataset.guideSrc; });
   document.querySelector(`input[name=guideTab][value="${tab}"]`).checked = true;
   document.querySelectorAll(".guide-panel").forEach(panel => { panel.hidden = panel.dataset.tab !== tab; });
 }

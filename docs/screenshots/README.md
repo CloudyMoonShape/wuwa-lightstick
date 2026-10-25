@@ -1,15 +1,13 @@
 # Screenshots
 
-[简体中文](README.zh-CN.md)
+[English](README.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md)
 
-Captured on 2026-10-24 from the deployed site at revision `0dc49ab`. The interface is Chinese. The browser was disconnected from hardware.
+Captured on 2026-10-24 from the local build for the iOS guide and slider update, based on `ef8f6f8`. The browser was disconnected. The counter is hidden on localhost. These captures show the actual translated interface.
 
-| File | Page | Viewport |
-|---|---|---|
-| [Controller](controller-desktop.png) | `https://wuwa.south-wall.com/` | 1280 × 720 |
-| [Mobile controller](controller-mobile.png) | `https://wuwa.south-wall.com/` | 390 × 844 |
-| [Principles](principles-desktop.png) | `https://wuwa.south-wall.com/principles` | 1280 × 720 |
+| Page | English | Chinese | Japanese |
+|---|---|---|---|
+| controller-desktop · 1280 × 900 | [en](controller-desktop-en.png) | [zh](controller-desktop-zh.png) | [ja](controller-desktop-ja.png) |
+| controller-mobile · 390 × 844 | [en](controller-mobile-en.png) | [zh](controller-mobile-zh.png) | [ja](controller-mobile-ja.png) |
+| principles-desktop · 1280 × 900 | [en](principles-desktop-en.png) | [zh](principles-desktop-zh.png) | [ja](principles-desktop-ja.png) |
 
-The mobile image uses a browser viewport override. It is not a physical-phone Bluetooth test. The visitor total is a value at capture time, not a maintained claim. These are unedited page captures.
-
-The images contain game artwork and supplied photos. See [third-party materials](../../THIRD_PARTY.md).
+Mobile captures use a viewport override. They are not physical-phone Bluetooth tests.

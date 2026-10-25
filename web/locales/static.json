@@ -721,5 +721,57 @@
   "MoonShade · 共鸣者者首页": {
     "en": "MoonShade · Resonator home",
     "ja": "MoonShade · Resonator ホーム"
+  },
+  "打开 Bluefy，在地址栏粘贴本站网址。": {
+    "en": "Open Bluefy and paste this website address into its address bar.",
+    "ja": "Bluefyを開き、アドレス欄にこのサイトのURLを貼り付けます。"
+  },
+  "安装 Bluefy": {
+    "en": "Install Bluefy",
+    "ja": "Bluefyをインストール"
+  },
+  "在 App Store 找到 Bluefy，核对开发者 PNN Soft。": {
+    "en": "Find Bluefy in the App Store. Check that the developer is PNN Soft.",
+    "ja": "App StoreでBluefyを探します。開発元がPNN Softであることを確認してください。"
+  },
+  "允许蓝牙": {
+    "en": "Allow Bluetooth",
+    "ja": "Bluetoothを許可"
+  },
+  "出现系统权限提示时，点 Allow（允许）。": {
+    "en": "Select Allow when iOS asks for Bluetooth permission.",
+    "ja": "Bluetoothの許可を求められたら、Allow（許可）を選びます。"
+  },
+  "选择灯棒": {
+    "en": "Select your lightstick",
+    "ja": "ペンライトを選択"
+  },
+  "打开本站，点「连接应援棒」，选择 JFKJ-FBFB。无需开启后台连接。": {
+    "en": "Open this site, select Connect lightstick, then select JFKJ-FBFB. Background connections are not required.",
+    "ja": "このサイトで「応援棒を接続」を押し、JFKJ-FBFBを選びます。バックグラウンド接続を有効にする必要はありません。"
+  },
+  "等待蓝灯": {
+    "en": "Wait for the blue flashes",
+    "ja": "青い点滅を待つ"
+  },
+  "Bluefy 显示 connected 后，继续等待网页完成蓝灯验证。": {
+    "en": "After Bluefy shows connected, wait for the website to finish the blue-flash check.",
+    "ja": "Bluefyにconnectedと表示された後も、サイトの青い点滅による確認が終わるまで待ちます。"
+  },
+  "开始控制": {
+    "en": "Start controlling",
+    "ja": "操作を開始"
+  },
+  "网页显示「已连接」后，再调色或播放灯效。": {
+    "en": "Wait until the website shows Connected. Then choose a color or effect.",
+    "ja": "サイトに「接続済み」と表示されたら、色やエフェクトを選べます。"
+  },
+  "截图已确认 Bluefy 可以连接此灯棒；不代表所有灯效和音乐功能都已逐项验证。beacio 尚未实测，只对 Safari 有效。iPhone 不支持「标签页」音源。": {
+    "en": "These screenshots confirm a Bluefy connection to this lightstick. They do not verify every effect or music feature. beacio has not been tested and works only with Safari. Tab audio is not available on iPhone.",
+    "ja": "このスクリーンショットでは、Bluefyからこのペンライトへの接続を確認しています。すべてのエフェクトや音楽機能を検証したものではありません。beacioは未検証で、Safari専用です。iPhoneではタブ音声を利用できません。"
+  },
+  "iPhone / iPad 的 Safari、Chrome 不能直接连接。可以使用支持网页蓝牙的 Bluefy，或 Safari 的 beacio 扩展。以下截图以 Bluefy 为例；两个工具都由第三方开发。": {
+    "en": "Safari and Chrome on iPhone / iPad cannot connect directly. Use Bluefy with Web Bluetooth support, or the beacio Safari extension. These screenshots show Bluefy. Both tools are made by third parties.",
+    "ja": "iPhone / iPadのSafariとChromeからは直接接続できません。Web Bluetooth対応のBluefy、またはSafariのbeacio拡張機能を使います。以下はBluefyの操作例です。どちらも第三者が開発したツールです。"
   }
 }

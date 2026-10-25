@@ -26,3 +26,5 @@
 - [色板审查](COLOR-AUDIT.md)
 - [许可说明](LICENSING-OPTIONS.md)
 - [公开前检查](PUBLIC-RELEASE.md)
+
+- [iPhone 图文连接教学](IOS.md)

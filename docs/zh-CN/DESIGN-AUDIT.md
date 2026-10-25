@@ -22,15 +22,15 @@
 
 官方壁纸经过压缩，由同源低优先级请求加载，不接收点击。实色面板保证操作区可读。字体子集和图标内嵌，控制页不请求第三方字体或脚本。
 
-网站保留中文。仓库以英文文档为主，并提供独立中文翻译。截图展示真实界面，不伪造英文 UI。
+网站支持中文、英文和日文。语言胶囊与社交图标同排。仓库提供三种语言入口，截图分别展示真实的三语界面。所有滑条采用 44 px 把手命中区和 48 px 高的输入区域。
 
 ## 图片
 
 | 文件 | 用途 |
 |---|---|
-| [controller-desktop.png](../screenshots/controller-desktop.png) | 当前控制页布局。 |
-| [controller-mobile.png](../screenshots/controller-mobile.png) | 窄屏层级和控件。 |
-| [principles-desktop.png](../screenshots/principles-desktop.png) | 原理页和硬件图片。 |
+| [controller-desktop-zh.png](../screenshots/controller-desktop-zh.png) | 当前控制页布局。 |
+| [controller-mobile-zh.png](../screenshots/controller-mobile-zh.png) | 窄屏层级和控件。 |
+| [principles-desktop-zh.png](../screenshots/principles-desktop-zh.png) | 原理页和硬件图片。 |
 
 截图只展示布局，不能证明已经连接灯棒或测量灯效。生产截图不应包含伪造的到访数字。
 

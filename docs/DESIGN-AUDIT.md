@@ -22,15 +22,15 @@ The site uses a bundled MoonShade style snapshot: neutral colors, fixed spacing,
 
 The official wallpaper is a compressed, same-origin background. It loads at low priority and cannot intercept input. Solid control panels preserve legibility. Font subsets and icons are embedded; the controller has no third-party font or script request.
 
-The website remains Chinese. English is the repository's primary documentation language, with a separate Chinese translation. Screenshots show the actual interface rather than an invented English UI.
+The website supports Chinese, English, and Japanese. A compact language pill shares the social-link row. The repository has three language entry points. Screenshots capture each actual translation. All range controls use a 44 px thumb target inside a 48 px input area.
 
 ## Images
 
 | File | Purpose |
 |---|---|
-| [controller-desktop.png](screenshots/controller-desktop.png) | Current controller layout. |
-| [controller-mobile.png](screenshots/controller-mobile.png) | Narrow-screen hierarchy and controls. |
-| [principles-desktop.png](screenshots/principles-desktop.png) | Explanation page and hardware imagery. |
+| [controller-desktop-en.png](screenshots/controller-desktop-en.png) | Current controller layout. |
+| [controller-mobile-en.png](screenshots/controller-mobile-en.png) | Narrow-screen hierarchy and controls. |
+| [principles-desktop-en.png](screenshots/principles-desktop-en.png) | Explanation page and hardware imagery. |
 
 Screenshots demonstrate layout. They do not prove that a lightstick was connected or an effect was measured. Do not place a fabricated visitor count in a production screenshot.
 

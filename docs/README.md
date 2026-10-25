@@ -26,3 +26,5 @@
 - [Color review](COLOR-AUDIT.md)
 - [License summary](LICENSING-OPTIONS.md)
 - [Public release review](PUBLIC-RELEASE.md)
+
+- [iPhone connection guide](IOS.md)

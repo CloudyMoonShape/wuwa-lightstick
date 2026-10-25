@@ -8,7 +8,7 @@
 
 **[打开控制台](https://wuwa.south-wall.com/?lang=zh)** · [开发文档](docs/zh-CN/README.md) · [English](README.md) · [日本語](README.ja.md)
 
-[![当前控制台：色轮、原生灯效、延伸灯效与音乐入口](docs/screenshots/controller-desktop.png)](https://wuwa.south-wall.com/?lang=zh)
+[![当前控制台：色轮、原生灯效、延伸灯效与音乐入口](docs/screenshots/controller-desktop-zh.png)](https://wuwa.south-wall.com/?lang=zh)
 
 选颜色，播放灯效，让灯光跟随音乐。无需账号，也无需更换固件。
 
@@ -16,6 +16,8 @@
 |---|---|---|
 | 由灯棒内部计时器运行。 | 由浏览器发送自制颜色序列。 | 浏览器分析文件、共享标签页声音或麦克风输入。 |
 | 平滑呼吸、三色渐变与预设轮播。 | 调速呼吸、心跳、烛光与自制配色。 | 音频分析在本机完成。 |
+
+[手机版](docs/screenshots/controller-mobile-zh.png) · [原理页](docs/screenshots/principles-desktop-zh.png)
 
 ## 连接
 
@@ -78,3 +80,5 @@ python3 -m http.server 8765 -d dist
 [社区许可证](LICENSE)是源码可用许可，不是 OSI 认可的开源许可证。[第三方材料](THIRD_PARTY.zh-CN.md)保留独立权利。
 
 [参与开发](CONTRIBUTING.zh-CN.md) · [报告安全问题](SECURITY.zh-CN.md)
+
+[iPhone 图文连接教学](docs/zh-CN/IOS.md)

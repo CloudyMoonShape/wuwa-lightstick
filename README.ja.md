@@ -8,7 +8,7 @@ Resonator はブラウザーから『鳴潮』コンサートの応援棒を操�
 
 **[コントローラーを開く](https://wuwa.south-wall.com/?lang=ja)** · [ドキュメント](docs/ja/README.md) · [English](README.md) · [简体中文](README.zh-CN.md)
 
-[![色環、本体エフェクト、拡張エフェクト、音楽操作を備えたコントローラー](docs/screenshots/controller-desktop.png)](https://wuwa.south-wall.com/?lang=ja)
+[![色環、本体エフェクト、拡張エフェクト、音楽操作を備えたコントローラー](docs/screenshots/controller-desktop-ja.png)](https://wuwa.south-wall.com/?lang=ja)
 
 色を選び、エフェクトを再生し、音楽に合わせて光らせます。アカウントの作成やファームウェアの変更は不要です。
 
@@ -16,6 +16,8 @@ Resonator はブラウザーから『鳴潮』コンサートの応援棒を操�
 |---|---|---|
 | 応援棒の内部タイマーで動作します。 | ブラウザーが独自の色の変化を送信します。 | ファイル、共有タブの音声、またはマイク入力を解析します。 |
 | 滑らかな明滅、RGB グラデーション、プリセットの切り替え。 | 速度を変えられる明滅、鼓動、ろうそく、独自の配色。 | 音声解析は使用中の端末で行います。 |
+
+[モバイル画面](docs/screenshots/controller-mobile-ja.png) · [仕組み](docs/screenshots/principles-desktop-ja.png)
 
 ## 接続
 
@@ -80,3 +82,5 @@ python3 -m http.server 8765 -d dist
 [Community License](LICENSE) はソース公開型のライセンスです。OSI 承認のオープンソースライセンスではありません。正式な条件は英語のライセンス本文です。[第三者の素材（英語）](THIRD_PARTY.md)には別の権利が適用されます。
 
 [開発への参加（英語）](CONTRIBUTING.md) · [セキュリティ問題の報告（英語）](SECURITY.md)
+
+[iPhone接続ガイド](docs/ja/IOS.md)

@@ -33,3 +33,5 @@
 - [色のレビュー](../COLOR-AUDIT.md)
 - [ライセンスの概要](../LICENSING-OPTIONS.md)
 - [公開前の確認](../PUBLIC-RELEASE.md)
+
+- [iPhone接続ガイド](IOS.md)

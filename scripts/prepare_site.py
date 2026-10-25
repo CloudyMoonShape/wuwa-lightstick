@@ -91,6 +91,10 @@ def main():
     # Public assets only. Never copy source environments or hardware dumps.
     if (ROOT / 'web/assets/hardware').exists():
         shutil.copytree(ROOT / 'web/assets/hardware', DEST / 'assets/hardware')
+    for name in ('install', 'permission', 'device', 'pairing', 'connected'):
+        if not (ROOT / 'web/assets/ios' / (name + '.webp')).is_file():
+            raise SystemExit('Missing iOS guide image: ' + name)
+    shutil.copytree(ROOT / 'web/assets/ios', DEST / 'assets/ios')
     (DEST / 'assets/artwork').mkdir(parents=True)
     for name in ARTWORK:
         shutil.copy2(ROOT / 'web/assets/artwork' / name, DEST / 'assets/artwork' / name)

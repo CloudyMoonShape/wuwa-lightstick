@@ -8,7 +8,7 @@ Resonator controls your Wuthering Waves concert lightstick from a browser.
 
 **[Open controller](https://wuwa.south-wall.com/?lang=en)** · [Documentation](docs/README.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md)
 
-[![Current controller with the color wheel, native effects, extended effects, and music controls](docs/screenshots/controller-desktop.png)](https://wuwa.south-wall.com/?lang=en)
+[![Current controller with the color wheel, native effects, extended effects, and music controls](docs/screenshots/controller-desktop-en.png)](https://wuwa.south-wall.com/?lang=en)
 
 Choose a color. Play an effect. Make the light follow your music. No account or firmware change is required.
 
@@ -16,6 +16,8 @@ Choose a color. Play an effect. Make the light follow your music. No account or 
 |---|---|---|
 | The lightstick runs its own timers. | The browser sends custom color sequences. | The browser analyzes a file, shared tab audio, or microphone input. |
 | Smooth breathing, RGB fades, and preset cycles. | Adjustable breathing, heartbeat, candlelight, and custom palettes. | Audio analysis stays on your device. |
+
+[Mobile view](docs/screenshots/controller-mobile-en.png) · [How it works](docs/screenshots/principles-desktop-en.png)
 
 ## Connect
 
@@ -78,3 +80,5 @@ Free use, modification, sharing, and free hosting are permitted. Software sales,
 The [Community License](LICENSE) is source-available. It is not an OSI-approved open-source license. [Third-party materials](THIRD_PARTY.md) retain separate rights.
 
 [Contribute](CONTRIBUTING.md) · [Report a security issue](SECURITY.md)
+
+[iPhone connection guide](docs/IOS.md)
