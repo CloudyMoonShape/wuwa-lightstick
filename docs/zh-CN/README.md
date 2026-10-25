@@ -1,8 +1,10 @@
-# 开发文档
+# 共鸣者文档
 
-[项目](../../README.zh-CN.md) · [English](../README.md)
+[项目](../../README.zh-CN.md) · [English](../README.md) · [日本語](../ja/README.md)
 
 ## 开发
+
+- [语言选择](LOCALIZATION.md)
 
 - [SDK](SDK.md)
 - [原生灯效](NATIVE-EFFECTS.md)

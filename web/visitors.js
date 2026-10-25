@@ -34,7 +34,9 @@
       if (!response.ok) return;
       const {total} = await response.json();
       if (!Number.isSafeInteger(total) || total < 0) return;
-      value.textContent = total.toLocaleString('zh-CN');
+      const render = () => { value.textContent = total.toLocaleString(globalThis.ResonatorI18n?.language || 'zh-CN'); };
+      render();
+      globalThis.addEventListener?.('resonatorlanguagechange', render);
       node.hidden = false;
     } catch { /* A counter must never interrupt the controller. */ }
     finally { clearTimeout(timer); }

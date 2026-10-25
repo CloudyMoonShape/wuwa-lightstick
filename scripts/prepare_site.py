@@ -1,6 +1,7 @@
 """Build a self-contained controller with optional same-origin artwork and docs."""
 from pathlib import Path
 import gzip
+import json
 import re
 import shutil
 
@@ -29,8 +30,17 @@ def inline_styles(html, controller=False):
 def shared_chrome(html, page):
     parts = ROOT / 'web/partials'
     extra = (parts / 'controller-header-extra.html').read_text() if page == 'index' else '<a class="ms-link web-small" href="/">回到遥控器</a>'
-    header = (parts / 'header.html').read_text().replace('{{title}}', '共鸣' if page == 'index' else '原理').replace('{{extra}}', extra)
+    header = (parts / 'header.html').read_text().replace('{{title}}', '共鸣者' if page == 'index' else '原理').replace('{{extra}}', extra)
     return html.replace('<!-- site-header -->', header).replace('<!-- site-footer -->', (parts / 'footer.html').read_text())
+
+def localized(html):
+    messages = {}
+    for path in sorted((ROOT / 'web/locales').glob('*.json')):
+        messages.update(json.loads(path.read_text()))
+    messages.update({'Language': {'zh':'语言','en':'Language','ja':'言語'}, 'Browser language': {'zh':'跟随浏览器','en':'Browser language','ja':'ブラウザーに合わせる'}})
+    data = json.dumps(messages, ensure_ascii=False, separators=(',', ':')).replace('<', '\\u003c')
+    script = '<script>window.RESONATOR_MESSAGES=' + data + ';\n' + (ROOT / 'web/i18n.js').read_text() + '</script>'
+    return html.replace('</body>', script + '</body>')
 
 def main():
     for name in ('index.html', 'app.js', 'visitors.js', 'style.css', *COPY):
@@ -72,11 +82,12 @@ def main():
     if DEST.exists():
         shutil.rmtree(DEST)
     DEST.mkdir()
+    html = localized(html)
     (DEST / 'index.html').write_text(html)
     for name in COPY:
         shutil.copy2(ROOT / 'web' / name, DEST / name)
-    (DEST / 'principles.html').write_text(inline_styles(shared_chrome((ROOT / 'web/principles.html').read_text(), 'principles')))
-    (DEST / '404.html').write_text(inline_styles((ROOT / 'web/404.html').read_text(), controller=True))
+    (DEST / 'principles.html').write_text(localized(inline_styles(shared_chrome((ROOT / 'web/principles.html').read_text(), 'principles'))))
+    (DEST / '404.html').write_text(localized(inline_styles((ROOT / 'web/404.html').read_text(), controller=True)))
     # Public assets only. Never copy source environments or hardware dumps.
     if (ROOT / 'web/assets/hardware').exists():
         shutil.copytree(ROOT / 'web/assets/hardware', DEST / 'assets/hardware')

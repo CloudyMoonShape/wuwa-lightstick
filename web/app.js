@@ -4,6 +4,7 @@ import { brightnessDrive, BrightnessSmoother, breathBrightness, breathHue } from
 import { outputRate, isControlReply, EffectClock, FrameSender } from "./output.js";
 import { DevicePlayback } from "./playback.js";
 
+const t = (source, params = {}) => window.ResonatorI18n?.t(source, params) ?? source.replace(/\{(\w+)\}/g, (_, key) => params[key] ?? `{${key}}`);
 const $ = id => document.getElementById(id);
 const hex = b => [...b].map(x => x.toString(16).padStart(2, "0")).join(" ");
 const requestedEngine = new URLSearchParams(location.search).get("engine");
@@ -17,7 +18,7 @@ function log(line) {
   el.scrollTop = el.scrollHeight;
 }
 
-function setStatus(text, cls = "") { $("status").textContent = text; $("status").className = "web-small " + cls; $("connectionMark").dataset.state = cls === "ok" ? "on" : cls === "err" ? "off" : "unknown"; }
+function setStatus(text, cls = "") { $("status").textContent = t(text); $("status").className = "web-small " + cls; $("connectionMark").dataset.state = cls === "ok" ? "on" : cls === "err" ? "off" : "unknown"; }
 
 // Transport and frame validation are shared with developer examples through sdk.js.
 let sentFrames = 0, replyFrames = 0, rttMs = 0, statsSince = performance.now();
@@ -25,17 +26,17 @@ const client = new LightstickClient({
   // FrameSender is the sole rate limiter for this controller. SDK defaults stay 60 Hz.
   minGapMs: 0,
   onState(state, detail) {
-    const labels = {selecting:"选择设备…", connecting:"连接中…", authenticating:"等待蓝灯闪完…", ready:"已连接 " + (detail || ""), disconnected:"已断开 · 屏幕预览", error:"连接失败，请检查电池和浏览器蓝牙权限" + (detail ? "（" + detail + "）" : "")};
+    const labels = {selecting:"选择设备…", connecting:"连接中…", authenticating:"等待蓝灯闪完…", ready:t("已连接 {device}", {device: detail || ""}), disconnected:"已断开 · 屏幕预览", error:detail ? t("连接失败，请检查电池和浏览器蓝牙权限（{detail}）", {detail}) : "连接失败，请检查电池和浏览器蓝牙权限"};
     setStatus(labels[state] || state, state === "ready" ? "ok" : state === "error" ? "err" : "");
     $("connect").disabled = ["selecting","connecting","authenticating"].includes(state);
-    $("connect").textContent = state === "ready" ? "断开连接" : "连接应援棒";
-    $("mode").textContent = state === "ready" ? "正在控制应援棒" : "屏幕预览";
+    $("connect").textContent = state === "ready" ? t("断开连接") : t("连接应援棒");
+    $("mode").textContent = state === "ready" ? t("正在控制应援棒") : t("屏幕预览");
     sender.invalidate();
     sentFrames = 0; replyFrames = 0; statsSince = performance.now();
     if (state === "ready" && running) configurePlayback();
     else playback.reset();
     if (state === "disconnected") stopAudio();
-    log(state + (detail ? " " + detail : ""));
+    log(t("状态 {state}{detail}", {state, detail: detail ? " " + detail : ""}));
   },
   onNotification(data) {
     if (client.ready && isControlReply(data)) replyFrames++;
@@ -199,7 +200,7 @@ async function useFile(file) {
   p.style.display = "block";
   if (!p._node) p._node = actx.createMediaElementSource(p);
   setSource(p._node, null, true, file.name);
-  try { await p.play(); } catch(e) { if (request === audioRequest) $("srcInfo").textContent = "无法播放这个文件，请换一个音频文件"; }
+  try { await p.play(); } catch(e) { if (request === audioRequest) $("srcInfo").textContent = t("无法播放这个文件，请换一个音频文件"); }
 }
 
 async function useTab() {
@@ -212,10 +213,10 @@ async function useTab() {
         noiseSuppression: false, autoGainControl: false } });
     if (request !== audioRequest || engine !== "music") { s.getTracks().forEach(t => t.stop()); return; }
     s.getVideoTracks().forEach(t => t.stop());
-    if (!s.getAudioTracks().length) { $("srcInfo").textContent = "没拿到声音：共享时要勾上「同时分享标签页音频」"; return; }
+    if (!s.getAudioTracks().length) { $("srcInfo").textContent = t("没拿到声音：共享时要勾上「同时分享标签页音频」"); return; }
     $("player").style.display = "none";
-    setSource(actx.createMediaStreamSource(s), s, true, "标签页声音");
-  } catch (e) { if (request === audioRequest) $("srcInfo").textContent = "共享取消：" + e.message; }
+    setSource(actx.createMediaStreamSource(s), s, true, t("标签页声音"));
+  } catch (e) { if (request === audioRequest) $("srcInfo").textContent = t("共享取消：{message}", {message: e.message}); }
 }
 
 async function useMic() {
@@ -226,8 +227,8 @@ async function useMic() {
       audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
     if (request !== audioRequest || engine !== "music") { s.getTracks().forEach(t => t.stop()); return; }
     $("player").style.display = "none";
-    setSource(actx.createMediaStreamSource(s), s, false, "麦克风");
-  } catch (e) { if (request === audioRequest) $("srcInfo").textContent = "麦克风被拒：" + e.message; }
+    setSource(actx.createMediaStreamSource(s), s, false, t("麦克风"));
+  } catch (e) { if (request === audioRequest) $("srcInfo").textContent = t("麦克风被拒：{message}", {message: e.message}); }
 }
 
 function applySync() {
@@ -240,7 +241,7 @@ function applySync() {
 // 灯晚于分析的时间 ≈ 排队等上一帧(约半帧) + 送达(约半个往返) + 固件 10 ms 定时 + 分析窗口一半 + 一帧刷新；
 // 再扣掉声卡/耳机自己的输出延迟（蓝牙耳机可能比灯还慢，这时只能补到 0）
 function autoSync() {
-  if (!rttMs) { $("srcInfo").textContent = "先连上棒子跑一会儿再点"; return; }
+  if (!rttMs) { $("srcInfo").textContent = t("先连上棒子跑一会儿再点"); return; }
   ensureAudio();
   const windowMs = FFT_SIZE / actx.sampleRate * 1000 / 2;
   const out = ((actx.outputLatency || 0) + actx.baseLatency) * 1000;
@@ -381,14 +382,14 @@ const sender = new FrameSender({
   rate: outputRate(new URLSearchParams(location.search).get("rate")),
   readFrame: now => sampleFrame(now).out,
   sendFrame: sendColor,
-  onError: error => log("发送失败 " + error.message)
+  onError: error => log(t("发送失败 {message}", {message: error.message}))
 });
 const playback = new DevicePlayback({ client, sender, canStream: () => !document.hidden && !!running,
   onMode: mode => {
-    $("mode").textContent = mode === "stream" ? "正在控制应援棒" : "灯棒自主播放 · 屏幕仅示意";
-    $("playbackState").textContent = mode === "stream" ? "" : "灯棒已确认";
+    $("mode").textContent = mode === "stream" ? t("正在控制应援棒") : t("灯棒自主播放 · 屏幕仅示意");
+    $("playbackState").textContent = mode === "stream" ? "" : t("灯棒已确认");
   },
-  onError: error => { $("playbackState").textContent = "切换失败，请重新连接"; log(error.message); }
+  onError: error => { $("playbackState").textContent = t("切换失败，请重新连接"); log(error.message); }
 });
 let lastPreview = "", lastOutput = "";
 const FLASH_EFFECTS = new Set(["闪烁", "频闪", "警灯", "爆闪", "彩虹跳变", "三色跳变", "三色连闪"]);
@@ -396,7 +397,7 @@ const FLASH_EFFECTS = new Set(["闪烁", "频闪", "警灯", "爆闪", "彩虹�
 function configurePlayback(forceReset = false) {
   if (!client.ready || !running) return;
   const kind = running.native || "stream";
-  if (kind !== "stream") $("playbackState").textContent = "等待灯棒确认…";
+  if (kind !== "stream") $("playbackState").textContent = t("等待灯棒确认…");
   void playback.configure({ kind, continuous: trialUsed, forceReset,
     rgb: balance(hexToRgb($("color").value), brightnessDrive(+$("bright").value / 100)),
     intervalMs: running.timed ? Math.round(250 / (+$("speed").value / 100)) : undefined });
@@ -415,9 +416,9 @@ function startEffect(fx) {
   if (!fx.music && !fx.native && fx.name !== "关灯" && engine === "music") { engine = "native"; trialUsed = true; renderEffects(); }
   if (previousEngine !== engine) updateEngineUrl();
   if (engine === "native" && fx === effects[0]) fx = nativeEffects[0];
-  if (FLASH_EFFECTS.has(fx.name) && !$("flashConsent").checked) { $("flashing").open = true; $("flashNote").textContent = "先开启「允许快速闪光」，或选择呼吸、渐变。"; return; }
+  if (FLASH_EFFECTS.has(fx.name) && !$("flashConsent").checked) { $("flashing").open = true; $("flashNote").textContent = t("先开启「允许快速闪光」，或选择呼吸、渐变。"); return; }
   $("flashNote").textContent = "";
-  $("effectName").textContent = fx.name;
+  $("effectName").textContent = t(fx.name);
   if ((fx.breathing || fx.native) && running !== fx) effectClock.reset(performance.now());
   if (fx !== running) { musicRgb = [0,0,0]; sender.invalidate(); }
   running = fx;
@@ -427,13 +428,13 @@ function startEffect(fx) {
   $("blackout").setAttribute("aria-pressed", String(fx.name === "关灯"));
   $("speed").disabled = ["常亮", "关灯"].includes(fx.name) || !!fx.music;
   if (fx.native && !fx.timed) $("speed").disabled = true;
-  $("speedv").textContent = fx.native && !fx.timed && fx.native !== "stream" ? "固定" : (+$("speed").value / 100).toFixed(1) + "×";
+  $("speedv").textContent = fx.native && !fx.timed && fx.native !== "stream" ? t("固定") : (+$("speed").value / 100).toFixed(1) + "×";
   document.querySelector(".color-panel").inert = !!fx.fixedPalette;
   document.querySelector(".color-panel").setAttribute("aria-disabled", String(!!fx.fixedPalette));
   $("calibration").inert = !!fx.fixedPalette;
-  $("brightv").textContent = fx.fixedPalette ? "预设" : $("bright").value + "%";
+  $("brightv").textContent = fx.fixedPalette ? t("预设") : $("bright").value + "%";
   $("playbackState").textContent = "";
-  $("nativeNote").textContent = fx.fixedPalette ? "颜色与亮度由灯棒预设；屏幕仅示意。" : fx.native === "breathe" ? "固定周期约 2.6 秒；屏幕仅示意。" : fx.native === "blink" ? "灯棒自主闪烁；屏幕仅示意。" : "";
+  $("nativeNote").textContent = fx.fixedPalette ? t("颜色与亮度由灯棒预设；屏幕仅示意。") : fx.native === "breathe" ? t("固定周期约 2.6 秒；屏幕仅示意。") : fx.native === "blink" ? t("灯棒自主闪烁；屏幕仅示意。") : "";
   if (!raf) { visualTime = performance.now(); raf = requestAnimationFrame(tick); }
   configurePlayback(fx.name === "关灯" && trialUsed);
 }
@@ -478,7 +479,12 @@ function tick() {
   }
   const key = out.join();
   if (key !== lastOutput) {
-    $("outputRgb").textContent = running.fixedPalette ? "灯棒预设 · 不提供实时 RGB 读回" : `${running.native && running.native !== "stream" ? "基础" : "输出"} RGB ${out.join(", ")} · ${out[0]>0 && out.every(x=>x===out[0]) ? "白光通道" : "RGB 通道"}`;
+    const baseOutput = running.native && running.native !== "stream";
+    const whiteOutput = out[0] > 0 && out.every(x => x === out[0]);
+    const outputLabel = baseOutput
+      ? (whiteOutput ? "基础 RGB {rgb} · 白光通道" : "基础 RGB {rgb} · RGB 通道")
+      : (whiteOutput ? "输出 RGB {rgb} · 白光通道" : "输出 RGB {rgb} · RGB 通道");
+    $("outputRgb").textContent = running.fixedPalette ? t("灯棒预设 · 不提供实时 RGB 读回") : t(outputLabel, {rgb: out.join(", ")});
     lastOutput = key;
   }
 }
@@ -522,8 +528,8 @@ function renderEffects() {
     for (const fx of entries) {
       const b = document.createElement("button");
       b.className = "web-small"; b.dataset.name = fx.name; b.dataset.effect = "";
-      b.innerHTML = (effectIcons[fx.name] ? `<svg viewBox="0 0 24 24" aria-hidden="true">${effectIcons[fx.name]}</svg>` : "") + `<span>${fx.name}</span>`;
-      b.title = fx.desc || fx.name;
+      b.innerHTML = (effectIcons[fx.name] ? `<svg viewBox="0 0 24 24" aria-hidden="true">${effectIcons[fx.name]}</svg>` : "") + `<span>${t(fx.name)}</span>`;
+      b.title = t(fx.desc || fx.name);
       b.setAttribute("aria-pressed", String(fx === running));
       b.classList.toggle("on", fx === running);
       b.onclick = () => startEffect(fx);
@@ -542,7 +548,7 @@ function updateEngineUrl() {
 }
 document.querySelectorAll('[name="engine"]').forEach(input => { input.onchange = () => {
   stopAudio(); engine = input.value; trialUsed ||= engine !== "web";
-  if (engine === "music") $("srcInfo").textContent = "选择音源";
+  if (engine === "music") $("srcInfo").textContent = t("选择音源");
   renderEffects();
   const selected = selectedEffects[engine];
   startEffect(FLASH_EFFECTS.has(selected.name) && !$("flashConsent").checked
@@ -565,8 +571,8 @@ $("sens").oninput = () => { $("sensv").textContent = (+$("sens").value / 100).to
 for (const [name, c] of PALETTE) {
   const b = document.createElement("button");
   b.className = "swatch web-small"; b.style.setProperty("--swatch", c); b.dataset.color = c;
-  b.title = `${name} · ${c.toUpperCase()}`;
-  b.setAttribute("aria-label", `选择${name} ${c.toUpperCase()}`);
+  b.title = t(name + " · {hex}", {hex: c.toUpperCase()});
+  b.setAttribute("aria-label", t("选择" + name + " {hex}", {hex: c.toUpperCase()}));
   b.onclick = () => { $("color").value = c; syncWheel(); colorChanged(); };
   $("swatches").append(b);
 }
@@ -599,7 +605,7 @@ function stopAudio() {
   if (stream) stream.getTracks().forEach(t => t.stop());
   if (srcNode) srcNode.disconnect(); srcNode = null;
   $("player").pause(); $("player").hidden = true; $("player").style.display = "none";
-  $("srcInfo").textContent = "音源已停止";
+  $("srcInfo").textContent = t("音源已停止");
   $("stopAudio").disabled = true;
   if (actx?.state === "running") actx.suspend().catch(error => log(error.message));
   const meter=$("meter"); meter.getContext("2d").clearRect(0,0,meter.width,meter.height);
@@ -625,9 +631,9 @@ document.addEventListener("click", async e => {
   const copy = e.target.closest("[data-copy]");
   if (!copy) return;
   const label = copy.textContent;
-  try { await navigator.clipboard.writeText(copy.dataset.copy); copy.textContent = "已复制"; }
+  try { await navigator.clipboard.writeText(copy.dataset.copy); copy.textContent = t("已复制"); }
   catch { copy.textContent = copy.dataset.copy; }
-  setTimeout(() => { copy.textContent = label; }, 2500);
+  setTimeout(() => { copy.textContent = t(label); }, 2500);
 });
 $("guide").addEventListener("click", e => { if (e.target === $("guide")) $("guide").close(); });
 if (!window.isSecureContext || typeof navigator.bluetooth?.requestDevice !== "function") {
@@ -636,10 +642,10 @@ if (!window.isSecureContext || typeof navigator.bluetooth?.requestDevice !== "fu
   const hint = {"in-app": "在微信 / QQ 里不能连接，请换到浏览器打开。", iphone: "iPhone / iPad 需要先装一个免费 App 才能连接。"}[guideDevice]
     ?? "当前浏览器尚未开放网页蓝牙，可以在屏幕上调色、播放灯效。";
   const more = document.createElement("button");
-  Object.assign(more, {type: "button", className: "web-small quiet inline", textContent: "查看连接方法"});
+  Object.assign(more, {type: "button", className: "web-small quiet inline", textContent: t("查看连接方法")});
   more.dataset.guide = "";
-  $("compat").replaceChildren(hint + " ", more);
-  $("connect").textContent = "怎么连接";
+  $("compat").replaceChildren(t(hint) + " ", more);
+  $("connect").textContent = t("怎么连接");
   $("connect").classList.add("guide-open");
   $("connect").onclick = () => { showGuideTab(guideDevice); $("guide").showModal(); };
   $("guideOpen").hidden = true;
@@ -666,7 +672,7 @@ function syncWheel() {
   $("wheelHue").value=Math.round(selectedHue); $("wheelSat").value=Math.round(s*100);
   $("wheelHueValue").textContent=`${Math.round(selectedHue)}°`;
   $("wheelSatValue").textContent=`${Math.round(s*100)}%`;
-  $("colorName").textContent=PALETTE.find(([,color])=>color === $("color").value)?.[0] || "自选";
+  $("colorName").textContent=t(PALETTE.find(([,color])=>color === $("color").value)?.[0] || "自选");
   document.querySelectorAll("[data-color]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.color === $("color").value)));
   paintRange($("wheelHue")); paintRange($("wheelSat"));
   ctx.putImageData(pixels,0,0);

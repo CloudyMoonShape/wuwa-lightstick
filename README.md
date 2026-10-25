@@ -4,11 +4,11 @@
   <img alt="Resonator" src="docs/assets/resonator.svg" width="360">
 </picture>
 
-Control your Wuthering Waves concert lightstick from a browser.
+Resonator controls your Wuthering Waves concert lightstick from a browser.
 
-**[Open controller](https://wuwa.south-wall.com/)** · [Documentation](docs/README.md) · [简体中文](README.zh-CN.md)
+**[Open controller](https://wuwa.south-wall.com/?lang=en)** · [Documentation](docs/README.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md)
 
-[![Current controller with the color wheel, native effects, extended effects, and music controls](docs/screenshots/controller-desktop.png)](https://wuwa.south-wall.com/)
+[![Current controller with the color wheel, native effects, extended effects, and music controls](docs/screenshots/controller-desktop.png)](https://wuwa.south-wall.com/?lang=en)
 
 Choose a color. Play an effect. Make the light follow your music. No account or firmware change is required.
 
@@ -20,11 +20,13 @@ Choose a color. Play an effect. Make the light follow your music. No account or 
 ## Connect
 
 1. Open the controller in Chrome on Android, macOS, or Windows, or Edge on Windows or macOS.
-2. Select **连接应援棒** (Connect lightstick).
+2. Select **Connect lightstick**.
 3. Select your device, named `JFKJ-FBFB`.
 4. Wait for the three blue flashes. Then choose a color or effect.
 
-The website interface is in Chinese. Safari and Chrome on iPhone or iPad do not provide Web Bluetooth and support screen previews only. To connect from an iPhone, use a free Web Bluetooth browser app such as Bluefy, or the beacio Safari extension; the controller's “连接说明” dialog gives step-by-step Chinese instructions per device. See [browser support](docs/SDK.md).
+The website supports Chinese, English, and Japanese. It uses your browser language unless you choose another language. See [language selection](docs/LOCALIZATION.md).
+
+Safari and Chrome on iPhone or iPad do not provide native Web Bluetooth. They support screen previews only. The connection guide describes optional bridges such as Bluefy and the beacio Safari extension. Those options require installation and are not native browser support. Open the connection guide for device-specific steps. See [browser support](docs/SDK.md).
 
 The research sample has board `HE-750G24` and firmware `V4.1.8`. Other hardware or firmware versions can behave differently. Flashing effects require a separate opt-in.
 

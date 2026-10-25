@@ -1,0 +1,490 @@
+{
+  "选择设备…": {
+    "en": "Choose a device…",
+    "ja": "デバイスを選択…"
+  },
+  "连接中…": {
+    "en": "Connecting…",
+    "ja": "接続中…"
+  },
+  "等待蓝灯闪完…": {
+    "en": "Waiting for the blue flashes…",
+    "ja": "青い点滅の終了を待っています…"
+  },
+  "已连接 {device}": {
+    "en": "Connected: {device}",
+    "ja": "接続済み：{device}"
+  },
+  "已断开 · 屏幕预览": {
+    "en": "Disconnected · Preview",
+    "ja": "切断済み · プレビュー"
+  },
+  "连接失败，请检查电池和浏览器蓝牙权限": {
+    "en": "Connection failed. Check the batteries and Bluetooth permission.",
+    "ja": "接続できません。電池とブラウザーの Bluetooth 権限を確認してください。"
+  },
+  "断开连接": {
+    "en": "Disconnect",
+    "ja": "切断"
+  },
+  "连接应援棒": {
+    "en": "Connect lightstick",
+    "ja": "応援棒を接続"
+  },
+  "正在控制应援棒": {
+    "en": "Controlling lightstick",
+    "ja": "応援棒を操作中"
+  },
+  "屏幕预览": {
+    "en": "Preview",
+    "ja": "プレビュー"
+  },
+  "状态 {state}{detail}": {
+    "en": "State {state}{detail}",
+    "ja": "状態 {state}{detail}"
+  },
+  "当前浏览器无法连接蓝牙，可以继续屏幕试玩": {
+    "en": "This browser cannot connect to Bluetooth. You can still use the preview.",
+    "ja": "このブラウザーでは Bluetooth に接続できません。プレビューは引き続き使えます。"
+  },
+  "未选择设备 · 继续预览": {
+    "en": "No device selected · Preview",
+    "ja": "デバイス未選択 · プレビュー"
+  },
+  "纯红": {
+    "en": "Red",
+    "ja": "赤"
+  },
+  "橙色": {
+    "en": "Orange",
+    "ja": "オレンジ"
+  },
+  "黄色": {
+    "en": "Yellow",
+    "ja": "黄"
+  },
+  "纯绿": {
+    "en": "Green",
+    "ja": "緑"
+  },
+  "青色": {
+    "en": "Cyan",
+    "ja": "シアン"
+  },
+  "纯蓝": {
+    "en": "Blue",
+    "ja": "青"
+  },
+  "品红": {
+    "en": "Magenta",
+    "ja": "マゼンタ"
+  },
+  "粉红": {
+    "en": "Pink",
+    "ja": "ピンク"
+  },
+  "白光": {
+    "en": "White",
+    "ja": "白"
+  },
+  "自选": {
+    "en": "Custom",
+    "ja": "カスタム"
+  },
+  "常亮": {
+    "en": "Steady",
+    "ja": "点灯"
+  },
+  "单色": {
+    "en": "One color",
+    "ja": "単色"
+  },
+  "调速呼吸": {
+    "en": "Variable breathing",
+    "ja": "速度可変ブレス"
+  },
+  "自选呼吸节奏": {
+    "en": "Choose the breathing speed",
+    "ja": "ブレスの速度を調整"
+  },
+  "闪烁": {
+    "en": "Blink",
+    "ja": "点滅"
+  },
+  "一亮一灭": {
+    "en": "Alternate on and off",
+    "ja": "点灯と消灯を交互に切り替え"
+  },
+  "频闪": {
+    "en": "Strobe",
+    "ja": "ストロボ"
+  },
+  "短促爆闪": {
+    "en": "Short, rapid flashes",
+    "ja": "短く速い点滅"
+  },
+  "心跳": {
+    "en": "Heartbeat",
+    "ja": "ハートビート"
+  },
+  "咚-咚": {
+    "en": "Double pulse",
+    "ja": "二連パルス"
+  },
+  "幻彩渐变": {
+    "en": "Rainbow fade",
+    "ja": "レインボーフェード"
+  },
+  "色环慢转": {
+    "en": "Move through the color wheel",
+    "ja": "色相環に沿ってゆっくり変化"
+  },
+  "彩虹跳变": {
+    "en": "Rainbow steps",
+    "ja": "レインボーステップ"
+  },
+  "七色硬切": {
+    "en": "Step through seven colors",
+    "ja": "7 色を順に切り替え"
+  },
+  "多色渐变": {
+    "en": "Palette fade",
+    "ja": "パレットフェード"
+  },
+  "配色 1 循环": {
+    "en": "Cycle palette 1",
+    "ja": "パレット 1 を繰り返す"
+  },
+  "冰蓝流光": {
+    "en": "Ice blue",
+    "ja": "アイスブルー"
+  },
+  "配色 2 循环": {
+    "en": "Cycle palette 2",
+    "ja": "パレット 2 を繰り返す"
+  },
+  "糖果": {
+    "en": "Candy",
+    "ja": "キャンディー"
+  },
+  "配色 3 循环": {
+    "en": "Cycle palette 3",
+    "ja": "パレット 3 を繰り返す"
+  },
+  "呼吸变色": {
+    "en": "Color breathing",
+    "ja": "カラーブレス"
+  },
+  "暗处柔和换色": {
+    "en": "Change color at low brightness",
+    "ja": "暗い部分で色を滑らかに変更"
+  },
+  "烛光": {
+    "en": "Candle",
+    "ja": "キャンドル"
+  },
+  "随机摇曳": {
+    "en": "Soft, irregular flicker",
+    "ja": "不規則で柔らかな揺らぎ"
+  },
+  "警灯": {
+    "en": "Red/blue flash",
+    "ja": "赤青フラッシュ"
+  },
+  "红蓝交替": {
+    "en": "Alternate red and blue",
+    "ja": "赤と青を交互に点灯"
+  },
+  "关灯": {
+    "en": "Off",
+    "ja": "消灯"
+  },
+  "全灭": {
+    "en": "Turn off all channels",
+    "ja": "全チャンネルを消灯"
+  },
+  "呼吸": {
+    "en": "Breathing",
+    "ja": "ブレス"
+  },
+  "三色渐变": {
+    "en": "RGB fade",
+    "ja": "RGB フェード"
+  },
+  "三色呼吸": {
+    "en": "RGB breathing",
+    "ja": "RGB ブレス"
+  },
+  "多色轮播": {
+    "en": "Palette cycle",
+    "ja": "パレットサイクル"
+  },
+  "三色跳变": {
+    "en": "RGB steps",
+    "ja": "RGB ステップ"
+  },
+  "三色连闪": {
+    "en": "RGB burst",
+    "ja": "RGB 連続フラッシュ"
+  },
+  "无法播放这个文件，请换一个音频文件": {
+    "en": "Cannot play this file. Choose another audio file.",
+    "ja": "このファイルは再生できません。別の音声ファイルを選んでください。"
+  },
+  "没拿到声音：共享时要勾上「同时分享标签页音频」": {
+    "en": "No audio received. Enable “Share tab audio” when sharing.",
+    "ja": "音声を取得できません。共有時に「タブの音声も共有する」を有効にしてください。"
+  },
+  "标签页声音": {
+    "en": "Tab audio",
+    "ja": "タブの音声"
+  },
+  "共享取消：{message}": {
+    "en": "Sharing canceled: {message}",
+    "ja": "共有をキャンセルしました：{message}"
+  },
+  "麦克风": {
+    "en": "Microphone",
+    "ja": "マイク"
+  },
+  "麦克风被拒：{message}": {
+    "en": "Microphone access denied: {message}",
+    "ja": "マイクへのアクセスが拒否されました：{message}"
+  },
+  "先连上棒子跑一会儿再点": {
+    "en": "Connect the lightstick and run an effect first.",
+    "ja": "先に応援棒を接続し、しばらく灯光効果を再生してください。"
+  },
+  "节拍脉冲": {
+    "en": "Beat pulse",
+    "ja": "ビートパルス"
+  },
+  "低音推亮度": {
+    "en": "Bass controls brightness",
+    "ja": "低音に合わせて明るさを変える"
+  },
+  "节拍换色": {
+    "en": "Beat colors",
+    "ja": "ビートカラー"
+  },
+  "每拍换一色": {
+    "en": "Change color on each beat",
+    "ja": "ビートごとに色を変更"
+  },
+  "频谱色": {
+    "en": "Spectrum color",
+    "ja": "スペクトルカラー"
+  },
+  "音高定颜色": {
+    "en": "Frequency controls color",
+    "ja": "周波数に合わせて色を変える"
+  },
+  "三频混色": {
+    "en": "Three-band mix",
+    "ja": "3 帯域ミックス"
+  },
+  "低红 中绿 高蓝": {
+    "en": "Bass: red · Mid: green · High: blue",
+    "ja": "低域：赤 · 中域：緑 · 高域：青"
+  },
+  "爆闪": {
+    "en": "Beat flash",
+    "ja": "ビートフラッシュ"
+  },
+  "拍上白闪": {
+    "en": "White flash on each beat",
+    "ja": "ビートに合わせて白く点滅"
+  },
+  "幻彩律动": {
+    "en": "Rainbow rhythm",
+    "ja": "レインボーリズム"
+  },
+  "流动色+拍点": {
+    "en": "Flowing colors and beat pulses",
+    "ja": "流れる色とビートパルス"
+  },
+  "发送失败 {message}": {
+    "en": "Send failed: {message}",
+    "ja": "送信できません：{message}"
+  },
+  "灯棒自主播放 · 屏幕仅示意": {
+    "en": "Device playback · Preview is approximate",
+    "ja": "本体で再生中 · 画面はイメージです"
+  },
+  "灯棒已确认": {
+    "en": "Device confirmed",
+    "ja": "本体が確認済み"
+  },
+  "切换失败，请重新连接": {
+    "en": "Mode change failed. Reconnect the lightstick.",
+    "ja": "モードを変更できません。再接続してください。"
+  },
+  "等待灯棒确认…": {
+    "en": "Waiting for device confirmation…",
+    "ja": "本体の確認を待っています…"
+  },
+  "先开启「允许快速闪光」，或选择呼吸、渐变。": {
+    "en": "Enable “Allow rapid flashing” first, or choose breathing or a fade.",
+    "ja": "先に「高速点滅を許可」を有効にするか、ブレスやフェードを選んでください。"
+  },
+  "固定": {
+    "en": "Fixed",
+    "ja": "固定"
+  },
+  "预设": {
+    "en": "Preset",
+    "ja": "プリセット"
+  },
+  "颜色与亮度由灯棒预设；屏幕仅示意。": {
+    "en": "The device sets color and brightness. The preview is approximate.",
+    "ja": "色と明るさは本体の設定を使います。画面はイメージです。"
+  },
+  "固定周期约 2.6 秒；屏幕仅示意。": {
+    "en": "Fixed cycle: about 2.6 seconds. The preview is approximate.",
+    "ja": "周期は約 2.6 秒で固定です。画面はイメージです。"
+  },
+  "灯棒自主闪烁；屏幕仅示意。": {
+    "en": "The device controls blinking. The preview is approximate.",
+    "ja": "点滅は本体が制御します。画面はイメージです。"
+  },
+  "灯棒预设 · 不提供实时 RGB 读回": {
+    "en": "Device preset · Live RGB values are not available",
+    "ja": "本体プリセット · RGB 値のリアルタイム取得はできません"
+  },
+  "基础 RGB {rgb} · 白光通道": {
+    "en": "Base RGB {rgb} · White channel",
+    "ja": "基本 RGB {rgb} · 白色チャンネル"
+  },
+  "基础 RGB {rgb} · RGB 通道": {
+    "en": "Base RGB {rgb} · RGB channels",
+    "ja": "基本 RGB {rgb} · RGB チャンネル"
+  },
+  "输出 RGB {rgb} · 白光通道": {
+    "en": "Output RGB {rgb} · White channel",
+    "ja": "出力 RGB {rgb} · 白色チャンネル"
+  },
+  "输出 RGB {rgb} · RGB 通道": {
+    "en": "Output RGB {rgb} · RGB channels",
+    "ja": "出力 RGB {rgb} · RGB チャンネル"
+  },
+  "选择音源": {
+    "en": "Choose an audio source",
+    "ja": "音源を選択"
+  },
+  "音源已停止": {
+    "en": "Audio stopped",
+    "ja": "音声を停止しました"
+  },
+  "屏幕预览 · 当前浏览器无法连接蓝牙": {
+    "en": "Preview · This browser cannot connect to Bluetooth",
+    "ja": "プレビュー · このブラウザーでは Bluetooth に接続できません"
+  },
+  "可以在屏幕上调色、播放灯效；当前浏览器尚未开放网页蓝牙。": {
+    "en": "Try colors and effects on screen. This browser does not provide Web Bluetooth.",
+    "ja": "画面上で色や灯光効果を試せます。このブラウザーは Web Bluetooth に対応していません。"
+  },
+  "仅预览": {
+    "en": "Preview only",
+    "ja": "プレビューのみ"
+  },
+  "纯红 · {hex}": {
+    "en": "Red · {hex}",
+    "ja": "赤 · {hex}"
+  },
+  "选择纯红 {hex}": {
+    "en": "Select red {hex}",
+    "ja": "赤 {hex} を選択"
+  },
+  "橙色 · {hex}": {
+    "en": "Orange · {hex}",
+    "ja": "オレンジ · {hex}"
+  },
+  "选择橙色 {hex}": {
+    "en": "Select orange {hex}",
+    "ja": "オレンジ {hex} を選択"
+  },
+  "黄色 · {hex}": {
+    "en": "Yellow · {hex}",
+    "ja": "黄 · {hex}"
+  },
+  "选择黄色 {hex}": {
+    "en": "Select yellow {hex}",
+    "ja": "黄 {hex} を選択"
+  },
+  "纯绿 · {hex}": {
+    "en": "Green · {hex}",
+    "ja": "緑 · {hex}"
+  },
+  "选择纯绿 {hex}": {
+    "en": "Select green {hex}",
+    "ja": "緑 {hex} を選択"
+  },
+  "青色 · {hex}": {
+    "en": "Cyan · {hex}",
+    "ja": "シアン · {hex}"
+  },
+  "选择青色 {hex}": {
+    "en": "Select cyan {hex}",
+    "ja": "シアン {hex} を選択"
+  },
+  "纯蓝 · {hex}": {
+    "en": "Blue · {hex}",
+    "ja": "青 · {hex}"
+  },
+  "选择纯蓝 {hex}": {
+    "en": "Select blue {hex}",
+    "ja": "青 {hex} を選択"
+  },
+  "品红 · {hex}": {
+    "en": "Magenta · {hex}",
+    "ja": "マゼンタ · {hex}"
+  },
+  "选择品红 {hex}": {
+    "en": "Select magenta {hex}",
+    "ja": "マゼンタ {hex} を選択"
+  },
+  "粉红 · {hex}": {
+    "en": "Pink · {hex}",
+    "ja": "ピンク · {hex}"
+  },
+  "选择粉红 {hex}": {
+    "en": "Select pink {hex}",
+    "ja": "ピンク {hex} を選択"
+  },
+  "白光 · {hex}": {
+    "en": "White · {hex}",
+    "ja": "白 · {hex}"
+  },
+  "选择白光 {hex}": {
+    "en": "Select white {hex}",
+    "ja": "白 {hex} を選択"
+  },
+  "连接失败，请检查电池和浏览器蓝牙权限（{detail}）": {
+    "en": "Connection failed. Check the batteries and Bluetooth permission. ({detail})",
+    "ja": "接続できません。電池とブラウザーの Bluetooth 権限を確認してください。（{detail}）"
+  },
+  "已复制": {
+    "en": "Copied",
+    "ja": "コピーしました"
+  },
+  "在微信 / QQ 里不能连接，请换到浏览器打开。": {
+    "en": "Cannot connect inside WeChat or QQ. Open this page in a browser.",
+    "ja": "WeChat / QQ 内では接続できません。ブラウザーでこのページを開いてください。"
+  },
+  "iPhone / iPad 需要先装一个免费 App 才能连接。": {
+    "en": "On iPhone or iPad, install a free app first to connect.",
+    "ja": "iPhone / iPad で接続するには、先に無料アプリをインストールしてください。"
+  },
+  "当前浏览器尚未开放网页蓝牙，可以在屏幕上调色、播放灯效。": {
+    "en": "This browser does not provide Web Bluetooth. Try colors and effects on screen.",
+    "ja": "このブラウザーは Web Bluetooth に対応していません。画面上で色や灯光効果を試せます。"
+  },
+  "查看连接方法": {
+    "en": "Connection guide",
+    "ja": "接続方法を見る"
+  },
+  "怎么连接": {
+    "en": "How to connect",
+    "ja": "接続方法"
+  }
+}

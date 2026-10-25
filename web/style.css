@@ -191,3 +191,5 @@ button.inline { min-height:0; padding:0; color:var(--web-ink); text-decoration:u
 .copy-row button { margin-left:0; }
 .guide-panel a { white-space:nowrap; margin-left:var(--web-space-2); }
 @media(max-width:767px) { .guide { padding:var(--web-space-4); } .guide-tabs { gap:0 var(--web-space-4); } }
+/* Translated action labels must fit narrow screens without truncation. */
+@media(max-width:767px){.connection-actions{display:grid;grid-template-columns:minmax(0,1fr) auto}.connection-actions #guideOpen{grid-column:1/-1;justify-self:start}.connection-actions #connect{min-width:0;white-space:normal}.connection-actions .power{grid-column:2}.guide-tabs{flex-wrap:wrap}}

@@ -1,0 +1,725 @@
+{
+  "跳到遥控器": {
+    "en": "Skip to controller",
+    "ja": "コントローラーへスキップ"
+  },
+  "请开启 JavaScript 使用遥控器。原理页仍可阅读。": {
+    "en": "Enable JavaScript to use the controller. You can still read the guide.",
+    "ja": "操作にはJavaScriptを有効にしてください。仕組みの解説はそのまま読めます。"
+  },
+  "应援棒遥控器": {
+    "en": "Lightstick controller",
+    "ja": "ペンライトコントローラー"
+  },
+  "未连接，可先试玩": {
+    "en": "Not connected. Try the preview.",
+    "ja": "未接続 · プレビューできます"
+  },
+  "连接应援棒": {
+    "en": "Connect lightstick",
+    "ja": "応援棒を接続"
+  },
+  "关灯": {
+    "en": "Turn off",
+    "ja": "消灯"
+  },
+  "色彩": {
+    "en": "Color",
+    "ja": "色"
+  },
+  "自选": {
+    "en": "Custom",
+    "ja": "カスタム"
+  },
+  "自选颜色": {
+    "en": "Custom color",
+    "ja": "カスタムカラー"
+  },
+  "色轮：拖动选择颜色，或展开精细调色使用滑块": {
+    "en": "Color wheel: drag to select a color, or open fine controls to use sliders",
+    "ja": "色相環：ドラッグで色を選択。細かく調整するにはスライダーを開いてください"
+  },
+  "快捷颜色": {
+    "en": "Color presets",
+    "ja": "カラープリセット"
+  },
+  "亮度": {
+    "en": "Brightness",
+    "ja": "明るさ"
+  },
+  "精细调色": {
+    "en": "Fine controls",
+    "ja": "細かく調整"
+  },
+  "色相": {
+    "en": "Hue",
+    "ja": "色相"
+  },
+  "浓度": {
+    "en": "Saturation",
+    "ja": "彩度"
+  },
+  "灯效": {
+    "en": "Effects",
+    "ja": "エフェクト"
+  },
+  "灯光预览": {
+    "en": "Light preview",
+    "ja": "ライトのプレビュー"
+  },
+  "常亮": {
+    "en": "Steady",
+    "ja": "常時点灯"
+  },
+  "屏幕预览": {
+    "en": "Screen preview",
+    "ja": "画面プレビュー"
+  },
+  "灯效类型": {
+    "en": "Effect type",
+    "ja": "エフェクトの種類"
+  },
+  "原生灯效": {
+    "en": "Native",
+    "ja": "内蔵"
+  },
+  "延伸灯效": {
+    "en": "Extended",
+    "ja": "拡張"
+  },
+  "音乐律动": {
+    "en": "Music",
+    "ja": "音楽"
+  },
+  "速度": {
+    "en": "Speed",
+    "ja": "速度"
+  },
+  "音乐文件": {
+    "en": "Audio file",
+    "ja": "音声ファイル"
+  },
+  "标签页": {
+    "en": "Browser tab",
+    "ja": "ブラウザーのタブ"
+  },
+  "麦克风": {
+    "en": "Microphone",
+    "ja": "マイク"
+  },
+  "选择音源": {
+    "en": "Choose an audio source",
+    "ja": "音源を選択"
+  },
+  "停止": {
+    "en": "Stop",
+    "ja": "停止"
+  },
+  "音频频谱": {
+    "en": "Audio spectrum",
+    "ja": "音声スペクトル"
+  },
+  "音乐灯效": {
+    "en": "Music effects",
+    "ja": "音楽エフェクト"
+  },
+  "灵敏度": {
+    "en": "Sensitivity",
+    "ja": "感度"
+  },
+  "声音同步": {
+    "en": "Audio sync",
+    "ja": "音声同期"
+  },
+  "延后": {
+    "en": "Delay",
+    "ja": "遅延"
+  },
+  "估算延迟": {
+    "en": "Estimate delay",
+    "ja": "遅延を推定"
+  },
+  "推迟音乐以贴合灯光，仅适用于文件和标签页。估算后可按观感微调。": {
+    "en": "Delay audio to match the light. Available for files and browser tabs only. Adjust by ear and eye after the estimate.",
+    "ja": "光に合わせて音声を遅らせます。ファイルとタブの音声のみ対応。推定後は実際の音と光を見て調整してください。"
+  },
+  "音频只在本机处理。": {
+    "en": "Audio stays on your device.",
+    "ja": "音声は端末内でのみ処理します。"
+  },
+  "闪光灯效": {
+    "en": "Flashing effects",
+    "ja": "点滅エフェクト"
+  },
+  "允许快速闪光": {
+    "en": "Allow fast flashing",
+    "ja": "高速点滅を許可"
+  },
+  "对闪光敏感请勿开启。": {
+    "en": "Do not enable this if you are sensitive to flashing light.",
+    "ja": "光の点滅に敏感な方は有効にしないでください。"
+  },
+  "蓝牙连接支持电脑 Chrome / Edge、Android Chrome。": {
+    "en": "Bluetooth control works in desktop Chrome / Edge and Android Chrome.",
+    "ja": "Bluetooth操作はパソコンのChrome / EdgeとAndroidのChromeに対応しています。"
+  },
+  "颜色微调": {
+    "en": "Color adjustment",
+    "ja": "色の補正"
+  },
+  "黄色中的绿": {
+    "en": "Green in yellow",
+    "ja": "黄色の緑成分"
+  },
+  "试黄色": {
+    "en": "Try yellow",
+    "ja": "黄色を試す"
+  },
+  "发绿往左，偏橙往右。默认值来自观感试调。": {
+    "en": "Move left if yellow looks green, or right if it looks orange. The default was adjusted by eye.",
+    "ja": "緑っぽければ左へ、オレンジっぽければ右へ。初期値は実物を見て調整した値です。"
+  },
+  "通道增益": {
+    "en": "Channel gains",
+    "ja": "チャンネル補正"
+  },
+  "启用手动修正": {
+    "en": "Enable manual correction",
+    "ja": "手動補正を有効にする"
+  },
+  "红": {
+    "en": "Red",
+    "ja": "赤"
+  },
+  "绿": {
+    "en": "Green",
+    "ja": "緑"
+  },
+  "蓝": {
+    "en": "Blue",
+    "ja": "青"
+  },
+  "试青色": {
+    "en": "Try cyan",
+    "ja": "シアンを試す"
+  },
+  "试品红": {
+    "en": "Try magenta",
+    "ja": "マゼンタを試す"
+  },
+  "重置增益": {
+    "en": "Reset gains",
+    "ja": "補正値をリセット"
+  },
+  "数值保存在此浏览器，默认不启用。白光使用独立灯珠，不受增益影响。": {
+    "en": "Values are saved in this browser. Correction is off by default. White uses a separate LED channel and is not affected.",
+    "ja": "値はこのブラウザーに保存されます。手動補正は初期状態では無効です。白色は独立したLEDチャンネルを使うため、補正の影響を受けません。"
+  },
+  "连接帮助": {
+    "en": "Connection help",
+    "ja": "接続ガイド"
+  },
+  "装好电池，在蓝牙弹窗中选择": {
+    "en": "Insert the batteries. In the Bluetooth dialog, select a device whose name starts with",
+    "ja": "電池を入れ、Bluetoothの選択画面で名前が"
+  },
+  "开头的设备。蓝灯闪完后即可操纵，网页灯效使用时请保持页面在前台。": {
+    "en": "to connect. Wait for the blue flashes to finish. Keep this page in the foreground while using browser effects.",
+    "ja": "で始まる機器を選んでください。青色の点滅が終わったら操作できます。ブラウザーで動かすエフェクトの使用中は、このページを前面に表示してください。"
+  },
+  "找不到设备时，请关闭其他已连接它的网页或程序，确认系统蓝牙与浏览器权限已开启，靠近棒子后重试。iPhone / iPad 的常规浏览器尚未开放网页蓝牙，只能屏幕预览；添加到主屏幕也不会改变这一点。": {
+    "en": "If the device is missing, close other pages or apps connected to it. Check system Bluetooth and browser permissions, move closer, and retry. Standard iPhone / iPad browsers do not expose Web Bluetooth. They support screen preview only. Adding the site to the Home Screen does not change this.",
+    "ja": "機器が見つからない場合は、接続中の別のページやアプリを閉じてください。端末のBluetoothとブラウザーの権限を確認し、ペンライトに近づいて再試行してください。iPhone / iPadの通常のブラウザーはWeb Bluetoothに対応しておらず、画面プレビューのみ利用できます。ホーム画面に追加しても、この制限は変わりません。"
+  },
+  "断开连接后灯光可能保持；需要熄灭时点关灯，或使用棒子的实体开关。": {
+    "en": "The light may stay on after disconnecting. To turn it off, use Turn off or the button on the lightstick.",
+    "ja": "切断後も点灯が続く場合があります。消すときは「消灯」かペンライト本体のボタンを使ってください。"
+  },
+  "连接详情": {
+    "en": "Connection details",
+    "ja": "接続の詳細"
+  },
+  "发送上限": {
+    "en": "Rate limit",
+    "ja": "送信上限"
+  },
+  "60 次/秒": {
+    "en": "60 / s",
+    "ja": "60回/秒"
+  },
+  "90 次/秒 · 试验": {
+    "en": "90 / s · experimental",
+    "ja": "90回/秒 · 試験用"
+  },
+  "120 次/秒 · 试验": {
+    "en": "120 / s · experimental",
+    "ja": "120回/秒 · 試験用"
+  },
+  "写入": {
+    "en": "Writes",
+    "ja": "書き込み"
+  },
+  "次/秒 · 指令回包": {
+    "en": "/ s · Replies",
+    "ja": "回/秒 · 応答"
+  },
+  "次/秒 · 写入耗时": {
+    "en": "/ s · Write time",
+    "ja": "回/秒 · 書き込み時間"
+  },
+  "你可以用网页控制鸣潮应援棒。看清内部硬件、蓝牙控制和演唱会场控原理，再去 GitHub 探索源码与研究记录。": {
+    "en": "Control a Wuthering Waves lightstick in your browser. Explore its hardware, Bluetooth control, and venue broadcast system. Find the source and research notes on GitHub.",
+    "ja": "ブラウザーで鳴潮のペンライトを操作。内部のハードウェア、Bluetooth操作、会場での一斉制御の仕組みを紹介します。ソースコードと調査記録はGitHubで確認できます。"
+  },
+  "它怎么工作 · 共鸣": {
+    "en": "How it works · Resonator",
+    "ja": "仕組み · Resonator"
+  },
+  "跳到正文": {
+    "en": "Skip to content",
+    "ja": "本文へスキップ"
+  },
+  "这支灯棒，": {
+    "en": "Your lightstick.",
+    "ja": "このペンライトを、"
+  },
+  "你也能控制": {
+    "en": "Your control.",
+    "ja": "自分の手で。"
+  },
+  "网页可以通过蓝牙控制你的鸣潮应援棒。你可以换颜色、调亮度和播放灯效。你无需拆机或更换固件。": {
+    "en": "Control your Wuthering Waves lightstick over Bluetooth. Change its color, adjust brightness, and play effects. No disassembly or firmware replacement is required.",
+    "ja": "鳴潮のペンライトをBluetoothで操作できます。色や明るさを変えたり、エフェクトを再生したりできます。分解やファームウェアの書き換えは不要です。"
+  },
+  "在 GitHub 查看共鸣项目": {
+    "en": "View Resonator on GitHub",
+    "ja": "GitHubでResonatorを見る"
+  },
+  "前往 GitHub": {
+    "en": "View on GitHub",
+    "ja": "GitHubを見る"
+  },
+  "演唱会观众举起蓝色应援棒，舞台上方亮起蓝色灯光": {
+    "en": "Concert audience holding blue lightsticks under blue stage lights",
+    "ja": "青いステージ照明の下で青色のペンライトを掲げる観客"
+  },
+  "里面有什么": {
+    "en": "Inside the lightstick",
+    "ja": "ペンライトの中身"
+  },
+  "放大查看拆开的研究样机": {
+    "en": "Enlarge the disassembled research sample",
+    "ja": "分解した調査用サンプルを拡大"
+  },
+  "拆开的研究样机，主板、电池仓和手柄外壳并排放置": {
+    "en": "Disassembled research sample with the controller board, battery holder, and handle shell side by side",
+    "ja": "制御基板、電池ホルダー、持ち手の外装を並べた調査用サンプル"
+  },
+  "手柄与电池": {
+    "en": "Handle and batteries",
+    "ja": "持ち手と電池"
+  },
+  "三节 AAA 电池给灯棒供电。控制板和电池仓都装在手柄内。图中是拆开的研究样机。": {
+    "en": "Three AAA batteries power the lightstick. The handle holds the controller board and battery holder. This photograph shows the disassembled research sample.",
+    "ja": "単4電池3本で動作します。持ち手の中に制御基板と電池ホルダーが入っています。写真は分解した調査用サンプルです。"
+  },
+  "放大查看控制板": {
+    "en": "Enlarge the controller board",
+    "ja": "制御基板を拡大"
+  },
+  "控制板正面，可见实体按键、主控芯片和板载天线": {
+    "en": "Front of the controller board with a button, controller chip, and printed antenna",
+    "ja": "ボタン、制御チップ、基板アンテナが見える制御基板の表面"
+  },
+  "控制板": {
+    "en": "Controller board",
+    "ja": "制御基板"
+  },
+  "控制板接收无线指令。板上的芯片执行指令。实体按键用于切换内置灯效。": {
+    "en": "The board receives wireless commands. Its chip executes them. The button switches between built-in effects.",
+    "ja": "基板が無線コマンドを受信し、チップが処理します。本体のボタンで内蔵エフェクトを切り替えます。"
+  },
+  "放大查看灯板": {
+    "en": "Enlarge the LED board",
+    "ja": "LED基板を拡大"
+  },
+  "灯板上的复合灯珠，可见白光区域和彩色发光区域": {
+    "en": "Composite LED on the light board with white and colored emitting regions",
+    "ja": "白色とカラーの発光部が見えるLED基板の複合LED"
+  },
+  "灯板": {
+    "en": "LED board",
+    "ja": "LED基板"
+  },
+  "灯板用红、绿、蓝三种光混色。芯片改变各路亮度，得到不同颜色。白光使用独立通道。": {
+    "en": "The LED board mixes red, green, and blue light. The chip adjusts each channel to produce different colors. White uses a separate channel.",
+    "ja": "赤・緑・青の光を混ぜて色を作ります。チップが各チャンネルの明るさを調整します。白色には独立したチャンネルを使います。"
+  },
+  "网页怎样控制它": {
+    "en": "Browser control",
+    "ja": "ブラウザーからの操作"
+  },
+  "网页通过蓝牙连接你选中的灯棒，直接发送控制指令": {
+    "en": "The browser connects to your selected lightstick over Bluetooth and sends commands directly",
+    "ja": "ブラウザーが選択したペンライトにBluetoothで接続し、コマンドを直接送信します"
+  },
+  "网页": {
+    "en": "Browser",
+    "ja": "ブラウザー"
+  },
+  "蓝牙": {
+    "en": "Bluetooth",
+    "ja": "Bluetooth"
+  },
+  "你的灯棒": {
+    "en": "Your lightstick",
+    "ja": "ペンライト"
+  },
+  "灯棒内置了蓝牙。我分析了它的控制指令，并把这些指令做成网页按钮。在支持网页蓝牙的浏览器中，你可以选择自己的灯棒并连接。": {
+    "en": "The lightstick has built-in Bluetooth. I analyzed its commands and turned them into browser controls. In a browser with Web Bluetooth, you can select and connect your own lightstick.",
+    "ja": "ペンライトにはBluetoothが内蔵されています。私はその制御コマンドを調べ、ブラウザーから操作できるようにしました。Web Bluetooth対応ブラウザーで、自分のペンライトを選んで接続できます。"
+  },
+  "你选好颜色后，浏览器把颜色指令发给灯棒。芯片读取指令，再调整灯珠。指令直接从你的设备发出，不经过网站服务器。": {
+    "en": "When you select a color, the browser sends a command to the lightstick. The chip reads it and adjusts the LED. Commands go directly from your device to the lightstick, not through the website server.",
+    "ja": "色を選ぶと、ブラウザーがペンライトへコマンドを送ります。チップがそれを読み取り、LEDを調整します。コマンドは端末からペンライトへ直接送られ、サイトのサーバーを経由しません。"
+  },
+  "灯珠和屏幕的出光不同。网页会先调整混色比例，再发送颜色。这些比例来自实物试调，不同批次的灯棒仍可能有色差。": {
+    "en": "LEDs and screens produce color differently. The browser adjusts the color mix before sending it. These ratios were tuned on a physical sample. Other batches may still show color differences.",
+    "ja": "LEDと画面では色の出方が異なります。ブラウザーは混色比率を補正してから送信します。比率は実物を見て調整したもので、製造ロットによって色が異なる場合があります。"
+  },
+  "演唱会怎样一起变色": {
+    "en": "Synchronized venue lighting",
+    "ja": "会場で色がそろう仕組み"
+  },
+  "样机固件里有一套现场接收逻辑。它接收专用发射器的无线广播。一次广播可以让多支灯棒执行指令，无需逐支配对。": {
+    "en": "The sample firmware has a venue receiver. It accepts broadcasts from a dedicated transmitter. One broadcast can control many lightsticks without pairing each one.",
+    "ja": "サンプルのファームウェアには会場用の受信処理があります。専用送信機の一斉送信を受け取り、1本ずつペアリングせずに多くのペンライトを操作できます。"
+  },
+  "每支灯棒保存一个组号。广播可设置颜色、亮度和灯效。分组指令可以让不同组显示不同颜色。": {
+    "en": "Each lightstick stores a group number. Broadcast commands set colors, brightness, and effects. Group commands can give different colors to different groups.",
+    "ja": "各ペンライトにはグループ番号が保存されています。一斉送信で色・明るさ・エフェクトを設定し、グループごとに異なる色を表示できます。"
+  },
+  "收到有效场控指令后，固件会锁住按键。持续约 30 分钟没有收到此类指令后，按键恢复。": {
+    "en": "A valid venue command locks the button. The button becomes available again after about 30 minutes without another valid venue command.",
+    "ja": "有効な会場制御コマンドを受信すると、ボタンがロックされます。その後、同種のコマンドを約30分間受信しなければ、再びボタンを使えるようになります。"
+  },
+  "以上来自样机固件分析，尚未做现场无线验证。照片只展示演出效果。": {
+    "en": "These findings come from sample firmware analysis. Venue radio operation has not been tested. The photographs show concert lighting only.",
+    "ja": "これはサンプルのファームウェア解析に基づく説明です。会場用無線通信の実機検証はしていません。写真は演出の様子を示すものです。"
+  },
+  "演出现场的观众举起粉色应援棒，舞台上有表演者和角色人偶": {
+    "en": "Concert audience holding pink lightsticks, with performers and character mascots on stage",
+    "ja": "ピンクのペンライトを掲げる観客と、ステージ上の出演者やキャラクターの着ぐるみ"
+  },
+  "现场发射器广播指令，多组灯棒接收同一广播，再按各自组号执行": {
+    "en": "A venue transmitter broadcasts commands to multiple lightstick groups, which respond according to their group numbers",
+    "ja": "会場の送信機がコマンドを一斉送信し、複数のペンライトが自分のグループ番号に応じて動作します"
+  },
+  "现场发射器": {
+    "en": "Venue transmitter",
+    "ja": "会場の送信機"
+  },
+  "无线广播": {
+    "en": "Radio broadcast",
+    "ja": "無線一斉送信"
+  },
+  "多组灯棒": {
+    "en": "Lightstick groups",
+    "ja": "ペンライトのグループ"
+  },
+  "你能用它做什么": {
+    "en": "What you can do",
+    "ja": "楽しみ方"
+  },
+  "选颜色": {
+    "en": "Choose a color",
+    "ja": "色を選ぶ"
+  },
+  "用色轮选择喜欢的颜色。调整亮度，用作桌面灯光或拍照道具。": {
+    "en": "Choose a color on the wheel. Adjust brightness for desk lighting or photographs.",
+    "ja": "色相環で好きな色を選びます。明るさを調整して、デスクの照明や撮影小物として使えます。"
+  },
+  "播放灯效": {
+    "en": "Play effects",
+    "ja": "エフェクトを再生"
+  },
+  "让亮度逐渐升降，形成呼吸效果。也可以让颜色连续变化。原生灯效由灯棒自行播放。延伸灯效由网页连续发送指令。": {
+    "en": "Let brightness rise and fall, or change colors continuously. Native effects run inside the lightstick. Extended effects use a stream of browser commands.",
+    "ja": "明るさをゆっくり変えたり、色を連続して切り替えたりできます。内蔵エフェクトはペンライト内部で動作します。拡張エフェクトはブラウザーからコマンドを連続送信します。"
+  },
+  "跟随音乐": {
+    "en": "Follow the music",
+    "ja": "音楽に合わせる"
+  },
+  "浏览器分析你提供的音频，把音量和节拍转成灯光变化。分析在你的设备上完成，本站不上传音频。": {
+    "en": "The browser analyzes your audio and turns volume and beats into light changes. Processing stays on your device. The site does not upload audio.",
+    "ja": "ブラウザーが音声を解析し、音量や拍に合わせて光を変えます。処理は端末内で行い、音声はアップロードしません。"
+  },
+  "源码与研究记录": {
+    "en": "Source and research",
+    "ja": "ソースコードと調査記録"
+  },
+  "页面未找到 · 共鸣": {
+    "en": "Page not found · Resonator",
+    "ja": "ページが見つかりません · Resonator"
+  },
+  "MoonShade · 共鸣首页": {
+    "en": "MoonShade · Resonator home",
+    "ja": "MoonShade · Resonator ホーム"
+  },
+  "这里没有页面。": {
+    "en": "Page not found.",
+    "ja": "ページが見つかりません。"
+  },
+  "这个链接不存在，回到遥控器继续玩吧。": {
+    "en": "This link does not exist. Return to the controller to continue.",
+    "ja": "このリンク先はありません。コントローラーに戻って続けてください。"
+  },
+  "回到遥控器": {
+    "en": "Back to controller",
+    "ja": "コントローラーに戻る"
+  },
+  "Resonator · 回到遥控器": {
+    "en": "Resonator · Back to controller",
+    "ja": "Resonator · コントローラーに戻る"
+  },
+  "Powered by @CloudyMoonShape": {
+    "en": "Powered by @CloudyMoonShape",
+    "ja": "Powered by @CloudyMoonShape"
+  },
+  "Photosensitive? Keep flashing effects off.": {
+    "en": "Photosensitive? Keep flashing effects off.",
+    "ja": "光の点滅に敏感な方は、点滅エフェクトを使わないでください。",
+    "zh": "对闪光敏感？请勿开启闪光灯效。"
+  },
+  "项目文档": {
+    "en": "Project documentation",
+    "ja": "プロジェクト資料"
+  },
+  "原理与开发 ↗": {
+    "en": "How it works ↗",
+    "ja": "仕組みと開発 ↗"
+  },
+  "源码许可 ↗": {
+    "en": "Source license ↗",
+    "ja": "ソースコードのライセンス ↗"
+  },
+  "Created by": {
+    "en": "Created by",
+    "ja": "制作：",
+    "zh": "制作："
+  },
+  "位共鸣者到访": {
+    "en": "Resonators visited",
+    "ja": "人の共鳴者が訪問"
+  },
+  "CloudyMoonShape 的社交链接": {
+    "en": "CloudyMoonShape on social media",
+    "ja": "CloudyMoonShape のSNS"
+  },
+  "X（Twitter）": {
+    "en": "X (Twitter)",
+    "ja": "X（Twitter）"
+  },
+  "原理 · 鸣潮音乐会应援棒控制工具": {
+    "en": "How it works · Wuthering Waves lightstick controller",
+    "ja": "仕組み · 鳴潮ペンライトコントローラー"
+  },
+  "连接说明": {
+    "en": "Connection guide",
+    "ja": "接続ガイド"
+  },
+  "其他设备": {
+    "en": "Other devices",
+    "ja": "その他の端末"
+  },
+  "找不到设备时，请关闭其他已连接它的网页或程序，确认系统蓝牙与浏览器权限已开启，靠近棒子后重试。iPhone / iPad、微信里打开，或手机浏览器连不上时，见": {
+    "en": "If the device is missing, close other pages or apps connected to it. Check system Bluetooth and browser permissions, move closer, and retry. For iPhone / iPad, WeChat, or other mobile browser issues, see",
+    "ja": "機器が見つからない場合は、接続中の別のページやアプリを閉じてください。端末のBluetoothとブラウザーの権限を確認し、ペンライトに近づいて再試行してください。iPhone / iPad、WeChat内の表示、その他のモバイルブラウザーで接続できない場合は、こちらをご覧ください："
+  },
+  "关闭": {
+    "en": "Close",
+    "ja": "閉じる"
+  },
+  "遥控用的是浏览器提供的「网页蓝牙」，和手机能不能连蓝牙耳机无关。连不上时仍可在屏幕上试玩。": {
+    "en": "Control requires Web Bluetooth in your browser. Support for Bluetooth headphones does not imply support for Web Bluetooth. You can still try the screen preview without a connection.",
+    "ja": "操作にはブラウザーのWeb Bluetooth機能が必要です。Bluetoothイヤホンが使えるかどうかとは別です。接続できなくても画面プレビューを試せます。"
+  },
+  "选择你的设备": {
+    "en": "Choose your device",
+    "ja": "端末を選択"
+  },
+  "电脑": {
+    "en": "Computer",
+    "ja": "パソコン"
+  },
+  "安卓": {
+    "en": "Android",
+    "ja": "Android"
+  },
+  "微信 / QQ": {
+    "en": "WeChat / QQ",
+    "ja": "WeChat / QQ"
+  },
+  "鸿蒙": {
+    "en": "HarmonyOS",
+    "ja": "HarmonyOS"
+  },
+  "Windows、Mac 用": {
+    "en": "On Windows or Mac, open this site in",
+    "ja": "WindowsやMacでは"
+  },
+  "或": {
+    "en": "or",
+    "ja": "または"
+  },
+  "打开本站，点「连接应援棒」即可。": {
+    "en": "and select “Connect lightstick”.",
+    "ja": "でこのサイトを開き、「応援棒を接続」を選んでください。"
+  },
+  "Mac 的 Safari、电脑版 Firefox 不能连接。": {
+    "en": "Safari on Mac and desktop Firefox cannot connect directly.",
+    "ja": "MacのSafariとパソコン版Firefoxでは直接接続できません。"
+  },
+  "用": {
+    "en": "Use",
+    "ja": "このサイトを"
+  },
+  "打开本站。首次连接时允许「附近的设备」或「位置」权限。": {
+    "en": "to open this site. When you first connect, allow “Nearby devices” or location access if requested.",
+    "ja": "で開いてください。初回接続時に求められた場合は、「付近のデバイス」または位置情報へのアクセスを許可してください。"
+  },
+  "手机自带浏览器、UC、夸克、QQ 浏览器等大多不能连接；连不上时复制网址，换到 Chrome 或 Edge 打开。": {
+    "en": "Most built-in mobile browsers, UC, Quark, and QQ Browser cannot connect. If connection fails, copy the URL and open it in Chrome or Edge.",
+    "ja": "端末標準のブラウザー、UC、Quark、QQ Browserなどは、多くの場合接続できません。接続できないときはURLをコピーし、ChromeかEdgeで開いてください。"
+  },
+  "复制网址": {
+    "en": "Copy URL",
+    "ja": "URLをコピー"
+  },
+  "iPhone / iPad 上所有浏览器都不能直接连接，需要先从 App Store 装一个免费 App，任选其一。App 界面是英文，下面写明了要点哪里。两个 App 都由第三方开发，与本站无关。": {
+    "en": "iPhone / iPad browsers need a native bridge for Bluetooth control. Install one of the free apps below from the App Store. Their interfaces are in English; the steps show what to select. Both are third-party apps and are not affiliated with this site.",
+    "ja": "iPhone / iPadのブラウザーからBluetoothで操作するには、接続を橋渡しするアプリが必要です。App Storeから、以下の無料アプリをどちらか1つインストールしてください。画面は英語ですが、選択する項目を下に示しています。どちらも当サイトとは関係のない第三者製アプリです。"
+  },
+  "方法一：Bluefy（最省事）": {
+    "en": "Option 1: Bluefy (simpler setup)",
+    "ja": "方法1：Bluefy（簡単に設定）"
+  },
+  "App Store 搜索": {
+    "en": "Search the App Store for",
+    "ja": "App Storeで"
+  },
+  "并安装，开发者是 PNN Soft。": {
+    "en": "and install it. The developer is PNN Soft.",
+    "ja": "を検索してインストールします。開発元はPNN Softです。"
+  },
+  "去 App Store": {
+    "en": "Open App Store",
+    "ja": "App Storeを開く"
+  },
+  "打开 Bluefy，在顶部地址栏粘贴本站网址。": {
+    "en": "Open Bluefy and paste this site’s URL into the address bar at the top.",
+    "ja": "Bluefyを開き、上部のアドレスバーにこのサイトのURLを貼り付けます。"
+  },
+  "点「连接应援棒」，系统询问蓝牙权限时点「好」，选": {
+    "en": "Select “Connect lightstick”. Allow Bluetooth access, then select a device whose name starts with",
+    "ja": "「応援棒を接続」を選び、Bluetoothへのアクセスを許可します。名前が"
+  },
+  "开头的设备。": {
+    "en": ".",
+    "ja": "で始まる機器を選んでください。"
+  },
+  "方法二：beacio（继续用 Safari）": {
+    "en": "Option 2: beacio (use Safari)",
+    "ja": "方法2：beacio（Safariを使う）"
+  },
+  "并安装，打开一次。": {
+    "en": "and install it. Open the app once.",
+    "ja": "を検索してインストールし、一度起動します。"
+  },
+  "回到 Safari 打开本站，点地址栏左侧「大小」图标（aA）→「管理扩展」→ 打开 beacio。": {
+    "en": "Return to Safari and open this site. Select the page settings icon (aA) beside the address bar, then “Manage Extensions”, and enable beacio.",
+    "ja": "Safariでこのサイトを開きます。アドレスバー横のページ設定アイコン（aA）から「機能拡張を管理」を選び、beacioを有効にします。"
+  },
+  "再点「大小」图标 → beacio →": {
+    "en": "Select the page settings icon again, then beacio, then",
+    "ja": "もう一度ページ設定アイコンを選び、beacio →"
+  },
+  "Enable on all websites": {
+    "en": "Enable on all websites",
+    "ja": "Enable on all websites",
+    "zh": "Enable on all websites"
+  },
+  "，系统弹窗里选「始终允许…」→「在所有网站上」。": {
+    "en": ". In the system prompt, select “Always Allow…” and then “On All Websites”.",
+    "ja": "を選びます。システムの確認画面で「常に許可…」→「すべてのWebサイト」を選びます。"
+  },
+  "刷新页面，点「连接应援棒」。": {
+    "en": "Reload the page and select “Connect lightstick”.",
+    "ja": "ページを再読み込みし、「応援棒を接続」を選びます。"
+  },
+  "beacio 只对 Safari 有效。两个 App 尚未与本站逐项实测，一个卡顿时可试另一个；音乐律动的「标签页」音源在 iPhone 上不可用。": {
+    "en": "beacio works only in Safari. Neither app has completed all tests with this site. If one stalls, try the other. The browser-tab audio source is not available on iPhone.",
+    "ja": "beacioはSafari専用です。どちらのアプリも当サイトとの全項目の実機テストは完了していません。片方がうまく動かない場合は、もう片方を試してください。iPhoneでは音楽の「ブラウザーのタブ」音源は使えません。"
+  },
+  "微信、QQ 里打开的网页都不能连接，需要换到浏览器：": {
+    "en": "Pages opened inside WeChat or QQ cannot connect. Open the page in a browser:",
+    "ja": "WeChatやQQ内で開いたページからは接続できません。ブラウザーで開いてください："
+  },
+  "点右上角": {
+    "en": "At the top right, select",
+    "ja": "右上のメニューを開きます："
+  },
+  "iPhone 选「在 Safari 中打开」，再按「iPhone」页装 App；安卓选「在浏览器打开」。": {
+    "en": "On iPhone, select “Open in Safari”, then follow the iPhone tab to install an app. On Android, select “Open in browser”.",
+    "ja": "iPhoneでは「Safariで開く」を選び、「iPhone」タブの手順でアプリをインストールします。Androidでは「ブラウザーで開く」を選びます。"
+  },
+  "安卓如果跳到的不是 Chrome / Edge，复制网址后换过去打开。": {
+    "en": "On Android, if the page opens in a browser other than Chrome or Edge, copy the URL and open it in one of those browsers.",
+    "ja": "AndroidでChromeやEdge以外が開いた場合は、URLをコピーしてChromeかEdgeで開き直してください。"
+  },
+  "HarmonyOS 4 及更早的版本能安装安卓版 Chrome，用法同安卓。": {
+    "en": "HarmonyOS 4 and earlier can install Android Chrome. Follow the Android steps.",
+    "ja": "HarmonyOS 4以前ではAndroid版Chromeをインストールできます。Androidの手順に従ってください。"
+  },
+  "HarmonyOS NEXT / 5 及以后的华为浏览器暂未确认能否连接，欢迎实测反馈。": {
+    "en": "Bluetooth control in Huawei Browser on HarmonyOS NEXT / 5 and later is not verified. Test reports are welcome.",
+    "ja": "HarmonyOS NEXT / 5以降のHuaweiブラウザーで接続できるかは未確認です。実機での結果をお知らせください。"
+  },
+  "。": {
+    "en": ".",
+    "ja": "。"
+  },
+  "共鸣者 · 鸣潮应援棒遥控器。打开网页，连接蓝牙，让颜色与音乐握在手里。": {
+    "en": "Resonator · Control your Wuthering Waves lightstick in your browser. Connect with Bluetooth and explore color and music.",
+    "ja": "Resonator · ブラウザーで鳴潮のペンライトを操作。Bluetoothでつないで、色と音楽を楽しもう。"
+  },
+  "共鸣者 · 鸣潮应援棒": {
+    "en": "Resonator · Wuthering Waves lightstick controller",
+    "ja": "Resonator · 鳴潮ペンライトコントローラー"
+  },
+  "共鸣者 · 鸣潮音乐会应援棒控制工具": {
+    "en": "Resonator · Wuthering Waves lightstick controller",
+    "ja": "Resonator · 鳴潮ペンライトコントローラー"
+  },
+  "它怎么工作 · 共鸣者": {
+    "en": "How it works · Resonator",
+    "ja": "仕組み · Resonator"
+  },
+  "在 GitHub 查看共鸣者项目": {
+    "en": "View Resonator on GitHub",
+    "ja": "GitHubでResonatorを見る"
+  },
+  "页面未找到 · 共鸣者": {
+    "en": "Page not found · Resonator",
+    "ja": "ページが見つかりません · Resonator"
+  },
+  "MoonShade · 共鸣者首页": {
+    "en": "MoonShade · Resonator home",
+    "ja": "MoonShade · Resonator ホーム"
+  },
+  "MoonShade · 共鸣者者首页": {
+    "en": "MoonShade · Resonator home",
+    "ja": "MoonShade · Resonator ホーム"
+  }
+}

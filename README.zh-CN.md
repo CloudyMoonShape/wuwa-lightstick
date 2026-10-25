@@ -4,11 +4,11 @@
   <img alt="Resonator" src="docs/assets/resonator.svg" width="360">
 </picture>
 
-在浏览器中控制你的鸣潮音乐会应援棒。
+共鸣者：在浏览器中控制你的鸣潮音乐会应援棒。
 
-**[打开控制台](https://wuwa.south-wall.com/)** · [开发文档](docs/zh-CN/README.md) · [English](README.md)
+**[打开控制台](https://wuwa.south-wall.com/?lang=zh)** · [开发文档](docs/zh-CN/README.md) · [English](README.md) · [日本語](README.ja.md)
 
-[![当前控制台：色轮、原生灯效、延伸灯效与音乐入口](docs/screenshots/controller-desktop.png)](https://wuwa.south-wall.com/)
+[![当前控制台：色轮、原生灯效、延伸灯效与音乐入口](docs/screenshots/controller-desktop.png)](https://wuwa.south-wall.com/?lang=zh)
 
 选颜色，播放灯效，让灯光跟随音乐。无需账号，也无需更换固件。
 
@@ -24,7 +24,9 @@
 3. 选择自己的 `JFKJ-FBFB` 设备。
 4. 等待三次蓝灯闪烁结束，再选择颜色或灯效。
 
-网站界面为中文。iPhone 和 iPad 上的 Safari、Chrome 没有 Web Bluetooth，只能屏幕预览；要在 iPhone 上连接，需先装免费的 Bluefy 浏览器或 beacio Safari 扩展。首页的「连接说明」弹窗按设备分页给出中文步骤。见[浏览器支持](docs/zh-CN/SDK.md)。
+网站支持中文、英文和日文，默认采用浏览器语言，也可手动切换。见[语言选择](docs/zh-CN/LOCALIZATION.md)。
+
+iPhone 和 iPad 上的 Safari、Chrome 没有原生 Web Bluetooth，只支持屏幕预览。连接说明介绍了 Bluefy 和 beacio Safari 扩展等可选桥接方式。这些方式需要安装，不属于浏览器原生支持。请打开连接说明查看对应设备的步骤。见[浏览器支持](docs/zh-CN/SDK.md)。
 
 研究样机采用 `HE-750G24` 主板和 `V4.1.8` 固件。其他硬件或固件版本可能有不同行为。闪光效果需要单独开启。
 
