@@ -1,0 +1,9 @@
+{
+  "ssh_host": "home-controller",
+  "remote_python": "/home/YOUR_USER/resonator-notify/venv/bin/python",
+  "remote_send": "/home/YOUR_USER/resonator-notify/send.py",
+  "source_tailnet_ip": "100.64.0.10",
+  "home_network": "192.168.1.0/24",
+  "timezone": "America/Los_Angeles",
+  "device_address": "REPLACE_WITH_LIGHTSTICK_BLE_ADDRESS"
+}
