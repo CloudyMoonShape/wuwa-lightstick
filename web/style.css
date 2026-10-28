@@ -219,3 +219,7 @@ input[type=range]{min-height:48px;touch-action:pan-y}input[type=range]:focus-vis
 .version-confirm {margin-top:24px;}
 .version-confirm button {width:100%;font-size:16px;min-height:48px;}
 @media(max-width:600px){.version-guide{padding:16px}.version-grid{grid-template-columns:1fr;gap:32px}.version-photo{aspect-ratio:4/3}.version-photo img{object-fit:contain}.version-progress,.version-card h3,.version-event{min-height:0}.version-state{font-size:20px}.version-card h3{font-size:19px}}
+
+.help-entry {position:relative;}
+.help-entry #help > summary {padding-inline-end:50%;}
+.help-entry .versions-shortcut {position:absolute;inset-block-start:0;inset-inline-end:0;max-width:48%;min-height:48px;padding:8px 0;background:transparent;color:var(--web-ink);text-decoration:underline;text-underline-offset:4px;white-space:normal;}
