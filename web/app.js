@@ -706,3 +706,31 @@ document.querySelectorAll('input[type="range"]').forEach(input => {
 const resetGains = $("calReset").onclick;
 $("calReset").onclick=()=>{resetGains();GAIN_IDS.forEach(id=>paintRange($(id)))};
 syncWheel();
+
+// First-visit compatibility guide; acknowledgement is separate from language.
+const versionsDialog = document.getElementById('versions');
+const versionsSeenKey = 'resonator.versions.seen.v1';
+function openVersions() {
+  document.querySelectorAll('[data-version-src]').forEach(image => {
+    if (!image.hasAttribute('src')) image.src = image.dataset.versionSrc;
+  });
+  if (!versionsDialog.open) versionsDialog.showModal();
+}
+function acknowledgeVersions() {
+  try { localStorage.setItem(versionsSeenKey, '1'); } catch {}
+}
+versionsDialog.addEventListener('submit', acknowledgeVersions);
+versionsDialog.addEventListener('cancel', acknowledgeVersions);
+versionsDialog.addEventListener('close', acknowledgeVersions);
+versionsDialog.addEventListener('click', event => {
+  if (event.target === versionsDialog) {
+    const rect = versionsDialog.getBoundingClientRect();
+    if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) versionsDialog.close();
+  }
+});
+document.addEventListener('click', event => {
+  if (event.target.closest('[data-versions]')) openVersions();
+});
+let versionsSeen = false;
+try { versionsSeen = localStorage.getItem(versionsSeenKey) === '1'; } catch {}
+if (!versionsSeen) openVersions();

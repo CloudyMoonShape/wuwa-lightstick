@@ -53,3 +53,7 @@ Earlier repository screenshots may show the previous game key visual from the [o
 The bilibili, X, Instagram, and GitHub SVG paths come from [Simple Icons](https://github.com/simple-icons/simple-icons/tree/4672316908c58ef9342f3069fe7ebe50d30d45b2/icons), revision `4672316908c58ef9342f3069fe7ebe50d30d45b2`, under [CC0 1.0](https://github.com/simple-icons/simple-icons/blob/4672316908c58ef9342f3069fe7ebe50d30d45b2/LICENSE.md).
 
 The icons identify social links. Trademark rights remain with their owners. Their presence does not indicate sponsorship. The site embeds the SVG paths and loads no icon library or social plug-in.
+
+## Compatibility photographs
+
+`web/assets/versions/` contains user-supplied photographs of the Los Angeles, Shanghai, and anniversary lightsticks. They identify hardware editions; character artwork remains the property of its respective rights holders. The images are separate, same-origin WebP files loaded when the version guide opens. Appearance is a guide, not proof of protocol compatibility.

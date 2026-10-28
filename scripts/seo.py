@@ -41,7 +41,7 @@ class PageParser(HTMLParser):
                 if tag == 'html' and key == 'lang': value = LANGUAGES[self.language]
                 if key in ('title','aria-label','alt','placeholder'):
                     value = self.messages.get(re.sub(r'\s+', ' ', value.strip()), {}).get(self.language, value)
-                if key in ('href','src','srcset','data-guide-src') and value.startswith(('assets/','moonshade/','LICENSE.txt')): value = '/' + value
+                if key in ('href','src','srcset','data-guide-src','data-version-src') and value.startswith(('assets/','moonshade/','LICENSE.txt')): value = '/' + value
                 if key == 'href' and value in ('/', 'principles.html', '/principles', '/principles.html'):
                     value = f'/{self.language}/' + ('principles' if 'principles' in value else '')
             result.append(key if value is None else key + '="' + escape(value, quote=True) + '"')

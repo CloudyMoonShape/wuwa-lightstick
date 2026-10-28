@@ -1,0 +1,102 @@
+{
+  "先识别你的应援棒": {
+    "en": "Identify your lightstick",
+    "ja": "お持ちのペンライトを確認"
+  },
+  "已支持": {
+    "en": "Supported",
+    "ja": "対応済み"
+  },
+  "等待样本": {
+    "en": "Awaiting sample",
+    "ja": "サンプル待ち"
+  },
+  "暂无计划": {
+    "en": "Not planned",
+    "ja": "対応予定なし"
+  },
+  "可连接并控制": {
+    "en": "Ready to connect and control",
+    "ja": "接続・操作できます"
+  },
+  "暂不支持，工程样本到货后逆向。": {
+    "en": "Not supported yet. Reverse engineering will start when a sample arrives.",
+    "ja": "現在は未対応。サンプル到着後に解析します。"
+  },
+  "暂不支持，暂无逆向计划。": {
+    "en": "Not supported. No reverse-engineering work is planned.",
+    "ja": "未対応。現在、解析の予定はありません。"
+  },
+  "2026 巡演版": {
+    "en": "2026 tour edition",
+    "ja": "2026年ツアー版"
+  },
+  "洛杉矶 · 新加坡 · 台北": {
+    "en": "Los Angeles · Singapore · Taipei",
+    "ja": "ロサンゼルス・シンガポール・台北"
+  },
+  "图示洛杉矶版：磨砂银色，手柄较粗短。": {
+    "en": "Los Angeles sample shown: matte silver, with a shorter, thicker handle.",
+    "ja": "写真はロサンゼルス版。つや消しシルバーで、持ち手は短く太めです。"
+  },
+  "2026 上海场": {
+    "en": "2026 Shanghai edition",
+    "ja": "2026年上海公演版"
+  },
+  "致予新世界": {
+    "en": "To the New World",
+    "ja": "To the New World"
+  },
+  "亮银色手柄，外形较修长。": {
+    "en": "Glossy silver handle, with a longer, slimmer shape.",
+    "ja": "光沢のあるシルバーで、持ち手は細長い形です。"
+  },
+  "一周年／二周年生日会版": {
+    "en": "1st / 2nd anniversary edition",
+    "ja": "1周年・2周年誕生日イベント版"
+  },
+  "鸣潮生日会": {
+    "en": "Wuthering Waves birthday event",
+    "ja": "鳴潮誕生日イベント"
+  },
+  "白色流线型手柄，整体较短。": {
+    "en": "White, curved handle. Shorter overall shape.",
+    "ja": "白い流線形の持ち手で、全体が短めです。"
+  },
+  "按钮疑似位于底部，待确认。": {
+    "en": "The button may be on the base; not confirmed.",
+    "ja": "ボタンは底面にあるようですが、未確認です。"
+  },
+  "外观仅供辅助识别。韩国版型号及兼容性尚未确认。": {
+    "en": "Appearance is only a guide. The Korean model and its compatibility are not confirmed.",
+    "ja": "外観は識別の目安です。韓国版の型式と対応状況は未確認です。"
+  },
+  "演唱会资料": {
+    "en": "Concert references",
+    "ja": "公演情報"
+  },
+  "知道了，开始使用": {
+    "en": "Got it, continue",
+    "ja": "確認して始める"
+  },
+  "支持的应援棒版本": {
+    "en": "Supported lightstick versions",
+    "ja": "対応ペンライト一覧"
+  },
+  "洛杉矶 · 10.17 ↗": {
+    "en": "Los Angeles · Oct 17 ↗",
+    "ja": "ロサンゼルス · 10/17 ↗"
+  },
+  "新加坡 · 09.26 ↗": {
+    "en": "Singapore · Sep 26 ↗",
+    "ja": "シンガポール · 9/26 ↗"
+  },
+  "台北 · 09.05 ↗": {
+    "en": "Taipei · Sep 5 ↗",
+    "ja": "台北 · 9/5 ↗"
+  },
+  "上海 · 07.16–18 ↗": {
+    "en": "Shanghai · Jul 16–18 ↗",
+    "ja": "上海 · 7/16–18 ↗"
+  }
+}
